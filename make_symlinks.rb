@@ -17,7 +17,7 @@ home = Pathname.new(ENV['HOME'])
 dotfiles = Pathname.new(__FILE__).realpath.dirname.expand_path
 puts "Source dir: #{dotfiles}"
 dotfiles.each_entry do |entry|
-  if ['.', '..', '.svn', File.basename(__FILE__)].include? entry.to_s
+  if (%w!. .. .svn .git! + [File.basename(__FILE__)]).include? entry.to_s
     puts "Skip: #{entry}"
     next
   end
