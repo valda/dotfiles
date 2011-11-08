@@ -1,0 +1,7 @@
+style "gtk-default-ja-utf8" {
+fontset = "-adobe-helvetica-medium-r-normal--12-100-100-100-p-76-iso8859-1,\
+-mplus-gothic-medium-r-normal--12-*-*-*-*-*-jisx0208.1983-0,\
+-misc-fixed-medium-r-normal--12-*-*-*-*-*-jisx0208.1983-0,\
+*-r-*"
+}
+class "GtkWidget" style "gtk-default-ja-utf8"

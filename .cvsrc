@@ -1,0 +1,3 @@
+diff -u
+update -d -P
+cvs -q

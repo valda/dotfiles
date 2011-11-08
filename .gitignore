@@ -1,0 +1,10 @@
+*~
+*.bak
+*.elc
+.emacs.d/.bm-repository
+.emacs.d/ac-comphist.dat
+.emacs.d/anything-c-adaptive-history
+.emacs.d/session.*
+.fluxbox/fbrun_history
+.fluxbox/lastwallpaper
+.mlterm/challenge

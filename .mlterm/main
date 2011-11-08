@@ -1,0 +1,13 @@
+fontsize=12
+step_in_changing_font_size=2
+use_anti_alias=false
+use_transbg=true
+scrollbar_mode=none
+fg_color=white
+bg_color=black
+fade_ratio=75
+brightness=25
+contrast=25
+input_method=scim
+encoding=auto
+not_use_unicode_font=true

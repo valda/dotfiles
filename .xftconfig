@@ -1,0 +1,7 @@
+match any family == "console"  edit family =+ "mono";
+match any family == "mono"     edit spacing = 100;
+
+match any family == "sans"  edit family += "MS PGothic";
+match any family == "serif" edit family += "MS PMincho";
+match any family == "fixed" edit family += "MS Gothic";
+match any family == "mono"  edit family += "MS Gothic";

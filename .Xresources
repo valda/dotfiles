@@ -1,0 +1,20 @@
+*VT100*background:              black
+*VT100*foreground:              white
+*VT100*scrollBar:               true
+*VT100*rightScrollBar:          true
+XTerm*utf8: 1
+XTerm*wideChars: true
+XTerm*locale: UTF-8
+XTerm*font: -efont-fixed-medium-r-normal--14-140-75-75-c-70-iso10646-1
+
+! Emacs for non-XIM
+Emacs*xnlLanguage: C
+Emacs.pane.menubar.*.borderWidth: 0
+Emacs.pane.menubar.*.shadowThickness: 1
+Emacs.pane.menubar.*.font: \
+	-adobe-helvetica-bold-r-normal--12-*-*-*-*-*-iso8859-1
+Emacs.pane.menubar.*.margin: 0
+!Emacs*MenuBar: off
+!Emacs*ToolBar: off
+
+Xcursor*theme: DMZ-White
