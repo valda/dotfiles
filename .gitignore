@@ -1,10 +1,95 @@
 *~
 *.bak
 *.elc
-.emacs.d/.bm-repository
-.emacs.d/ac-comphist.dat
-.emacs.d/anything-c-adaptive-history
-.emacs.d/session.*
-.fluxbox/fbrun_history
-.fluxbox/lastwallpaper
-.mlterm/challenge
+*.log
+*.stackdump
+/.android
+/.bash_history
+/.dvdcss
+/.emacs.d/.bm-repository
+/.emacs.d/ac-comphist.dat
+/.emacs.d/anything-c-adaptive-history
+/.emacs.d/server/server
+/.emacs.d/session.*
+/.emacs.d/tramp
+/.emacs.d/url/cookies
+/.eshell/history
+/.eshell/lastdir
+/.fastri-index
+/.fluxbox/fbrun_history
+/.fluxbox/lastwallpaper
+/.gem
+/.gimp-2.4
+/.gimp-2.6
+/.gnupg
+/.irb_history
+/.migemo-pattern
+/.mlterm/challenge
+/.navi2ch
+/.pit
+/.recentf
+/.recently-used.xbel
+/.rnd
+/.session
+/.smplayer
+/.ssh
+/.subversion
+/.thumbnails
+/.unison/
+/.viminfo
+/.wl
+/.zcompdump
+/.zsh-history
+/Access Connections/
+/Alcohol 52%/
+/AppData/
+/Application Data/
+/Bluetooth 交換フォルダ/
+/Contacts/
+/Cookies/
+/Desktop/
+/Documents/
+/Downloads/
+/Dropbox/
+/Favorites/
+/Fuji Xerox/
+/Launchy/
+/Links/
+/Local Settings/
+/Music/
+/My Documents/
+/My Dropbox/
+/My Music/
+/My Pictures/
+/My Videos/
+/My Virtual Machines/
+/NTUSER.DAT*
+/NetHood/
+/Pictures/
+/PrintHood/
+/Recent/
+/Saved Games/
+/Searches/
+/SendTo/
+/SharedFolder/
+/Videos/
+/Visual Studio 2005/
+/Visual Studio Projects/
+/_viminfo
+/bak/
+/desktop.ini
+/disable_compressefolder_for_win7/
+/emacs23-build/
+/fontconfig/
+/mplayer/
+/ntuser.dat*
+/ntuser.ini
+/opt/
+/src/
+/test/
+/tmp/
+/wc/
+/workspace/
+/スタート メニュー/
+/マイ壁紙/
+/伊集院/
