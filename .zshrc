@@ -256,11 +256,15 @@ if [ "$EMACS" = t -o "$TERM" = dumb ]; then
 fi
 
 #-------------------------------------------------------------------------
-# rbenv 
+# rbenv
 #-------------------------------------------------------------------------
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
 source $HOME/.rbenv/completions/rbenv.zsh
+rehash () {
+    rbenv rehash
+    builtin rehash
+}
 
 #-------------------------------------------------------------------------
 resume-ssh-agent
