@@ -126,6 +126,7 @@ myabbrev=(
 'lg' '| grep'
 'lx' '| xargs -r'
 '0lx' '-print0 | xargs -0 -r'
+'be' 'bundle exec'
 )
 
 my-expand-abbrev() {
