@@ -1,0 +1,3 @@
+[submodule ".emacs.d/elisp/emacs-rails"]
+	path = .emacs.d/elisp/emacs-rails
+	url = git://github.com/remvee/emacs-rails.git
