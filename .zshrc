@@ -259,12 +259,14 @@ fi
 #-------------------------------------------------------------------------
 # rbenv
 #-------------------------------------------------------------------------
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
-rehash () {
-    rbenv rehash
-    builtin rehash
-}
+if [ -d "$HOME/.rbenv" ]; then
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    eval "$(rbenv init -)"
+    rehash () {
+        rbenv rehash
+        builtin rehash
+    }
+fi
 
 #-------------------------------------------------------------------------
 resume-ssh-agent
