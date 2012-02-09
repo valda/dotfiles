@@ -1,0 +1,32 @@
+/* -*- coding: utf-8 -*- */
+
+/* ブックマークの"タブですべて開く"を非表示 */
+.openintabs-menuitem, .bookmarks-actions-menuseparator { display: none !important; }
+
+/* 新しいタブボタンを非表示 */
+.tabs-newtab-button { display:none !important; }
+
+/* ::::: ツールバーのカスタマイズのアイコン表示を変更 ::::: */
+#palette-box {
+    float: left !important;
+    overflow-x: hidden !important;
+}
+#palette-box .paletteRow {
+    display: inline !important;
+}
+#palette-box > hbox > toolbarpaletteitem {
+    display: inline !important;
+    vertical-align: middle !important;
+    margin: 5px !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+
+/* ::::: Firefox 9 タブマウスオーバーで閉じるボタンを表示 ::::: */
+.tabbrowser-tab[fadein]:not([pinned]):not(:hover):not([selected="true"]) .tab-close-button {
+    display: none !important;
+}
+.tabbrowser-tab[fadein]:not([pinned]):hover .tab-close-button {
+    display: -moz-box !important;
+}
+
