@@ -46,6 +46,7 @@ refererChanger:{
 		'api.e-map.ne.jp': '@NORMAL',
 	    'pics.dmm.co.jp' : '@FORGE',
 	    'stat.ameba.jp' : '@BLOCK',
+	    'fpsunknown.com' : '@BLOCK',
 		//下はデバッグ用
 		//'taruo.net' : 'example.co.jp',
 	};
