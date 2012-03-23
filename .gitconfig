@@ -38,3 +38,5 @@
 	token = !pit get github 2>/dev/null | awk '/token:/ {print $2}'
 [gui]
 	recentrepo = C:/Fallout 3
+[http]
+	proxy = 
