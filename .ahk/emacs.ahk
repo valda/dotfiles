@@ -421,10 +421,3 @@ scroll_down()
 	IfMsgBox, Yes
 		ExitApp
 	Return
-
-; Winキー単体は当然殺すべき
-~LWin::
-~RWin::
-LWin Up::
-RWin Up::
-	return
