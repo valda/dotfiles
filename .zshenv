@@ -36,7 +36,7 @@ export GREP_OPTIONS="--color=auto"
 export LV='-Ou8 -c'
 export TZ='JST-9'
 export GISTY_DIR=$HOME/wc/gists
-#export GST_TAG_ENCODING=CP932
+export GST_TAG_ENCODING=CP932
 export GST_ID3_TAG_ENCODING=CP932
 if [ -x /usr/share/source-highlight/src-hilite-lesspipe.sh ]
     then
