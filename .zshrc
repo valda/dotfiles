@@ -214,33 +214,33 @@ chpwd () {
 preexec() {
     # screen のタイトルを更新
     if [ "${TERM[0,6]}" = screen ]; then
-	emulate -L zsh
-	local -a cmd; cmd=(${(z)2})
-	case $cmd[1] in
-	    fg)
-		if (( $#cmd == 1 )); then
-		    cmd=(builtin jobs -l %+)
-		else
-		    cmd=(builtin jobs -l $cmd[2])
-		fi
-		;;
-	    %*)
-		cmd=(builtin jobs -l $cmd[1])
-		;;
-	    cd)
-		if (( $#cmd == 2 )); then
-		    cmd[1]=$cmd[2]
-		fi
-		;&
-	    *)
-		echo -ne "\033k$cmd[1]:t\033\\"
-		return
-		;;
-	esac
-	local -A jt; jt=(${(kv)jobtexts})
-	$cmd >>(read num rest
-	    cmd=(${(z)${(e):-\$jt$num}})
-	    echo -ne "\033k$cmd[1]:t\033\\") 2>/dev/null
+    emulate -L zsh
+    local -a cmd; cmd=(${(z)2})
+    case $cmd[1] in
+        fg)
+        if (( $#cmd == 1 )); then
+            cmd=(builtin jobs -l %+)
+        else
+            cmd=(builtin jobs -l $cmd[2])
+        fi
+        ;;
+        %*)
+        cmd=(builtin jobs -l $cmd[1])
+        ;;
+        cd)
+        if (( $#cmd == 2 )); then
+            cmd[1]=$cmd[2]
+        fi
+        ;&
+        *)
+        echo -ne "\033k$cmd[1]:t\033\\"
+        return
+        ;;
+    esac
+    local -A jt; jt=(${(kv)jobtexts})
+    $cmd >>(read num rest
+        cmd=(${(z)${(e):-\$jt$num}})
+        echo -ne "\033k$cmd[1]:t\033\\") 2>/dev/null
     fi
 }
 
@@ -267,6 +267,16 @@ if [ -d "$HOME/.rbenv" ]; then
         builtin rehash
     }
 fi
+
+#-------------------------------------------------------------------------
+# local::lib
+#-------------------------------------------------------------------------
+eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+
+#-------------------------------------------------------------------------
+# z.sh - https://github.com/rupa/z.git
+#-------------------------------------------------------------------------
+test -e z/z.sh && source z/z.sh
 
 #-------------------------------------------------------------------------
 resume-ssh-agent
