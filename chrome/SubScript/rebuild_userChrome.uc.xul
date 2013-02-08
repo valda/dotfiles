@@ -8,10 +8,13 @@
 // @include        main
 // @compatibility  Firefox 3.5b4pre 3.6a1pre 4.0b7pre
 // @author         Alice0775
+// @version        2012/11/30 22:00 ubuntu12.04.1 "chromeフォルダを開く" に失敗することがあるのを修正
+// ==/UserScript==
+// @version        2012/09/30 09:00 ubuntu12.04.1 "chromeフォルダを開く" に失敗することがあるのを修正
+// @version        2012/02/25 23:00 restart
 // @version        2010/10/25 22:00 Bug 574688 adon bar
 // @version        2010/07/04 00:00 nsDragAndDrop
 // @version        2009/11/14 00:00 Seamonkeyに対応
-// ==/UserScript==
 // @version        2009/08/24 00:00 Namoroka3.6a2pre で右クリックでのスクリプト編集時にコンテキストメニューが表示されるのを修正
 // @version        2009/04/10 00:00 Minefield3.6a1pre での動作改善
 // @version        2009/03/27 00:00 nsIProcess変更
@@ -25,6 +28,7 @@
 // @version        2007/12/14 19:00 日本語のファイル名のスクリプトの有効/無効が機能していなかったのを修正
 // @version        2007/12/14 17:00 スクリプトの有効/無効/編集を設定できるようにした
 // @Note           使用するエディタを編集しておくこと
+// @Note           Required Sub-Script/Overlay Loader v3.0.38mod( https://github.com/alice0775/userChrome.js/blob/master/userChrome.js )
  -->
 <script type="application/javascript" xmlns="http://www.w3.org/1999/xhtml"><![CDATA[
   var userChromejs = {
@@ -260,7 +264,7 @@
       menuitem.setAttribute('checked', !flag);
 
       var menupopup = document.getElementById("userChromejs_options");
-      for(var i = 3, len = menupopup.childNodes.length; i < len; i++){
+      for(var i = 4, len = menupopup.childNodes.length; i < len; i++){
         menupopup.removeChild(menupopup.lastChild);
       }
 
@@ -528,6 +532,40 @@
             }
         }
     },
+
+    restartApp: function() {
+      const appStartup = Components.classes["@mozilla.org/toolkit/app-startup;1"]
+                        .getService(Components.interfaces.nsIAppStartup);
+
+      // Notify all windows that an application quit has been requested.
+      var os = Components.classes["@mozilla.org/observer-service;1"]
+                         .getService(Components.interfaces.nsIObserverService);
+      var cancelQuit = Components.classes["@mozilla.org/supports-PRBool;1"]
+                                 .createInstance(Components.interfaces.nsISupportsPRBool);
+      os.notifyObservers(cancelQuit, "quit-application-requested", null);
+
+      // Something aborted the quit process.
+      if (cancelQuit.data)
+        return;
+
+      // Notify all windows that an application quit has been granted.
+      os.notifyObservers(null, "quit-application-granted", null);
+
+      // Enumerate all windows and call shutdown handlers
+      var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+                         .getService(Components.interfaces.nsIWindowMediator);
+      var windows = wm.getEnumerator(null);
+      var win;
+      while (windows.hasMoreElements()) {
+        win = windows.getNext();
+        if (("tryToClose" in win) && !win.tryToClose())
+          return;
+      }
+      let XRE = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime);
+      if (typeof XRE.invalidateCachesOnRestart == "function")
+        XRE.invalidateCachesOnRestart();
+      appStartup.quit(appStartup.eRestart | appStartup.eAttemptQuit);
+    }
   }
   userChromejs.init();
 
@@ -592,9 +630,12 @@
         <menuitem label="userChrome.jsの再構築/新しいウィンドウ"
                   accesskey="x"
                   oncommand="userChromejs.rebuild();"/>
+        <menuitem label="ブラウザを再起動する"
+                  accesskey="r"
+                  oncommand="userChromejs.restartApp();"/>
         <menuitem label="chromeフォルダを開く"
                   accesskey="h"
-                  oncommand='Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("UChrm", Components.interfaces.nsILocalFile).launch();'/>
+                  oncommand='new Components.Constructor("@mozilla.org/file/local;1","nsILocalFile", "initWithPath")(Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("UChrm", Components.interfaces.nsIFile).path).reveal();'/>
       </menupopup>
     </menu>
 
@@ -618,9 +659,12 @@
         <menuitem label="userChrome.jsの再構築/新しいウィンドウ"
                   accesskey="x"
                   oncommand="userChromejs.rebuild();"/>
+        <menuitem label="再起動する"
+                  accesskey="r"
+                  oncommand="userChromejs.restartApp();"/>
         <menuitem label="chromeフォルダを開く"
                   accesskey="h"
-                  oncommand='Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("UChrm", Components.interfaces.nsILocalFile).launch();'/>
+                  oncommand='new Components.Constructor("@mozilla.org/file/local;1","nsILocalFile", "initWithPath")(Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("UChrm", Components.interfaces.nsIFile).path).reveal();'/>
       </menupopup>
     </menu>
 

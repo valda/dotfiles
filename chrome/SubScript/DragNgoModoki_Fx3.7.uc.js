@@ -5,6 +5,19 @@
 // @include        main
 // @compatibility  Firefox 4.0 5.0 6.0 7.0 8 9 10.0a1
 // @author         Alice0775
+// @version        2013/01/08 02:00 Bug 827546
+// ==/UserScript==
+// @version        2013/01/01 15:00 Avoid to overwrite data on dragstart. And Bug 789546
+// @version        2012/10/24 23:00 href=javascript://のリンクテキストの処理変更
+// @version        2012/10/06 23:00 Bug 795065 Add privacy status to nsDownload
+// @version        2012/10/06 07:00 Bug 722872  call .init(null) for nsITransferable instance
+// @version        2012/07/10 12:00 'テキストをConQueryで検索'にlink追加
+// @version        2012/06/01 23:00 regression 04/19
+// @version        2012/05/04 13:00 Bug 741216 対策
+// @version        2012/04/19 00:05 debugなし
+// @version        2012/04/19 00:00 designModeはなにもしないようにした
+// @version        2012/03/01 12:00 isTabEmpty使うように
+// @version        2012/02/12 16:00 fixed Bug 703514
 // @version        2012/01/31 11:00 by Alice0775  12.0a1 about:newtab
 // @version        2012/01/30 01:00 tavClose, this.sourcenode = null;
 // @version        2011/07/22 21:00 Bug 50660 [FILE]Drag and drop for file upload form control (Fx7 and later)
@@ -12,7 +25,6 @@
 // @version        2011/06/23 16:00 openLinkInにした
 // @version        2011/06/22 00:00 getElementsByXPath 配列で返すのを忘れていた
 // @version        2011/06/19 21:00 Google modified getElementsByXPath
-// ==/UserScript==
 // @version        2011/04/14 21:00 Google doc などでdrag drop uploadができないので外部ファイルのドロップは止め
 // @version        2011/03/30 10:20 プロンプト
 // @version        2011/03/29 14:20 copyToSearchBar, appendToSearchBar, searchWithEngine 追加変更
@@ -81,7 +93,7 @@ var DragNGo = {
     {dir:'U', modifier:'',name:'xpi/jarインストール',obj:'xpi,jar',cmd:function(self,event,info){self.installXpi(info.urls);}},
     {dir:'U', modifier:'',name:'リンクを新しいタブ前面に開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'tab', null);}},
     {dir:'D', modifier:'',name:'リンクを新しいタブ後面に開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'tabshifted', null);}},
-    {dir:'DU', modifier:'',name:'リンクを新しいタブでaguse.jp検索',obj:'link, textlink',cmd:function(self,event,info){self.searchWithEngine(info.urls, ['aguse.jp'], 'tab');}},
+    //{dir:'D', modifier:'',name:'リンクを新しいタブでaguse.jp検索',obj:'link, textlink',cmd:function(self,event,info){self.searchWithEngine(info.urls, ['aguse.jp'], 'tab');}},
     {dir:'L', modifier:'',name:'リンクを現在のタブ開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'current', null);}},
 
   /*=== 画像 ===*/
@@ -93,7 +105,7 @@ var DragNGo = {
     {dir:'R', modifier:'',name:'テキストをConQueryで検索',obj:'text',cmd:function(self,event,info){self.openConQueryPopup(event);}},
     {dir:'UL', modifier:'',name:'テキストを現在のタブでgooウェブ検索(Green Label)',obj:'link, text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['gooウェブ検索(Green Label)'], 'current');}},
     {dir:'U', modifier:'',name:'テキストを新しいタブでGoogle検索',obj:'text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'tab');}},
-    {dir:'D', modifier:'',name:'テキストを新しいタブ後面でGoogle検索',obj:'text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'tabshifted');}},
+    {dir:'D', modifier:'',name:'テキストを現在のタブでGoogle検索',obj:'text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'current');}},
     {dir:'DL', modifier:'',name:'リンクテキストを新しいタブでGoogle検索',obj:'link',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'tab');}},
     {dir:'UL', modifier:'',name:'テキストを新しいタブでAmazon.com検索',obj:'link, text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Amazon.com'], 'tab');}},
     {dir:'UR', modifier:'',name:'テキストを新しいタブでYahoo! JAPAN検索',obj:'link, text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Yahoo! JAPAN'], 'tab');}},
@@ -114,8 +126,8 @@ var DragNGo = {
     {dir:'RD', modifier:'',name:'画像をD:/hogeに保存(SF)',obj:'image',cmd:function(self,event,info){if('saveFolderModoki' in window){saveFolderModoki.saveLink(info.urls[0], info.texts[0], 'D:\\hoge');}else{ self.saveLinkToLocal(info.urls[0],info.fname[0],'D:/hoge', true);}}},
     {dir:'RD', modifier:'',name:'リンクをD:/に保存(SF)',obj:'link',cmd:function(self,event,info){if('saveFolderModoki' in window){saveFolderModoki.saveLink(info.urls[0], info.texts[0], 'D:\\');}else{ self.saveLinkToLocal(info.urls[0],info.fname[0],'D:/', false);}}},
 */
-    {dir:'RD', modifier:'',name:'画像を名前を受けて保存'  ,obj:'image',cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0]);}},
-    {dir:'RD', modifier:'',name:'リンクを名前を受けて保存',obj:'link' ,cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0]);}},
+    {dir:'RD', modifier:'',name:'画像を名前を受けて保存'  ,obj:'image',cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0], info.nodes[0].ownerDocument, info.nodes[0].ownerDocument);}},
+    {dir:'RD', modifier:'',name:'リンクを名前を受けて保存',obj:'link' ,cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0], info.nodes[0].ownerDocument, info.nodes[0].ownerDocument);}},
 
   /*=== appPathをparamsで開く, paramsはtxtで置き換えcharsetに変換される ===*/
     {dir:'U', modifier:'shift,ctrl',name:'リンクをInternet Explorerで開く',obj:'link',cmd:function(self,event,info){self.launch(info.urls[0], "C:\\Program Files\\Internet Explorer\\iexplore.exe",["%%URL%%"],"Shift_JIS");}},
@@ -141,7 +153,7 @@ var DragNGo = {
         var p = prompt('Input word to search under the domain('+_document.location.hostname+'):', info.texts[0]);
         if(p)
           _document.location.href = 'http://www.google.com/search?as_qdr=y15&q=site:' +
-                                    _document.location.href.split('/')[2] + 
+                                    _document.location.href.split('/')[2] +
                                     ' '+encodeURIComponent(p);
       }
     },
@@ -278,9 +290,7 @@ var DragNGo = {
         return false;
       var url = submission.uri.spec;
       if (/tab|window/.test(where) && (
-          !gBrowser.mCurrentBrowser.docShell.busyFlags &&
-          !gBrowser.mCurrentBrowser.docShell.restoringDocument &&
-          ("isBlankPageURL" in window ? isBlankPageURL(gBrowser.currentURI.spec) : gBrowser.currentURI.spec == "about:blank") ||
+          isTabEmpty(gBrowser.selectedTab) ||
           this.currentRegExp.test(url)))
         where = 'current';
       switch (where) {
@@ -290,7 +300,7 @@ var DragNGo = {
           if (loadInBackground) {
             if (where == 'tabshifted')
                where = 'tab';
-            else if (where == 'tab') 
+            else if (where == 'tab')
               where = 'tabshifted'
           }
           if ("TreeStyleTabService" in window)
@@ -355,9 +365,7 @@ var DragNGo = {
       doc = content.document;
     urls.forEach(function(url){
       if (/tab|window/.test(where) && (
-          !gBrowser.mCurrentBrowser.docShell.busyFlags &&
-          !gBrowser.mCurrentBrowser.docShell.restoringDocument &&
-           ("isBlankPageURL" in window ? isBlankPageURL(gBrowser.currentURI.spec) : gBrowser.currentURI.spec == "about:blank") ||
+          isTabEmpty(gBrowser.selectedTab) ||
           self.currentRegExp.test(url)))
         where = 'current';
       switch (where) {
@@ -367,7 +375,7 @@ var DragNGo = {
           if (loadInBackground) {
             if (where == 'tabshifted')
                where = 'tab';
-            else if (where == 'tab') 
+            else if (where == 'tab')
               where = 'tabshifted'
           }
           if ("TreeStyleTabService" in window)
@@ -399,6 +407,19 @@ var DragNGo = {
 
   openConQueryPopup: function openConQueryPopup(event) {
     if (typeof cqrShowHotmenu !='undefined')
+      if (!this.selection) {
+        var dragService = Cc["@mozilla.org/widget/dragservice;1"]
+                          .getService(Ci.nsIDragService);
+        var dragSession = dragService.getCurrentSession();
+        var sourceNode = dragSession.sourceNode;
+        if (sourceNode instanceof HTMLAnchorElement) {
+          var range = this.focusedWindow.document.createRange()
+          range.selectNodeContents(sourceNode)
+          var sel = this.focusedWindow.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
       cqrShowHotmenu(null, event.screenX, event.screenY);
   },
 
@@ -487,7 +508,10 @@ var DragNGo = {
 
     try {
       //saveURL(url, fpath, null, false, skipPrompt, null);
-      persist.saveURI( uri, null, null, null, "", file);
+      let privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
+                                .getInterface(Ci.nsIWebNavigation)
+                                .QueryInterface(Ci.nsILoadContext);
+      persist.saveURI( uri, null, null, null, "", file, privacyContext);
     } catch (ex) {
       alert('failed:\n' + ex);
       file = null;
@@ -551,23 +575,27 @@ var DragNGo = {
     return file; // nsILocalFileObject or null
   },
 
-  saveAs: function(aURL, aFileName, aReferrer){
+  saveAs: function(aURL, aFileName, aReferrer, aSourceDocument){
+    if (aReferrer instanceof HTMLDocument) {
+      aReferrer = aReferrer.documentURIObject;
+    }
     var contentType = this.getContentType(aURL);
-    if (this.imageLinkRegExp.test(aURL) || /^image\//i.test(contentType)){
-      if (/^data:/.test(aURL))
-        saveImageURL(aURL, "index.png", null, true, false, aReferrer );
-      else
-        saveImageURL(aURL, null, null, false, false, aReferrer );
+    if (this.imageLinkRegExp.test(aURL) || /^image\//i.test(contentType)) {
+      if (/^data:/.test(aURL)) {
+        saveImageURL(aURL, "index.png", null, true, false, aReferrer, aSourceDocument);
+      } else {
+        saveImageURL(aURL, null, null, false, false, aReferrer, aSourceDocument);
+      }
     }else{
-      this.saveURL(aURL, aFileName, null, true, false, aReferrer );
+      this.saveURL(aURL, aFileName, null, true, false, aReferrer, aSourceDocument);
     }
   },
 
   //urlを名前を付けて保存
   saveURL: function saveURL(aURL, aFileName, aFilePickerTitleKey, aShouldBypassCache,
-                 aSkipPrompt, aReferrer){
+                 aSkipPrompt, aReferrer, aSourceDocument) {
     window.saveURL(aURL, aFileName, aFilePickerTitleKey, aShouldBypassCache,
-                 aSkipPrompt, aReferrer)
+                 aSkipPrompt, aReferrer, aSourceDocument)
   },
 
   //aURLのcontentTypeをキャッシュから得る
@@ -661,7 +689,7 @@ var DragNGo = {
       function buildNextInstall() {
           if (pos == URLs.length) {
               if (installs.length > 0) {
-                  AddonManager.installAddonsFromWebpage("application/x-xpinstall", this, null, installs);
+                  AddonManager.installAddonsFromWebpage("application/x-xpinstall", window, null, installs);
               }
               return;
           }
@@ -892,16 +920,22 @@ var DragNGo = {
     return arr;
   },
 
-  isParentEditableNode: function(node) {
-    while (node && node.parentNode) {
+  isParentEditableNode: function isParentEditableNode(node){
+    //if (Components.lookupMethod(node.ownerDocument, 'designMode').call(node.ownerDocument) == 'on')
+    //  return node;
+    while (node) {
       try {
+        if (!(node instanceof Ci.nsIDOMNSEditableElement))
+          throw 0;
         node.QueryInterface(Ci.nsIDOMNSEditableElement);
         if (!node.hasOwnProperty("type") || node.type != "file")
           return node;
       }
       catch(e) {
       }
-      if (node.isContentEditable)
+      if (/input|textarea/.test(node.localName))
+        return node;
+      if (node.isContentEditable || node.contentEditable=='true')
         return node;
       node = node.parentNode;
     }
@@ -924,6 +958,9 @@ var DragNGo = {
       // Setup a transfer item to retrieve the file data
       var trans = Cc["@mozilla.org/widget/transferable;1"]
                   .createInstance(Ci.nsITransferable);
+      if (!trans)
+        return;
+      trans.init(null);
       flavours.forEach(function (flavour) {
         trans.addDataFlavor(flavour);
       });
@@ -1088,10 +1125,14 @@ var DragNGo = {
 
     // 転送データをセットする
     if (event.originalTarget instanceof HTMLImageElement) {
-      event.dataTransfer.mozSetDataAt("application/x-moz-node", event.originalTarget , 0);
-      event.dataTransfer.mozSetDataAt("text/x-moz-url", event.originalTarget.src+"\n"+event.originalTarget.src ,0);
-      event.dataTransfer.mozSetDataAt("text/uri-list", event.originalTarget.src ,0);
-      event.dataTransfer.mozSetDataAt("text/plain", event.originalTarget.src ,0);
+      if (!event.dataTransfer.mozGetDataAt("application/x-moz-node" ,0))
+        event.dataTransfer.mozSetDataAt("application/x-moz-node", event.originalTarget , 0);
+      if (!event.dataTransfer.mozGetDataAt("text/x-moz-url" ,0))
+        event.dataTransfer.mozSetDataAt("text/x-moz-url", event.originalTarget.src+"\n"+event.originalTarget.src ,0);
+      if (!event.dataTransfer.mozGetDataAt("text/uri-list" ,0))
+        event.dataTransfer.mozSetDataAt("text/uri-list", event.originalTarget.src ,0);
+      if (!event.dataTransfer.mozGetDataAt("text/plain" ,0))
+        event.dataTransfer.mozSetDataAt("text/plain", event.originalTarget.src ,0);
     }
     // xxx Bug 475045 Can't drag unlinkified URL to bookmarks toolbar (regression from Firefox 3)
     if (event.originalTarget instanceof Text) {
@@ -1107,11 +1148,21 @@ var DragNGo = {
           if (arr[i].match(this.linkRegExp)) {
             try {
               uri = makeURI(RegExp.$1);
-              event.dataTransfer.mozSetDataAt("text/x-moz-url", uri.spec + "\n" + uri.spec, j);
+             if (!event.dataTransfer.mozGetDataAt("text/x-moz-url", j))
+               event.dataTransfer.mozSetDataAt("text/x-moz-url", uri.spec + "\n" + uri.spec, j);
               j++;
             } catch (ex) {}
           }
         }
+      }
+    }
+    // xxx Bug 703514 - can't drag bookmarklet to toolbar  (regression from Firefox 4)
+    if (event.originalTarget instanceof HTMLAnchorElement) {
+      var href = event.originalTarget.href;
+      if (/^javascript:/.test(href)) {
+        var str = gatherTextUnder(event.originalTarget);
+        if (!event.dataTransfer.mozGetDataAt("text/x-moz-url", 0))
+          event.dataTransfer.mozSetDataAt("text/x-moz-url", href + "\n" + str, 0);
       }
     }
   },
@@ -1160,7 +1211,6 @@ var DragNGo = {
     return (flg == flg1);
   },
 
-
   dragover: function dragover(event) {
     var self = this;
     var dragService = Cc["@mozilla.org/widget/dragservice;1"]
@@ -1190,9 +1240,11 @@ var DragNGo = {
       return;
     }
 
-    if (this.isParentEditableNode(target))
+    //designModeなら何もしない
+    if (target.ownerDocument instanceof HTMLDocument && Components.lookupMethod(target.ownerDocument, 'designMode').call(target.ownerDocument) == 'on') {
+      self.setStatusMessage('', 0, false);
       return;
-
+    }
     // do nothing if event.defaultPrevented (maybe hosted d&d by web page)
     if (event.defaultPrevented)
       return;
@@ -1217,11 +1269,13 @@ var DragNGo = {
         return;
       }
       // file以外のドロップ
+
       // input/textarea何もしないで置く
-      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+      if (self.isParentEditableNode(target)) {
         self.setStatusMessage('', 0, false);
         return;
       }
+
 
       for (var i = 0; i < self.GESTURES.length; i++) {
         var GESTURES = self.GESTURES[i];
@@ -1250,10 +1304,11 @@ var DragNGo = {
       return;
     } else if (sourceNode && !isSameBrowser) { //別ブラウザから
       // input/textarea何もしないで置く
-      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+      if (self.isParentEditableNode(target)) {
         self.setStatusMessage('', 0, false);
         return;
       }
+
       for (var i = 0; i < self.GESTURES.length; i++) {
         var GESTURES = self.GESTURES[i];
         // 方向はないこと
@@ -1283,7 +1338,9 @@ var DragNGo = {
 
     // 同じブラウザ内から
     // input/textarea何もしないで置く
-    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+    if (target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        self.isParentEditableNode(target)) {
       self.setStatusMessage('', 0, false);
       return;
     }
@@ -1384,6 +1441,13 @@ var DragNGo = {
               info.files.push(null);
               info.fname.push(self.candidateFname(data, url));
               self.sourcenode = data;
+            } else if(url) {
+              info.urls.push(null);
+              info.texts.push(gatherTextUnder(data));
+              info.nodes.push(data);
+              info.files.push(null);
+              info.fname.push(null);
+              self.sourcenode = data;
             }
           }
           break;
@@ -1443,7 +1507,7 @@ var DragNGo = {
                 if (url.trim() && self.dragDropSecurityCheck(event, dragSession, url)) {
                   info.urls.push(url);
                   info.texts.push(url);
-                  info.nodes.push(null);
+                  info.nodes.push(node);
                   info.files.push(null);
                   info.fname.push(self.candidateFname(null, url));
                 }
@@ -1453,7 +1517,7 @@ var DragNGo = {
                 if (url.trim() && self.dragDropSecurityCheck(event, dragSession, url)) {
                   info.urls.push(url);
                   info.texts.push(url);
-                  info.nodes.push(null);
+                  info.nodes.push(node);
                   info.files.push(null);
                   info.fname.push(self.candidateFname(null, url));
                 }

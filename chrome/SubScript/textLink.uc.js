@@ -5,12 +5,17 @@
 // @include        main
 // @include        chrome://messenger/content/messenger.xul
 // @include        chrome://messenger/content/messageWindow.xul
-// @compatibility  Firefox 2.0 3.0 3.5, Thunderbird 2.0
+// @compatibility  Firefox 10, Thunderbird 10
 // @author         Alice0775
 // @note           Left DblClick        : open link on  new tab
 // @note           ctrl + Left DblClick : open current tab
 // @note           shift + Left DblClick: save as link
 // @note           全角で書かれたURLを解釈するには,user.jsにおいて,user_pref("network.enableIDN", true);
+// @version        2013/01/18 23:00 Bug 795065 Add privacy status to nsDownload
+// @version        2013/01/08 02:00 Bug 827546
+// ==/UserScript==
+// @version        checkLoadURIStrWithPrincipal
+// @version        2012/07/26 15:00 .hoge とか ..huga はスキップ
 // @version        2011/11/28 09:00 update TLD リスト
 // @version        2011/11/23 19:00 エラー修正
 // @version        2011/11/05 11:00 textNodeの隣がnullで親の隣がbrなら探索を終わりにしてみる
@@ -23,7 +28,6 @@
 // @version        2010/09/29 22:00 aタグは無視するように
 // @version        2010/09/15 18:00 input要素で誤動作していた
 // @version        2010/03/22 19:00 tldcheck正規表現修正
-// ==/UserScript==
 // @version        2009/11/30 01:00 ブロックレベル要素としてblockquote忘れてた
 // @version        2009/08/30 01:00 "|"も追加
 // @version        2009/07/05 09:00 末尾の.,削除するようにした
@@ -147,7 +151,7 @@ function ucjs_textlink(event){
 
   //親ブロック要素の文字列をすべて得る
     const allowedParents = [
-        /*"a",*/"abbr", "acronym", "address", "applet", "b", "bdo", "big", "blockquote", "body",
+        "a","abbr", "acronym", "address", "applet", "b", "bdo", "big", "blockquote", "body",
         "caption", "center", "cite", "code", "dd", "del", "dir", "div", "dfn", "dl", "dt", "em",
         "fieldset", "font", "form", "h1", "h2", "h3", "h4", "h5", "h6", "i", "iframe",
         "ins", "kdb", "li", "menu", "noframes", "noscript", "object", "ol", "p", "pre", "q", "samp", "small", "span", "strike",
@@ -300,6 +304,9 @@ function ucjs_textlink(event){
 
 //debug(i1 +" "+ si +" "+ ei +" "+ i2);
     if (i1 <= si && ei <= i2){
+      // .hoge とか ..huga はスキップ
+      if (/^\./.test(arrUrl[i]) && !/^[\.]+[/]/.test(arrUrl[i]))
+        return;
 //debug(arrUrl[i]);
       //このURLと思しき文字列の中にレンジが含まれていたので,これをURLとして新しいタブで開きましょう
       var url = arrUrl[i];
@@ -329,7 +336,7 @@ function ucjs_textlink(event){
       var URIFixup = Components.classes['@mozilla.org/docshell/urifixup;1']
                      .getService(Components.interfaces.nsIURIFixup);
       try{
-//debug(url);
+debug(url);
         var uri = URIFixup.createFixupURI(
             url,
             URIFixup.FIXUP_FLAG_NONE ); //FIXUP_FLAG_ALLOW_KEYWORD_LOOKUP→FIXUP_FLAG_NONE
@@ -407,6 +414,8 @@ function ucjs_textlink(event){
     //  return node;
     while (node && node.parentNode) {
       try {
+        if (!(node instanceof Ci.nsIDOMNSEditableElement))
+          throw 0;
         node.QueryInterface(Ci.nsIDOMNSEditableElement);
         return node;
       }
@@ -424,9 +433,12 @@ function ucjs_textlink(event){
   function isValidTld(aURI){
     const regexpTLD = new RegExp("\\.(arpa|asia|int|nato|cat|com|net|org|info|biz|name|pro|mobi|museum|coop|aero|edu|gov|jobs|mil|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bu|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cp|cr|cs|sk|cu|cv|cx|cy|cz|dd|de|dg|dj|dk|dm|do|dz|ea|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|fx|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|ic|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|me|md|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nt|nu|nz|om|pa|pc|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|ss|st|su|sv|sy|sz|ta|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|wg|ws|yd|ye|yt|yu|za|zm|zr|zw|localhost)\\.?$","");
     const regexpIP = new RegExp("^[1-2]?[0-9]?[0-9]\\.[1-2]?[0-9]?[0-9]\\.[1-2]?[0-9]?[0-9]\\.[1-2]?[0-9]?[0-9]$","");
+    const idnService = Components.classes["@mozilla.org/network/idn-service;1"]
+                             .getService(Components.interfaces.nsIIDNService);
     var host, tlds;
     try {
       host = aURI.host.split('/')[0];
+      host = idnService.convertUTF8toACE(host);
     } catch(e) {
       if (aURI.spec.match(/^(.+?\/\/(?:[^\/]+@)?)([^\/]+)(:\d+)?(?:.*)$/)) {
         host = RegExp.$2;
@@ -459,13 +471,17 @@ function ucjs_textlink(event){
         if(event.shiftKey)
           saveAsURL(uri, doc);
         else
-          openNewTab(uri);
+          openNewTab(uri, doc);
       }catch(e){}
       closeContextMenu();
   }
 
   function saveAsURL(uri, doc){
     var linkText = uri.spec;
+    var aReferrer = doc;
+    if (aReferrer instanceof HTMLDocument) {
+      aReferrer = aReferrer.documentURIObject;
+    }
     //Thunderbird
     if (/^chrome:\/\/messenger\/content\//.test(window.location.href)) {
       // URL Loading Security Check
@@ -475,11 +491,14 @@ function ucjs_textlink(event){
       var secMan = Components.classes["@mozilla.org/scriptsecuritymanager;1"]
                              .getService(nsIScriptSecurityManager);
       try {
-        secMan.checkLoadURIStr(sourceURL, uri.spec, nsIScriptSecurityManager.STANDARD);
+        if (uri instanceof Components.interfaces.nsIURI)
+         secMan.checkLoadURIWithPrincipal(doc.nodePrincipal, uri, nsIScriptSecurityManager.STANDARD);
+        else
+         secMan.checkLoadURIStrWithPrincipal(doc.nodePrincipal, uri, nsIScriptSecurityManager.STANDARD);
       } catch (e) {
-        throw "Load of " + url + " denied.";
+        throw "Load denied.";
       }
-      saveURL( uri.spec, linkText, null, true );
+      saveURL( uri.spec, linkText, null, true, false ,aReferrer , doc);
       return;
     }
 
@@ -489,11 +508,10 @@ function ucjs_textlink(event){
     else
       urlSecurityCheck(uri.spec, activeBrowser().currentURI.spec,Ci.nsIScriptSecurityManager.DISALLOW_SCRIPT);
 
-    saveURL( uri.spec, linkText, null, true, false,
-             makeURI(doc.location.href, doc.characterSet) );
+    saveURL( uri.spec, linkText, null, true, false, aReferrer , doc );
   }
 
-  function openNewTab(uri){
+  function openNewTab(uri, doc){
     //Thunderbird
     if (/^chrome:\/\/messenger\/content\//.test(window.location.href)) {
       // Make sure we are allowed to open this URL
@@ -504,9 +522,12 @@ function ucjs_textlink(event){
       var secMan = Components.classes["@mozilla.org/scriptsecuritymanager;1"]
                              .getService(nsIScriptSecurityManager);
       try {
-        secMan.checkLoadURIStr(sourceURL, uri.spec, nsIScriptSecurityManager.STANDARD);
+        if (uri instanceof Components.interfaces.nsIURI)
+         secMan.checkLoadURIWithPrincipal(doc.nodePrincipal, uri, nsIScriptSecurityManager.STANDARD);
+        else
+         secMan.checkLoadURIStrWithPrincipal(doc.nodePrincipal, uri, nsIScriptSecurityManager.STANDARD);
       } catch (e) {
-        throw "Load of " + url + " denied.";
+        throw "Load denied.";
       }
       var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"]
                         .getService(Components.interfaces.nsIExternalProtocolService);
@@ -625,6 +646,8 @@ function ucjs_textlink(event){
     var node = aRange.commonAncestorContainer.parentNode;
     while (node && node.parentNode){
       try {
+        if (!(node instanceof Components.interfaces.nsIDOMNSEditableElement))
+          throw 0;
         node.QueryInterface(Components.interfaces.nsIDOMNSEditableElement);
         return node;
       }
