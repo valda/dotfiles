@@ -13,6 +13,8 @@ is_pre_spc = 0
 ; 必要の無い部分はコメントアウトして下さい
 is_target()
 {
+	IfWinActive,ahk_class IrfanView
+		Return 1
 	IfWinActive,ahk_class ConsoleWindowClass ;Cygwin
 		Return 1
 ;	IfWinActive,ahk_class MEADOW ;Meadow
