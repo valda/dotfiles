@@ -2,8 +2,6 @@ set nocompatible
 filetype on
 syntax on
 set cindent
-set smartindent
-set autoindent
 set backspace=indent,eol,start
 set paste
 set incsearch
@@ -73,4 +71,3 @@ set backup
 set backupdir=~/bak
 set directory=~/tmp
 set autoread
-set backspace=indent,eol,start
