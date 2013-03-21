@@ -29,7 +29,7 @@ setopt magic_equal_subst
 
 HISTFILE="$HOME/.zsh-history"
 HISTSIZE=10000
-SAVEHIST=1000000
+SAVEHIST=10000
 WORDCHARS="`echo $WORDCHARS|sed 's!/!!'`"
 
 case $ZSH_VERSION in
