@@ -10,6 +10,8 @@ export LANG=ja_JP.UTF-8
 export LC_CTYPE=ja_JP.UTF-8
 export LANGUAGE=ja
 export GDK_USE_XFT=1
+export GST_TAG_ENCODING=CP932
+export GST_ID3_TAG_ENCODING=CP932
 
 [ -z $GTK_IM_MODULE ] && export GTK_IM_MODULE=ibus
 [ -z $QT_IM_MODULE ] && export QT_IM_MODULE=ibus
