@@ -1,8 +1,8 @@
 ## General
 background no
 disable_auto_reload true
-update_interval 2.0
-update_interval_on_battery 5.0
+update_interval 3.0
+update_interval_on_battery 10.0
 total_run_times 0
 double_buffer yes
 text_buffer_size 8192
@@ -48,10 +48,10 @@ override_utf8_locale yes
 #draw_shades yes
 #default_shade_color black
 draw_outline yes
-default_outline_color 203040
+default_outline_color 202030
 
 ## Color
-default_color white
+default_color e0e0e0
 # Title
 color1 5070e0
 # Bar
@@ -91,16 +91,17 @@ ${color1}System ${hr}
 ${color } ${nodename} - ${sysname} ${kernel} on ${machine}
 ${color } Uptime: ${uptime}
 ${color1}${voffset 3}Processor ${hr}
-${color } CPU ${freq_g 0}GHz: ${color2}${cpubar cpu0}
+${color } CPU0 ${freq_g 0}GHz: ${color2}${cpubar cpu0}
 ${color }${template0 0 20 325}${voffset -5}
+${color } CPU1 ${freq_g 1}GHz: ${color2}${cpubar cpu1}
 ${color }${template0 1 20 325}${voffset -5}
 ${color }${template7 20 325}${voffset -5}
 ${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O
 ${color }${template8 1 150 200 250 300}
 ${color1}${voffset 3}Memory ${hr}
-${color } RAM: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}
+${color } Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}
+${color } buffers/cache: ${buffers}/${cached}
 ${color } Swap: ${swap}/${swapmax} - ${swapperc}%${goto 190}${color2}${swapbar}
-${color } B/C: ${buffers}/${cached}
 ${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM
 ${color }${template8 2 150 200 250 300}
 ${color1}${voffset 3}Disk${hr}
