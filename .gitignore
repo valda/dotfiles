@@ -6,6 +6,7 @@
 /.android
 /.bash_history
 /.dvdcss
+/.emacs.d/custom.el
 /.emacs.d/.bm-repository
 /.emacs.d/ac-comphist.dat
 /.emacs.d/anything-c-adaptive-history
