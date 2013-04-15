@@ -91,10 +91,10 @@ ${color1}System ${hr}
 ${color } ${nodename} - ${sysname} ${kernel} on ${machine}
 ${color } Uptime: ${uptime}
 ${color1}${voffset 3}Processor ${hr}
-${color } CPU0 ${freq_g 0}GHz: ${color2}${cpubar cpu0}
-${color }${template0 0 20 325}${voffset -5}
 ${color } CPU1 ${freq_g 1}GHz: ${color2}${cpubar cpu1}
 ${color }${template0 1 20 325}${voffset -5}
+${color } CPU2 ${freq_g 2}GHz: ${color2}${cpubar cpu2}
+${color }${template0 2 20 325}${voffset -5}
 ${color }${template7 20 325}${voffset -5}
 ${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O
 ${color }${template8 1 150 200 250 300}
