@@ -1,7 +1,7 @@
 ## General
 background no
 disable_auto_reload true
-update_interval 3.0
+update_interval 5.0
 update_interval_on_battery 10.0
 total_run_times 0
 double_buffer yes
@@ -36,7 +36,7 @@ no_buffers no
 
 ## Text/Font Settings
 use_xft yes
-xftfont Arial:size=9
+xftfont Arial:Bold:size=12
 xftalpha 0.8
 uppercase no
 override_utf8_locale yes
@@ -45,21 +45,21 @@ override_utf8_locale yes
 #draw_borders no
 #border_width 1
 #stippled_borders 8
-#draw_shades yes
-#default_shade_color black
-draw_outline yes
-default_outline_color 202030
+draw_shades yes
+default_shade_color 185e5c
+#draw_outline yes
+#default_outline_color 202030
 
 ## Color
-default_color e0e0e0
+default_color ffffff
 # Title
-color1 5070e0
+color1 7cd1cb
 # Bar
-color2 2d56ab
+color2 337f7c
 # Top Title
-color3 5070e0
+color3 356866
 # Top 1
-color4 fbff8a
+color4 9cd1cf
 #color5
 #color6
 #color7
@@ -68,50 +68,61 @@ color4 fbff8a
 
 ## Template
 # CPU Graph <num> <height> <width>
-template0 ${cpugraph cpu\1 \2,\3 40b0ff 2d56ab  100 -t}${offset -\3} CPU\1: ${cpu cpu\1}%
+template0 ${cpugraph cpu\1 \2,\3 337f7c 7cd1cb  100 -t}${offset -\3} CPU\1: ${cpu cpu\1}%
 # CPU Top <num> <indent1> <indent2> <indent3> <indent4>
 template1 ${top name \1}${goto \2}${top pid \1}${goto \3}${top cpu \1}${goto \4}${top mem \1}${goto \5}${top io_perc \1}
 # Memory Top <num> <indent1> <indent2> <indent3> <indent4>
 template2 ${top_mem name \1}${goto \2}${top_mem pid \1}${goto \3}${top_mem mem_vsize \1}${goto \4}${top_mem mem_res \1}${goto \5}${top_mem mem \1}
 # Disk I/O Graph <device> <type> <height> <width>
-template3 ${diskiograph_\2 \1 \3,\4 40b0ff 2d56ab 10000 -t}${offset -\4} /dev/\1 \2: ${diskio_\2 \1}
+template3 ${diskiograph_\2 \1 \3,\4 337f7c 7cd1cb 10000 -t}${offset -\4} /dev/\1 \2: ${diskio_\2 \1}
 # Disk I/O Top <num> <indent1> <indent2> <indent3> <indent4>
 template4 ${top_io name \1}${goto \2}${top_io pid \1}${goto \3}${top_io io_read \1}${goto \4}${top_io io_write \1}${goto \5}${top_io io_perc \1}
 # Network Graph <ethN> <type> <height> <width>
-template5 ${\2speedgraph \1 \3,\4 40b0ff 2d56ab 1000 -t}${offset -\4} \1 \2: ${\2speed \1}
+template5 ${\2speedgraph \1 \3,\4 337f7c 7cd1cb 1000 -t}${offset -\4} \1 \2: ${\2speed \1}
 # Disk Bar <name> <path>
-template6 \1 ${goto 55} ${fs_used \2}/${fs_size \2} ${goto 150} ${color2} ${fs_bar 6 \2}
+template6 \1 ${goto 55} ${fs_used \2}/${fs_size \2} ${goto 150} ${color2} ${fs_bar 6 \2}${color}
 # Load Average Graph <height> <width>
-template7 ${loadgraph \1,\2 40b0ff 2d56ab 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}
+template7 ${loadgraph \1,\2 337f7c 7cd1cb 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}
 # Top 5 <template num> <indent1> <indent2> <indent3> <indent4>
-template8 ${color4} ${template\1 1 \2 \3 \4 \5}\n${color} ${template\1 2 \2 \3 \4 \5}\n${color} ${template\1 3 \2 \3 \4 \5}\n${color} ${template\1 4 \2 \3 \4 \5}\n${color} ${template\1 5 \2 \3 \4 \5}
+template8 ${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \4 \5}\n ${template\1 3 \2 \3 \4 \5}\n ${template\1 4 \2 \3 \4 \5}\n ${template\1 5 \2 \3 \4 \5}
 
 TEXT
-${color1}System ${hr}
-${color } ${nodename} - ${sysname} ${kernel} on ${machine}
-${color } Uptime: ${uptime}
-${color1}${voffset 3}Processor ${hr}
-${color } CPU1 ${freq_g 1}GHz: ${color2}${cpubar cpu1}
-${color }${template0 1 20 325}${voffset -5}
-${color } CPU2 ${freq_g 2}GHz: ${color2}${cpubar cpu2}
-${color }${template0 2 20 325}${voffset -5}
-${color }${template7 20 325}${voffset -5}
-${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O
-${color }${template8 1 150 200 250 300}
-${color1}${voffset 3}Memory ${hr}
-${color } Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}
-${color } buffers/cache: ${buffers}/${cached}
-${color } Swap: ${swap}/${swapmax} - ${swapperc}%${goto 190}${color2}${swapbar}
-${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM
-${color }${template8 2 150 200 250 300}
-${color1}${voffset 3}Disk${hr}
-${color }${goto 10}${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
-${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O
-${color }${template8 4 150 200 250 300}
-${color }
-${color } ${template6 / /}
-${color } ${template6 /home /home}
-${color } ${template6 /tmp /tmp}
-${color1}${voffset 3}Network ${hr}
-${if_up eth0}${color }${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}${if_up eth1}
-${color }${template5 eth1 Down 20 166}${goto 175}${template5 eth1 Up 20 166}${voffset -5}${endif}
+${font URW Gothic L:Book:size=26}${color1}System ${hr}${color}${font}
+
+ ${pre_exec lsb_release -d | cut -f 2}
+ ${nodename} ${kernel} on ${machine}
+ Uptime: ${uptime}
+
+${font URW Gothic L:Book:size=26}${color1}${voffset 3}Processor ${hr}${color}${font}
+
+ CPU1 ${freq_g 1}GHz: ${color2}${cpubar cpu1}${color}
+${template0 1 20 325}${voffset -5}
+ CPU2 ${freq_g 2}GHz: ${color2}${cpubar cpu2}${color}
+${template0 2 20 325}${voffset -5}
+${template7 20 325}${voffset -5}
+${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
+${template8 1 150 200 250 300}
+
+${font URW Gothic L:Book:size=26}${color1}${voffset 3}Memory ${hr}${color}${font}
+
+ Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}${color}
+ buffers/cache: ${buffers}/${cached}
+ Swap: ${swap}/${swapmax} - ${swapperc}%${goto 190}${color2}${swapbar}${color}
+${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
+${template8 2 150 200 250 300}
+
+${font URW Gothic L:Book:size=26}${color1}${voffset 3}Disk ${hr}${color}${font}
+
+${goto 10}${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
+${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
+${template8 4 150 200 250 300}
+
+ ${template6 / /}
+ ${template6 /home /home}
+ ${template6 /tmp /tmp}
+
+${font URW Gothic L:Book:size=26}${color1}${voffset 3}Network ${hr}${color}${font}
+
+${if_up eth0}${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}
+${if_up eth1}${template5 eth1 Down 20 166}${goto 175}${template5 eth1 Up 20 166}${voffset -5}${endif}
+
