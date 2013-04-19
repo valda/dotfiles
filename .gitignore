@@ -103,3 +103,5 @@
 /.VirtualBox
 
 /.gimp-2.8
+
+/.emacs.d/.session
