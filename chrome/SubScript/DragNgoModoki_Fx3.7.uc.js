@@ -3,8 +3,17 @@
 // @namespace      http://space.geocities.yahoo.co.jp/gl/alice0775
 // @description    ファイル名をD&D
 // @include        main
-// @compatibility  Firefox 4.0 5.0 6.0 7.0 8 9 10.0a1
+// @compatibility  Firefox 17
 // @author         Alice0775
+// @version        2013/05/02 01:00 Bug 789546
+// @version        2013/04/22 14:00 typo, "use strict" mode
+// @version        2013/04/19 20:00 treat HTMLCanvasElement as image
+// @version        2013/04/14 23:40 remove all temp file on exit browser
+// @version        2013/04/14 23:00 text open with externalEditor, char code
+// @version        2013/04/14 22:00 text open with externalEditor (sloppy)
+// @version        2013/04/14 21:00 checking element using Ci.nsIImageLoadingContent instead of HTMLImageElement
+// @version        2013/03/05 00:00 input type=file change event が発火しないのを修正 Fx7+
+// @version        2013/01/29 00:00 draggable="true"もう一度有効
 // @version        2013/01/08 02:00 Bug 827546
 // ==/UserScript==
 // @version        2013/01/01 15:00 Avoid to overwrite data on dragstart. And Bug 789546
@@ -64,6 +73,7 @@
 // @version        2009/12/15 17:00 Fx3.6 and more
 // @version        2007/08/04 20:00
 // @LICENSE        MPL 1.1/GPL 2.0/LGPL 2.1
+"use strict";
 if (typeof Cc != 'object' ) { var Cc = Components.classes;}
 if (typeof Ci != 'object' ) { var Ci = Components.interfaces;}
 if (typeof Cr != 'object' ) { var Cr = Components.results;}
@@ -100,7 +110,7 @@ var DragNGo = {
     {dir:'U', modifier:'',name:'画像を新しいタブ前面に開く',obj:'image',cmd:function(self,event,info){self.openUrls(info.urls, 'tab', null);}},
     {dir:'D', modifier:'',name:'画像を新しいタブ後面に開く',obj:'image',cmd:function(self,event,info){self.openUrls(info.urls, 'tabshifted', null);}},
     {dir:'L', modifier:'',name:'画像を現在のタブに開く',obj:'image',cmd:function(self,event,info){self.openUrls(info.urls, 'current', null);}},
-
+    {dir:'LD', modifier:'',name:'Google 類似画像検索',obj:'image',cmd:function(self,event,info){var TargetImage=info.urls[0];var URL="http://www.google.com/searchbyimage?image_url="+TargetImage;if(TargetImage)gBrowser.loadOneTab(URL,null,null,null,false,false);}},
   /*=== Web Search ===*/
     {dir:'R', modifier:'',name:'テキストをConQueryで検索',obj:'text',cmd:function(self,event,info){self.openConQueryPopup(event);}},
     {dir:'UL', modifier:'',name:'テキストを現在のタブでgooウェブ検索(Green Label)',obj:'link, text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['gooウェブ検索(Green Label)'], 'current');}},
@@ -129,6 +139,10 @@ var DragNGo = {
     {dir:'RD', modifier:'',name:'画像を名前を受けて保存'  ,obj:'image',cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0], info.nodes[0].ownerDocument, info.nodes[0].ownerDocument);}},
     {dir:'RD', modifier:'',name:'リンクを名前を受けて保存',obj:'link' ,cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0], info.nodes[0].ownerDocument, info.nodes[0].ownerDocument);}},
 
+  /*=== テキストをえでぃたーで開く ===*/
+    {dir:'DL', modifier:'',name:'テキストをエディターで開く',obj:'text',cmd:function(self,event,info){self.editText(null, info.texts[0]);}}, // 引数 null: view_source.editor.pathのエディターを使う
+
+
   /*=== appPathをparamsで開く, paramsはtxtで置き換えcharsetに変換される ===*/
     {dir:'U', modifier:'shift,ctrl',name:'リンクをInternet Explorerで開く',obj:'link',cmd:function(self,event,info){self.launch(info.urls[0], "C:\\Program Files\\Internet Explorer\\iexplore.exe",["%%URL%%"],"Shift_JIS");}},
     {dir:'R', modifier:'shift,ctrl',name:'テキストをDDwinで開く',obj:'text',cmd:function(self,event,info){self.launch(info.texts[0], "c:\\Program Files\\DDwin\\ddwin.exe", [",2,,G1,%%SEL%%"], "Shift_JIS");}},
@@ -153,7 +167,7 @@ var DragNGo = {
         var p = prompt('Input word to search under the domain('+_document.location.hostname+'):', info.texts[0]);
         if(p)
           _document.location.href = 'http://www.google.com/search?as_qdr=y15&q=site:' +
-                                    _document.location.href.split('/')[2] +
+                                    _document.location.href.split('/')[2] + 
                                     ' '+encodeURIComponent(p);
       }
     },
@@ -300,7 +314,7 @@ var DragNGo = {
           if (loadInBackground) {
             if (where == 'tabshifted')
                where = 'tab';
-            else if (where == 'tab')
+            else if (where == 'tab') 
               where = 'tabshifted'
           }
           if ("TreeStyleTabService" in window)
@@ -375,7 +389,7 @@ var DragNGo = {
           if (loadInBackground) {
             if (where == 'tabshifted')
                where = 'tab';
-            else if (where == 'tab')
+            else if (where == 'tab') 
               where = 'tabshifted'
           }
           if ("TreeStyleTabService" in window)
@@ -579,7 +593,7 @@ var DragNGo = {
     if (aReferrer instanceof HTMLDocument) {
       aReferrer = aReferrer.documentURIObject;
     }
-    var contentType = this.getContentType(aURL);
+    var contentType = this.getContentType(aURL, aSourceDocument);
     if (this.imageLinkRegExp.test(aURL) || /^image\//i.test(contentType)) {
       if (/^data:/.test(aURL)) {
         saveImageURL(aURL, "index.png", null, true, false, aReferrer, aSourceDocument);
@@ -598,48 +612,104 @@ var DragNGo = {
                  aSkipPrompt, aReferrer, aSourceDocument)
   },
 
-  //aURLのcontentTypeをキャッシュから得る
-  getContentType: function(aURL){
-    var contentType = null;
-    //var contentDisposition = null;
-    try {
-      var imageCache = Cc["@mozilla.org/image/cache;1"].getService(imgICache);
-      var props =
-        imageCache.findEntryProperties(makeURI(aURL, getCharsetforSave(null)));
-      if (props) {
-        contentType = props.get("type", nsISupportsCString);
-        //contentDisposition = props.get("content-disposition", nsISupportsCString);
-      }
-    } catch (e) {
-      // Failure to get type and content-disposition off the image is non-fatal
+  editText: function editText(editor, text) {
+    // Get filename.
+    var file = Components.classes["@mozilla.org/file/directory_service;1"]
+                         .getService(Components.interfaces.nsIProperties)
+                         .get("TmpD", Components.interfaces.nsIFile);
+    file.append("DnD.tmp");
+    file.createUnique(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, parseInt("664", 8));
+
+    // Write the data to the file.
+    var ostr = Components.classes['@mozilla.org/network/file-output-stream;1'].
+          createInstance(Components.interfaces.nsIFileOutputStream);
+    ostr.init(file, 2, 0x200, false);
+
+    if(navigator.platform == "Win32") {
+      // Convert Unix newlines to standard network newlines.
+      text = text.replace(/\n/g, "\r\n");
     }
-    return contentType;
+    var conv = Components.classes['@mozilla.org/intl/saveascharset;1'].
+          createInstance(Components.interfaces.nsISaveAsCharset);
+    try{
+      conv.Init('UTF-8', 0, 0);
+      text = conv.Convert(text);
+    }catch(e){
+    }
+
+    ostr.write(text, text.length);
+
+    ostr.flush();
+    ostr.close();
+
+    // Edit the file.
+    editfile(editor, file.path);
+
+
+    // the external view source editor or null
+    function getExternalViewSourceEditorPath() {
+      try {
+        return Components.classes["@mozilla.org/preferences-service;1"]
+                      .getService(Components.interfaces.nsIPrefBranch)
+                      .getComplexValue("view_source.editor.path",
+                                       Components.interfaces.nsIFile).path;
+      }
+      catch (ex) {
+        Components.utils.reportError(ex);
+      }
+
+      return null;
+    }
+
+    function editfile(editor, filename) {
+      // Figure out what editor to use.
+      editor = editor || getExternalViewSourceEditorPath();
+      if (!editor) {
+        alert("Error_No_Editor");
+        return false;
+      }
+
+      var file = Components.classes["@mozilla.org/file/local;1"].
+          createInstance(Components.interfaces.nsILocalFile);
+      file.initWithPath(editor);
+      if(!file.exists()){
+        alert("Error_invalid_Editor_file");
+        return false;
+      }
+      if(!file.isExecutable()){
+        alert("Error_Editor_not_executable");
+        return false;
+      }
+
+      // Run the editor.
+      var process = Components.classes["@mozilla.org/process/util;1"].
+          createInstance(Components.interfaces.nsIProcess);
+      process.init(file);
+      var args = [filename];
+      process.run(false, args, args.length);  // don't block
+      return true;
+    }
   },
 
-  //appPathをparamsで開く, paramsはtxtで置き換えcharsetに変換される
-  launch: function launch(txt, appPath,params,charset){
-    var UI = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-          createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-    UI.charset = charset;
-
-    var appfile = Components.classes['@mozilla.org/file/local;1']
-                    .createInstance(Components.interfaces.nsILocalFile);
-    appfile.initWithPath(decodeURIComponent(escape(appPath)));
-    if (!appfile.exists()){
-      alert("Executable does not exist.");
-      return;
-    }
-    var process = Components.classes['@mozilla.org/process/util;1']
-                  .createInstance(Components.interfaces.nsIProcess);
-
-    var args = new Array();
-    for(var i=0,len=params.length;i<len;i++){
-      if(params[i]){
-        args.push(UI.ConvertFromUnicode(params[i].replace(/%%URL%%/i,txt).replace(/%%SEL%%/i,txt)));
-      }
-    }
-    process.init(appfile);
-    process.run(false, args, args.length, {});
+  //aURLのcontentTypeをキャッシュから得る
+  getContentType: function(aURL, aDoc){
+    var contentType = null;
+    var contentDisposition = null;
+    try {
+       var imageCache = Components.classes["@mozilla.org/image/tools;1"]
+                                  .getService(Components.interfaces.imgITools)
+                                  .getImgCacheForDocument(aDoc);
+       var props =
+         imageCache.findEntryProperties(makeURI(aURL, getCharsetforSave(null)));
+       if (props) {
+         contentType = props.get("type", nsISupportsCString);
+         contentDisposition = props.get("content-disposition",
+                                        nsISupportsCString);
+       }
+     } catch (e) {
+       // Failure to get type and content-disposition off the image is non-fatal
+     }
+    return contentType;
   },
 
   //ファイルのパスをインプットフィールドに記入
@@ -670,6 +740,16 @@ var DragNGo = {
 
   //Xpiのインストール
   installXpi: function installXpi(URLs){
+    function buildNextInstall() {
+      if (pos == URLs.length) {
+        if (installs.length > 0) {
+          AddonManager.installAddonsFromWebpage("application/x-xpinstall", window, null, installs);
+        }
+        return;
+      }
+      AddonManager.getInstallForURL(URLs[pos++], function (aInstall) {installs.push(aInstall);buildNextInstall();}, "application/x-xpinstall");
+    }
+
     var self = this;
     if (typeof InstallTrigger != 'undefined') {
       var xpinstallObj = {};
@@ -685,17 +765,6 @@ var DragNGo = {
       // xxx Firefox4.0b5pre
       var pos = 0;
       var installs = [];
-
-      function buildNextInstall() {
-          if (pos == URLs.length) {
-              if (installs.length > 0) {
-                  AddonManager.installAddonsFromWebpage("application/x-xpinstall", window, null, installs);
-              }
-              return;
-          }
-          AddonManager.getInstallForURL(URLs[pos++], function (aInstall) {installs.push(aInstall);buildNextInstall();}, "application/x-xpinstall");
-      }
-
       buildNextInstall();
     }
   },
@@ -988,24 +1057,27 @@ var DragNGo = {
       inputElement = target;
     }
     if (inputElement instanceof HTMLInputElement && inputElement.type == 'file') {
-      if (/drop/.test(event.type)) {
-        if (this.getVer >= 7) {
-          dragSession.canDrop = true;
-        } else {
+      if (this.getVer() >= 7) {
+        if (!/drop/.test(event.type)) {
+          this.setStatusMessage('パスを記入', 0, true);
+        }
+        return true;
+      } else {
+        if (/drop/.test(event.type)) {
           if (inputElement.hasAttribute("multiple") &&
               typeof inputElement.mozSetFileNameArray =="function") {
             this.putMultipleFilePath(inputElement, urls);
           } else {
             this.putFilePath(inputElement, urls[0]);
           }
+          event.preventDefault();
+          return true;
+        } else {
+          this.setStatusMessage('パスを記入', 0, true);
+          dragSession.canDrop = true;
+          event.preventDefault();
+          return true;
         }
-        event.preventDefault();
-        return true;
-      } else {
-        this.setStatusMessage('パスを記入', 0, true);
-        dragSession.canDrop = true;
-        event.preventDefault();
-        return true;
       }
     } else if (this.xpiLinkRegExp.test(urls[0])) {
       if (/drop/.test(event.type)) {
@@ -1124,7 +1196,7 @@ var DragNGo = {
     this.directionChain = "";
 
     // 転送データをセットする
-    if (event.originalTarget instanceof HTMLImageElement) {
+    if (event.originalTarget instanceof Ci.nsIImageLoadingContent) {
       if (!event.dataTransfer.mozGetDataAt("application/x-moz-node" ,0))
         event.dataTransfer.mozSetDataAt("application/x-moz-node", event.originalTarget , 0);
       if (!event.dataTransfer.mozGetDataAt("text/x-moz-url" ,0))
@@ -1248,14 +1320,15 @@ var DragNGo = {
     // do nothing if event.defaultPrevented (maybe hosted d&d by web page)
     if (event.defaultPrevented)
       return;
-    /*
+
+    // xxx 2013/01/29
     if (sourceNode) {
       var xpath = 'ancestor-or-self::*[@draggable="true"]';
       var elm = this.getElementsByXPath(xpath, sourceNode);
       if (elm.length > 0)
         return;
     }
-    */
+    
 
     var isSameBrowser = !(sourceNode &&
                          (gBrowser &&
@@ -1269,7 +1342,7 @@ var DragNGo = {
         return;
       }
       // file以外のドロップ
-
+      
       // input/textarea何もしないで置く
       if (self.isParentEditableNode(target)) {
         self.setStatusMessage('', 0, false);
@@ -1456,10 +1529,14 @@ var DragNGo = {
           data = self.getElementsByXPath('descendant-or-self::img', sourceNode);
           if (data.length < 1)
             break;
-
           var node = data[data.length - 1];  //
-          if (node instanceof HTMLImageElement) {
-            var url = node.getAttribute('src');
+          if (node instanceof Ci.nsIImageLoadingContent ||
+              node instanceof HTMLCanvasElement) {
+            if (node instanceof Ci.nsIImageLoadingContent) {
+              var url = node.getAttribute('src');
+            } else if (node instanceof HTMLCanvasElement) {
+              url = node.toDataURL();
+            }
             var baseURI = self.ioService.newURI(node.ownerDocument.documentURI, null, null);
             url = self.ioService.newURI(url, null, baseURI).spec;
             if (url && self.dragDropSecurityCheck(event, dragSession, url)) {
@@ -1642,6 +1719,7 @@ var DragNGo = {
   },
 
   init: function() {
+    window.addEventListener('unload', this, false);
     gBrowser.addEventListener('pagehide', this, false);
     gBrowser.addEventListener('dragend', this, false);
     gBrowser.addEventListener('drop', this, false);
@@ -1679,12 +1757,35 @@ var DragNGo = {
   },
 
   uninit: function() {
+    window.removeEventListener('unload', this, false);
     gBrowser.removeEventListener('pagehide', this, false);
     gBrowser.removeEventListener('dragend', this, false);
     gBrowser.removeEventListener('drop', this, false);
     gBrowser.removeEventListener('dragover', this, false);
     gBrowser.removeEventListener('dragenter', this, false);
     gBrowser.removeEventListener('dragstart', this, false);
+
+    // remove all temporaly file
+    var windowType = "navigator:browser";
+    var windowManager = Components.classes['@mozilla.org/appshell/window-mediator;1'].getService();
+    var windowManagerInterface = windowManager.QueryInterface(Components.interfaces.nsIWindowMediator);
+    var enumerator = windowManagerInterface.getEnumerator(windowType);
+    if (enumerator.hasMoreElements()) {
+      return;
+    }
+    var file = Components.classes["@mozilla.org/file/directory_service;1"]
+                     .getService(Components.interfaces.nsIProperties)
+                     .get("TmpD", Components.interfaces.nsIFile);
+    var entries = file.directoryEntries;
+    while (entries.hasMoreElements()){
+      var entry = entries.getNext().QueryInterface(Components.interfaces.nsIFile);
+      if (/DnD(-\d+)?\.tmp$/.test(entry.leafName)){
+        try{
+          entry.remove(false);
+        }catch(e){}
+      }
+    }
+
   },
 
   debug: function(aMsg){
