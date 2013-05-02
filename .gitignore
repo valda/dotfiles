@@ -6,10 +6,12 @@
 /.android
 /.bash_history
 /.dvdcss
-/.emacs.d/custom.el
 /.emacs.d/.bm-repository
+/.emacs.d/.session
 /.emacs.d/ac-comphist.dat
 /.emacs.d/anything-c-adaptive-history
+/.emacs.d/custom.el
+/.emacs.d/elpa/
 /.emacs.d/server/server
 /.emacs.d/session.*
 /.emacs.d/tramp
@@ -20,8 +22,7 @@
 /.fluxbox/fbrun_history
 /.fluxbox/lastwallpaper
 /.gem
-/.gimp-2.4
-/.gimp-2.6
+/.gimp-2.*
 /.gnupg
 /.howm-keys
 /.irb_history
@@ -101,7 +102,3 @@
 /chrome/uAutoPagerize.json
 /chrome/keybindings.html
 /.VirtualBox
-
-/.gimp-2.8
-
-/.emacs.d/.session
