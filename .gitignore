@@ -11,6 +11,7 @@
 /.emacs.d/ac-comphist.dat
 /.emacs.d/anything-c-adaptive-history
 /.emacs.d/custom.el
+/.emacs.d/el-get/
 /.emacs.d/elpa/
 /.emacs.d/server/server
 /.emacs.d/session.*
