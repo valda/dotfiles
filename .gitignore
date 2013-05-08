@@ -103,3 +103,4 @@
 /chrome/uAutoPagerize.json
 /chrome/keybindings.html
 /.VirtualBox
+/.emacs.d/el-get-backup-*/
