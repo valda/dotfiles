@@ -48,18 +48,18 @@ override_utf8_locale yes
 #draw_shades yes
 #default_shade_color 185e5c
 draw_outline yes
-default_outline_color 202030
+default_outline_color 600222
 
 ## Color
 default_color ffffff
 # Title
-color1 7cd1cb
+color1 f26a98
 # Bar
-color2 337f7c
+color2 ca1452
 # Top Title
-color3 356866
+color3 f2abc3
 # Top 1
-color4 9cd1cf
+color4 cef3ac
 #color5
 #color6
 #color7
@@ -68,21 +68,21 @@ color4 9cd1cf
 
 ## Template
 # CPU Graph <num> <height> <width>
-template0 ${cpugraph cpu\1 \2,\3 356866 7cd1cb  100 -t}${offset -\3} CPU\1: ${cpu cpu\1}%
+template0 ${cpugraph cpu\1 \2,\3 ca1452 f26a98  100 -t}${offset -\3} CPU\1: ${cpu cpu\1}%
 # CPU Top <num> <indent1> <indent2> <indent3> <indent4>
 template1 ${top name \1}${goto \2}${top pid \1}${goto \3}${top cpu \1}${goto \4}${top mem \1}${goto \5}${top io_perc \1}
 # Memory Top <num> <indent1> <indent2> <indent3> <indent4>
 template2 ${top_mem name \1}${goto \2}${top_mem pid \1}${goto \3}${top_mem mem_vsize \1}${goto \4}${top_mem mem_res \1}${goto \5}${top_mem mem \1}
 # Disk I/O Graph <device> <type> <height> <width>
-template3 ${diskiograph_\2 \1 \3,\4 356866 7cd1cb 10000 -t}${offset -\4} /dev/\1 \2: ${diskio_\2 \1}
+template3 ${diskiograph_\2 \1 \3,\4 ca1452 f26a98 10000 -t}${offset -\4} /dev/\1 \2: ${diskio_\2 \1}
 # Disk I/O Top <num> <indent1> <indent2> <indent3> <indent4>
 template4 ${top_io name \1}${goto \2}${top_io pid \1}${goto \3}${top_io io_read \1}${goto \4}${top_io io_write \1}${goto \5}${top_io io_perc \1}
 # Network Graph <ethN> <type> <height> <width>
-template5 ${\2speedgraph \1 \3,\4 356866 7cd1cb 1000 -t}${offset -\4} \1 \2: ${\2speed \1}
+template5 ${\2speedgraph \1 \3,\4 ca1452 f26a98 1000 -t}${offset -\4} \1 \2: ${\2speed \1}
 # Disk Bar <name> <path>
 template6 \1 ${goto 55} ${fs_used \2}/${fs_size \2} ${goto 150} ${color2} ${fs_bar 6 \2}${color}
 # Load Average Graph <height> <width>
-template7 ${loadgraph \1,\2 356866 7cd1cb 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}
+template7 ${loadgraph \1,\2 ca1452 f26a98 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}
 # Top 5 <template num> <indent1> <indent2> <indent3> <indent4>
 template8 ${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \4 \5}\n ${template\1 3 \2 \3 \4 \5}\n ${template\1 4 \2 \3 \4 \5}\n ${template\1 5 \2 \3 \4 \5}
 
