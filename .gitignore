@@ -1,8 +1,9 @@
-*~
 *.bak
 *.elc
 *.log
 *.stackdump
+*~
+/.VirtualBox
 /.android
 /.bash_history
 /.dvdcss
@@ -11,6 +12,7 @@
 /.emacs.d/ac-comphist.dat
 /.emacs.d/anything-c-adaptive-history
 /.emacs.d/custom.el
+/.emacs.d/el-get-backup-*/
 /.emacs.d/el-get/
 /.emacs.d/elpa/
 /.emacs.d/server/server
@@ -27,10 +29,16 @@
 /.gnupg
 /.howm-keys
 /.irb_history
+/.kkcrc
+/.lesshst
 /.migemo-pattern
 /.mlterm/challenge
+/.mozilla/extensions/
+/.mozilla/firefox/
+/.mozilla/plugins/
 /.navi2ch
 /.pit
+/.rainlendar2/
 /.recentf
 /.recently-used.xbel
 /.rnd
@@ -81,6 +89,8 @@
 /Visual Studio Projects/
 /_viminfo
 /bak/
+/chrome/keybindings.html
+/chrome/uAutoPagerize.json
 /desktop.ini
 /disable_compressefolder_for_win7/
 /emacs23-build/
@@ -97,13 +107,3 @@
 /スタート メニュー/
 /マイ壁紙/
 /伊集院/
-/.kkcrc
-/.lesshst
-/.rainlendar2/
-/chrome/uAutoPagerize.json
-/chrome/keybindings.html
-/.VirtualBox
-/.emacs.d/el-get-backup-*/
-/.mozilla/firefox/
-/.mozilla/plugins/
-/.mozilla/extensions/
