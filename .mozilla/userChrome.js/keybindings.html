@@ -1,0 +1,329 @@
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>All key bindings</title>
+                <style type="text/css">
+                    a {
+text-decoration:none;
+}
+
+a:link,a:active {
+color:#900;
+text-decoration:underline;
+}
+
+a:visited {
+color:#193154;
+text-decoration:underline;
+}
+
+a:hover {
+color:#565656;
+text-decoration:underline;
+}
+
+body {
+background-color:#E6E6E6;
+color:#1D1D1D;
+font-size:100%;
+font-family:'Helvetica', 'Arial', sans-serif;
+text-align:center;
+margin:2em 15px 15px;
+padding:0;
+}
+
+div#container {
+background-color:#FBFBFB;
+max-width:900px;
+text-align:left;
+font-size:93%;
+border-color:#D4D4D4;
+border-style:solid;
+border-width:1px;
+margin:0 auto;
+padding:10px 20px;
+}
+
+h1 {
+font-size:175%;
+text-align:left;
+font-weight:400;
+margin:0;
+padding:10px 0;
+}
+
+h2 {
+font-size:140%;
+text-align:left;
+font-weight:400;
+color:#2E2E2E;
+border-bottom:1px solid #BBB;
+margin:10px 0;
+padding:5px 0;
+}
+
+h3 {
+font-size:130%;
+color:#344D5E;
+text-align:left;
+font-weight:400;
+padding-left:5px;
+border-bottom:1px dotted #344D5E;
+margin:4px 7px;
+}
+
+hr {
+height:1px;
+background-color:#BBB;
+border:none;
+}
+
+blockquote {
+border:1px solid #BBB;
+padding:1px;
+}
+
+p {
+text-indent:1em;
+text-align:left;
+margin:5px 10px;
+padding:2px 0;
+}
+
+ol {
+text-align:left;
+margin:15px;
+}
+
+li {
+margin:7px 0;
+}
+
+dl {
+margin:5px 15px;
+}
+
+pre {
+border:1px #BBB solid;
+padding: 4px;
+margin: 6px 3px;
+background-color: #f9eefa;
+}
+
+*.table-keybindings {
+text-align:left;
+font:100%/1.7em "trebuchet ms", "bitstream vera sans", verdana, helvetica, sans-serif;
+width:100%;
+border:1px #BBB solid;
+border-collapse:collapse;
+border-spacing:0;
+}
+
+*.table-keybindings th {
+border:1px #BBB solid;
+background:#F3F0FC;
+line-height:120%;
+border-width:0 0 1px 1px;
+padding:5px;
+}
+
+*.table-keybindings td {
+border:1px #BBB solid;
+border-width:0 0 1px 1px;
+padding:5px;
+}
+
+*.table-keybindings td:first-child {
+width:10em;
+}
+
+                </style>
+            </head>
+            <body>
+                <div id="container">
+                    <h1>All key bindings</h1><hr />
+<ul>
+<li><a href="#special">Special Keys</a></li>
+<li><a href="#parg">Prefix Argument Keys</a></li>
+<li><a href="#global">Global Bindings</a></li>
+<li><a href="#view">View mode Bindings</a></li>
+<li><a href="#edit">Edit mode Bindings</a></li>
+<li><a href="#caret">Caret mode Bindings</a></li>
+</ul>
+<h2 id='special'>Special Keys</h2>
+<table class='table-keybindings'>
+<tr><th>Role</th><th>Key</th><th>Description</th></tr>
+<tr><td>Quit key</td><td>C-g</td><td>キー入力のキャンセル等に用いられます</td></tr>
+<tr><td>Help key</td><td>&lt;f1&gt;</td><td>任意のキーシーケンスに続けて入力すると、そのキーから始まるキーバインドが一覧表示されます</td></tr>
+<tr><td>Escape key</td><td>C-q</td><td>このキーの後に続けて入力されたキーは Firefox に直接送られます</td></tr>
+<tr><td>Start key macro recording</td><td>&lt;f3&gt;</td><td>キーマクロの定義を開始します</td></tr>
+<tr><td>End key macro recording / Play key macro</td><td>&lt;f4&gt;</td><td>キーマクロの定義を終了 ＆ 記録されたキーマクロの再生を行います</td></tr>
+<tr><td>Suspension switch key</td><td>&lt;f2&gt;</td><td>一時停止状態を切り替えるキーです</td></tr>
+</table>
+
+<h2 id='parg'>Prefix Argument Keys</h2>
+<p>現在前置引数機能は有効となっています。設定ダイアログからこの機能を無効にすることができます。</p>
+
+<table class='table-keybindings'>
+<tr><th>Key</th><th>Description</th></tr>
+<tr><td>C-u</td><td>前置引数の入力を開始します。 C-u の後に - を続けると、負の前置引数入力となり、数値が省略された場合は 4 を C-u の数だけ掛け合わせた値となります。</td></tr>
+<tr><td></td><td>正の前置引数の入力を開始します</td></tr>
+<tr><td>C--</td><td>負の前置引数の入力を開始します</td></tr>
+<tr><td>C-M--</td><td>負の前置引数の入力を開始します</td></tr>
+<tr><td>M--</td><td>負の前置引数の入力を開始します</td></tr>
+</table>
+
+<h2 id='global'>Global Bindings</h2>
+<table class='table-keybindings'>
+<tr><th>Key</th><th>Binding</th></tr>
+<tr><td>C-M-r</td><td>設定ファイルを再読み込み</td></tr>
+<tr><td>M-x</td><td>エクステ一覧表示</td></tr>
+<tr><td>M-:</td><td>JavaScript のコードを評価</td></tr>
+<tr><td>&lt;f1&gt; b</td><td>キーバインド一覧を表示</td></tr>
+<tr><td>&lt;f1&gt; F</td><td>Firefox のヘルプを表示</td></tr>
+<tr><td>C-m</td><td>リターンコードを生成</td></tr>
+<tr><td>C-x l</td><td>ロケーションバーへフォーカス</td></tr>
+<tr><td>C-x g</td><td>検索バーへフォーカス</td></tr>
+<tr><td>C-x t</td><td>最初のインプットエリアへフォーカス</td></tr>
+<tr><td>C-x s</td><td>最初のボタンへフォーカス</td></tr>
+<tr><td>C-x k</td><td>タブ / ウィンドウを閉じる</td></tr>
+<tr><td>C-x K</td><td>ウィンドウを閉じる</td></tr>
+<tr><td>C-x n</td><td>ウィンドウを開く</td></tr>
+<tr><td>C-x C-c</td><td>Firefox を終了</td></tr>
+<tr><td>C-x o</td><td>次のフレームを選択</td></tr>
+<tr><td>C-x 1</td><td>現在のフレームだけを表示</td></tr>
+<tr><td>C-x C-f</td><td>ファイルを開く</td></tr>
+<tr><td>C-x C-s</td><td>ファイルを保存</td></tr>
+<tr><td>M-w</td><td>選択中のテキストをコピー</td></tr>
+<tr><td>C-s</td><td>Emacs ライクなインクリメンタル検索</td></tr>
+<tr><td>C-r</td><td>Emacs ライクな逆方向インクリメンタル検索</td></tr>
+<tr><td>C-c u</td><td>閉じたタブを元に戻す</td></tr>
+<tr><td>C-c C-c C-v</td><td>Javascript コンソールを表示</td></tr>
+<tr><td>C-c C-c C-c</td><td>Javascript コンソールの表示をクリア</td></tr>
+<tr><td>C-M-l</td><td>ひとつ右のタブへ</td></tr>
+<tr><td>C-M-h</td><td>ひとつ左のタブへ</td></tr>
+</table>
+
+<h2 id='view'>View mode Bindings</h2>
+<table class='table-keybindings'>
+<tr><th>Key</th><th>Binding</th></tr>
+<tr><td>C-n</td><td>一行スクロールダウン</td></tr>
+<tr><td>j</td><td>一行スクロールダウン</td></tr>
+<tr><td>C-p</td><td>一行スクロールアップ</td></tr>
+<tr><td>k</td><td>一行スクロールアップ</td></tr>
+<tr><td>C-f</td><td>右へスクロール</td></tr>
+<tr><td>.</td><td>右へスクロール</td></tr>
+<tr><td>C-b</td><td>左へスクロール</td></tr>
+<tr><td>,</td><td>左へスクロール</td></tr>
+<tr><td>M-v</td><td>一画面分スクロールアップ</td></tr>
+<tr><td>b</td><td>一画面分スクロールアップ</td></tr>
+<tr><td>C-v</td><td>一画面スクロールダウン</td></tr>
+<tr><td>M-&lt;</td><td>ページ先頭へ移動</td></tr>
+<tr><td>g</td><td>ページ先頭へ移動</td></tr>
+<tr><td>M-&gt;</td><td>ページ末尾へ移動</td></tr>
+<tr><td>G</td><td>ページ末尾へ移動</td></tr>
+<tr><td>l</td><td>ひとつ右のタブへ</td></tr>
+<tr><td>h</td><td>ひとつ左のタブへ</td></tr>
+<tr><td>:</td><td>コマンドの実行</td></tr>
+<tr><td>R</td><td>更新</td></tr>
+<tr><td>B</td><td>戻る</td></tr>
+<tr><td>F</td><td>進む</td></tr>
+<tr><td>C-x h</td><td>すべて選択</td></tr>
+<tr><td>f</td><td>最初のインプットエリアへフォーカス</td></tr>
+<tr><td>M-p</td><td>次のボタンへフォーカスを当てる</td></tr>
+<tr><td>M-n</td><td>前のボタンへフォーカスを当てる</td></tr>
+</table>
+
+<h2 id='edit'>Edit mode Bindings</h2>
+<table class='table-keybindings'>
+<tr><th>Key</th><th>Binding</th></tr>
+<tr><td>C-x h</td><td>全て選択</td></tr>
+<tr><td>C-x u</td><td>アンドゥ</td></tr>
+<tr><td>C-x r d</td><td>矩形削除</td></tr>
+<tr><td>C-x r t</td><td>矩形置換</td></tr>
+<tr><td>C-x r o</td><td>矩形行空け</td></tr>
+<tr><td>C-x r k</td><td>矩形キル</td></tr>
+<tr><td>C-x r y</td><td>矩形ヤンク</td></tr>
+<tr><td>C-SPC</td><td>マークをセット</td></tr>
+<tr><td>C-@</td><td>マークをセット</td></tr>
+<tr><td>C-o</td><td>行を開く (Open line)</td></tr>
+<tr><td>C-_</td><td>アンドゥ</td></tr>
+<tr><td>C-\</td><td>リドゥ</td></tr>
+<tr><td>C-a</td><td>行頭へ移動</td></tr>
+<tr><td>C-e</td><td>行末へ</td></tr>
+<tr><td>C-f</td><td>一文字右へ移動</td></tr>
+<tr><td>C-b</td><td>一文字左へ移動</td></tr>
+<tr><td>M-f</td><td>一単語右へ移動</td></tr>
+<tr><td>M-b</td><td>一単語左へ移動</td></tr>
+<tr><td>C-n</td><td>一行下へ</td></tr>
+<tr><td>C-p</td><td>一行上へ</td></tr>
+<tr><td>C-v</td><td>一画面分下へ</td></tr>
+<tr><td>M-v</td><td>一画面分上へ</td></tr>
+<tr><td>M-&lt;</td><td>テキストエリア先頭へ</td></tr>
+<tr><td>M-&gt;</td><td>テキストエリア末尾へ</td></tr>
+<tr><td>C-d</td><td>次の一文字削除</td></tr>
+<tr><td>C-h</td><td>前の一文字を削除</td></tr>
+<tr><td>M-d</td><td>次の一単語を削除</td></tr>
+<tr><td>C-&lt;backspace&gt;</td><td>前の一単語を削除</td></tr>
+<tr><td>M-&lt;delete&gt;</td><td>前の一単語を削除</td></tr>
+<tr><td>M-u</td><td>次の一単語を全て大文字に (Upper case)</td></tr>
+<tr><td>M-l</td><td>次の一単語を全て小文字に (Lower case)</td></tr>
+<tr><td>M-c</td><td>次の一単語をキャピタライズ</td></tr>
+<tr><td>C-k</td><td>カーソルから先を一行カット (Kill line)</td></tr>
+<tr><td>C-y</td><td>貼り付け (Yank)</td></tr>
+<tr><td>M-y</td><td>古いクリップボードの中身を順に貼り付け (Yank pop)</td></tr>
+<tr><td>C-M-y</td><td>以前にコピーしたテキスト一覧から選択して貼り付け</td></tr>
+<tr><td>C-w</td><td>選択中のテキストを切り取り (Kill region)</td></tr>
+<tr><td>M-n</td><td>次のテキストエリアへフォーカス</td></tr>
+<tr><td>M-p</td><td>前のテキストエリアへフォーカス</td></tr>
+</table>
+
+<h2 id='caret'>Caret mode Bindings</h2>
+<table class='table-keybindings'>
+<tr><th>Key</th><th>Binding</th></tr>
+<tr><td>C-a</td><td>キャレットを行頭へ移動</td></tr>
+<tr><td>^</td><td>キャレットを行頭へ移動</td></tr>
+<tr><td>C-e</td><td>キャレットを行末へ移動</td></tr>
+<tr><td>$</td><td>キャレットを行末へ移動</td></tr>
+<tr><td>C-n</td><td>キャレットを一行下へ</td></tr>
+<tr><td>j</td><td>キャレットを一行下へ</td></tr>
+<tr><td>C-p</td><td>キャレットを一行上へ</td></tr>
+<tr><td>k</td><td>キャレットを一行上へ</td></tr>
+<tr><td>C-f</td><td>キャレットを一文字右へ移動</td></tr>
+<tr><td>l</td><td>キャレットを一文字右へ移動</td></tr>
+<tr><td>C-b</td><td>キャレットを一文字左へ移動</td></tr>
+<tr><td>h</td><td>キャレットを一文字左へ移動</td></tr>
+<tr><td>C-h</td><td>キャレットを一文字左へ移動</td></tr>
+<tr><td>M-f</td><td>キャレットを一単語右へ移動</td></tr>
+<tr><td>w</td><td>キャレットを一単語右へ移動</td></tr>
+<tr><td>M-b</td><td>キャレットを一単語左へ移動</td></tr>
+<tr><td>W</td><td>キャレットを一単語左へ移動</td></tr>
+<tr><td>C-v</td><td>キャレットを一画面分下へ</td></tr>
+<tr><td>SPC</td><td>キャレットを一画面分下へ</td></tr>
+<tr><td>M-v</td><td>キャレットを一画面分上へ</td></tr>
+<tr><td>b</td><td>キャレットを一画面分上へ</td></tr>
+<tr><td>M-&lt;</td><td>キャレットをページ先頭へ移動</td></tr>
+<tr><td>g</td><td>キャレットをページ先頭へ移動</td></tr>
+<tr><td>M-&gt;</td><td>キャレットを行末へ移動</td></tr>
+<tr><td>G</td><td>キャレットを行末へ移動</td></tr>
+<tr><td>J</td><td>画面を一行分下へスクロール</td></tr>
+<tr><td>K</td><td>画面を一行分上へスクロール</td></tr>
+<tr><td>,</td><td>左へスクロール</td></tr>
+<tr><td>.</td><td>右へスクロール</td></tr>
+<tr><td>z</td><td>キャレットの位置までスクロール</td></tr>
+<tr><td>C-SPC</td><td>マークをセット</td></tr>
+<tr><td>C-@</td><td>マークをセット</td></tr>
+<tr><td>:</td><td>コマンドの実行</td></tr>
+<tr><td>R</td><td>更新</td></tr>
+<tr><td>B</td><td>戻る</td></tr>
+<tr><td>F</td><td>進む</td></tr>
+<tr><td>C-x h</td><td>すべて選択</td></tr>
+<tr><td>f</td><td>最初のインプットエリアへフォーカス</td></tr>
+<tr><td>M-p</td><td>次のボタンへフォーカスを当てる</td></tr>
+<tr><td>M-n</td><td>前のボタンへフォーカスを当てる</td></tr>
+</table>
+
+                </div>
+            </body>
+        </html>

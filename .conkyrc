@@ -20,7 +20,7 @@ minimum_size 330 0
 maximum_width 330
 
 ## Behavior
-alignment top_right
+alignment top_left
 use_spacer none
 format_human_readable yes
 short_units no
@@ -45,10 +45,10 @@ override_utf8_locale yes
 #draw_borders no
 #border_width 1
 #stippled_borders 8
-draw_shades yes
-default_shade_color 185e5c
-#draw_outline yes
-#default_outline_color 202030
+#draw_shades yes
+#default_shade_color 185e5c
+draw_outline yes
+default_outline_color 202030
 
 ## Color
 default_color ffffff

@@ -104,3 +104,6 @@
 /chrome/keybindings.html
 /.VirtualBox
 /.emacs.d/el-get-backup-*/
+/.mozilla/firefox/
+/.mozilla/plugins/
+/.mozilla/extensions/
