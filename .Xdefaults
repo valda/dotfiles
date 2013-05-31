@@ -1,0 +1,13 @@
+URxvt*font: xft:Ricty:style=Regular:size=16:antialias=true
+URxvt*depth: 32
+URxvt*buffered: true
+URxvt*foreground: white
+URxvt*background: rgba:0000/0000/0000/dddd
+URxvt*transparent: false
+URxvt*fading: 10%
+URxvt*fadeColor: rgba:0000/0000/0000/0000
+URxvt*scrollBar: false
+URxvt.lineSpace: 0
+URxvt.letterSpace: -1
+urxvt*preeditType: OnTheSpot
+urxvt*perl-ext: xim-onthespot

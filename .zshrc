@@ -24,23 +24,20 @@ setopt sh_word_split
 setopt auto_param_keys
 setopt extended_history
 setopt append_history
-setopt hist_ignore_space
 setopt magic_equal_subst
+setopt hist_ignore_space
+setopt hist_expire_dups_first
+setopt hist_ignore_all_dups
+setopt hist_reduce_blanks
+setopt share_history
 
 HISTFILE="$HOME/.zsh-history"
 HISTSIZE=10000
 SAVEHIST=10000
 WORDCHARS="`echo $WORDCHARS|sed 's!/!!'`"
 
-case $ZSH_VERSION in
-4.*)
-setopt hist_expire_dups_first
-setopt hist_ignore_all_dups
-setopt share_history
-
 ## Completion configuration
-#
-fpath=(~/.zsh/functions/Completion ${fpath})
+fpath=($HOME/.zsh/functions/Completion $fpath)
 autoload -Uz compinit
 compinit
 
@@ -48,12 +45,7 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*:default' menu select true
 zstyle ':completion:*' use-cache true
-;;
-esac
 
-#stty -istrip
-#stty erase '^\?'
-#bindkey -m
 bindkey -e
 bindkey ";5C" forward-word
 bindkey ";5D" backward-word
@@ -62,7 +54,6 @@ autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic
 
 alias a=alias
-#a cd=" cd"
 a rm=" rm -i"
 a sudo=" sudo"
 a ls="ls -F --color --show-control-chars"
