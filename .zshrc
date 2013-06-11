@@ -193,6 +193,7 @@ _update_term_title () {
 precmd() {
     _update_prompt
     _update_rprompt
+    _update_term_title
 }
 
 chpwd () {
