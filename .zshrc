@@ -67,6 +67,7 @@ a j="jobs"
 a ec="emacsclient"
 a dpkg='COLUMNS=${COLUMNS:-80} dpkg'
 a psa="ps axuww"
+a ssh="ssh -A"
 
 gd() {
     dirs -v

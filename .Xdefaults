@@ -5,7 +5,7 @@ URxvt*foreground: white
 URxvt*background: rgba:0000/0000/0000/cccc
 URxvt*transparent: false
 URxvt*fading: 15%
-URxvt*fadeColor: rgba:3333/3333/3333/0000
+URxvt*fadeColor: rgba:ffff/ffff/ffff/0000
 URxvt*scrollBar: false
 URxvt*lineSpace: 0
 URxvt*letterSpace: -1

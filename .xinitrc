@@ -10,13 +10,4 @@
 [ -z $XMODIFIERS ] && export XMODIFIERS="@im=IBUS"
 ibus-daemon --xim &
 
-case "`hostname -s`" in
-    miyuri)
-	export WINDOW_MANAGER=compiz
-	exec ssh-agent gnome-session
-	;;
-    *)
-	exec ssh-agent x-window-manager
-	;;
-esac
-
+ssh-agent gnome-session
