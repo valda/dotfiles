@@ -2,5 +2,4 @@
 *VT100*foreground:              white
 *VT100*scrollBar:               false
 
-!Emacs.FontBackend: xft
 Emacs*useXIM: false

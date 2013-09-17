@@ -2,17 +2,17 @@ URxvt*font: xft:Ricty:style=Regular:size=16:antialias=true
 URxvt*depth: 32
 URxvt*buffered: true
 URxvt*foreground: white
-URxvt*background: rgba:0000/0000/0000/cccc
+URxvt*background: rgba:0000/0000/0000/dddd
 URxvt*transparent: false
-URxvt*fading: 15%
+URxvt*fading: 20%
 URxvt*fadeColor: rgba:ffff/ffff/ffff/0000
 URxvt*scrollBar: false
 URxvt*lineSpace: 0
 URxvt*letterSpace: -1
 URxvt*termName: xterm-256color
 URxvt*perl-ext-common: default,matcher,xim-onthespot,clipboard
+URxvt*matcher.button: 2
 URxvt*preeditType: OnTheSpot
-URxvt.matcher.button: 2
 
 ! black dark/light
 URxvt*color0: #2e3436
