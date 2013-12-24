@@ -5,6 +5,10 @@
 // @include        main
 // @compatibility  Firefox 17
 // @author         Alice0775
+// @version        2013/10/31 00:00 Bug 821687  Status panel should be attached to the content area
+// @version        2013/09/13 00:00 Bug 856437 Remove Components.lookupMethod
+// @version        2013/08/26 14:00 use FormHistory.update and fixed typo
+// @version        2013/05/30 01:00 text drag fails on http://blog.livedoor.jp/doku1108/archives/52130085.html
 // @version        2013/05/02 01:00 Bug 789546
 // @version        2013/04/22 14:00 typo, "use strict" mode
 // @version        2013/04/19 20:00 treat HTMLCanvasElement as image
@@ -102,8 +106,8 @@ var DragNGo = {
   /*=== リンク ===*/
     {dir:'U', modifier:'',name:'xpi/jarインストール',obj:'xpi,jar',cmd:function(self,event,info){self.installXpi(info.urls);}},
     {dir:'U', modifier:'',name:'リンクを新しいタブ前面に開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'tab', null);}},
-    {dir:'D', modifier:'',name:'リンクを新しいタブ後面に開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'tabshifted', null);}},
-    //{dir:'D', modifier:'',name:'リンクを新しいタブでaguse.jp検索',obj:'link, textlink',cmd:function(self,event,info){self.searchWithEngine(info.urls, ['aguse.jp'], 'tab');}},
+    //{dir:'D', modifier:'',name:'リンクを新しいタブ後面に開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'tabshifted', null);}},
+    {dir:'D', modifier:'',name:'リンクを新しいタブでaguse.jp検索',obj:'link, textlink',cmd:function(self,event,info){self.searchWithEngine(info.urls, ['aguse.jp'], 'tab');}},
     {dir:'L', modifier:'',name:'リンクを現在のタブ開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'current', null);}},
 
   /*=== 画像 ===*/
@@ -244,7 +248,7 @@ var DragNGo = {
   //選択文字列を得る
   get selection() {
     var targetWindow = this.focusedWindow;
-    var sel = Components.lookupMethod(targetWindow, 'getSelection').call(targetWindow);
+    var sel = targetWindow.getSelection();
     if (sel && !sel.toString()) {
       var node = document.commandDispatcher.focusedElement;
       if (node &&
@@ -338,7 +342,7 @@ var DragNGo = {
     }
     // 検索履歴に残す
     if (addHistoryEntry)
-      this.searchbardispatchEvent(text);
+      this.searchBardispatchEvent(text);
     return true;
   },
 
@@ -364,11 +368,24 @@ var DragNGo = {
 
     var event = document.createEvent("UIEvents");
     event.initUIEvent("input", true, true, window, 0);
+    var searchbar = this.searchbar;
     searchbar.dispatchEvent(event);
-    if (searchText) {
-      searchbar._textbox._formHistSvc
-        .addEntry(searchbar._textbox.getAttribute("autocompletesearchparam"),
-                  searchText);
+    if (typeof searchbar.FormHistory == "object") {
+      if (searchText && !PrivateBrowsingUtils.isWindowPrivate(window)) {
+        searchbar.FormHistory.update(
+          { op : "bump",
+            fieldname : searchbar._textbox.getAttribute("autocompletesearchparam"),
+            value : searchText },
+          { handleError : function(aError) {
+              Components.utils.reportError("Saving search to form history failed: " + aError.message);
+          }});
+      }
+    } else {
+      if (searchText) {
+        searchbar._textbox._formHistSvc
+          .addEntry(searchbar._textbox.getAttribute("autocompletesearchparam"),
+                    searchText);
+      }
     }
   },
 
@@ -819,7 +836,7 @@ var DragNGo = {
         status4ever.value = UI.ConvertToUnicode('');
       }, !timeToClear ? 1500 : timeToClear);
     } else {
-      var statusbar = document.getElementById("statusbar-display");
+      var statusbar =  XULBrowserWindow.statusTextField || document.getElementById("statusbar-display");
       try{
         try {msg = UI.ConvertToUnicode(msg)}catch(e){}
         if(msg!=''){
@@ -990,7 +1007,7 @@ var DragNGo = {
   },
 
   isParentEditableNode: function isParentEditableNode(node){
-    //if (Components.lookupMethod(node.ownerDocument, 'designMode').call(node.ownerDocument) == 'on')
+    //if (node.ownerDocument.designMode == 'on')
     //  return node;
     while (node) {
       try {
@@ -1313,7 +1330,7 @@ var DragNGo = {
     }
 
     //designModeなら何もしない
-    if (target.ownerDocument instanceof HTMLDocument && Components.lookupMethod(target.ownerDocument, 'designMode').call(target.ownerDocument) == 'on') {
+    if (target.ownerDocument instanceof HTMLDocument && target.ownerDocument.designMode == 'on') {
       self.setStatusMessage('', 0, false);
       return;
     }
@@ -1529,6 +1546,12 @@ var DragNGo = {
           data = self.getElementsByXPath('descendant-or-self::img', sourceNode);
           if (data.length < 1)
             break;
+
+          if (event.dataTransfer.types.contains(["text/plain"])) {
+            if(!!self.selection && event.dataTransfer.getData(["text/plain"]) == self.selection)
+            break;
+          }
+
           var node = data[data.length - 1];  //
           if (node instanceof Ci.nsIImageLoadingContent ||
               node instanceof HTMLCanvasElement) {

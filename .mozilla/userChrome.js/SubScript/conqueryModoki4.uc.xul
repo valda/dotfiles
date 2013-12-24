@@ -9,6 +9,8 @@
 // @include        main
 // @compatibility  Firefox 3.0 3.5, 3.6
 // @author         Alice0775
+// @version        2013/09/13 21:00 Bug 856437 Remove Components.lookupMethod
+// @version        2013/09/13 20:00 Bug 738818
 // @version        2013/01/19 20:00 Bug 831008 Disable Mutation Events in chrome/XUL
 // @version        2011/11/10 12:30 defolt change R: shift, M:Tab Clipboard
 // @version        2011/03/11 10:30 Bug641090
@@ -312,7 +314,7 @@
 
     _getselection: function() {  //選択されている文字列を得る
         var targetWindow = this._getFocusedWindow();
-        var sel = Components.lookupMethod(targetWindow, 'getSelection').call(targetWindow);
+        var sel = targetWindow.getSelection();
         // for textfields
         if (sel && !sel.toString()) {
           var node = document.commandDispatcher.focusedElement;
@@ -786,9 +788,14 @@
     },
 
     engineRevert: function(aEvent){
-      const nsIBSS = Components.interfaces.nsIBrowserSearchService;
-      const searchService =Components.classes["@mozilla.org/browser/search-service;1"].getService(nsIBSS);
-      searchService.currentEngine = searchService.defaultEngine;
+      let defaultPrefB = Services.prefs.getDefaultBranch("browser.search.");
+      let nsIPLS = Components.interfaces.nsIPrefLocalizedString;
+      let defaultEngine =Services.search.defaultEngine;
+      try {
+        defaultEngineName = defaultPrefB.getComplexValue("defaultenginename", nsIPLS).data;
+        defaultEngine = Services.search.getEngineByName(defaultEngineName);
+      } catch (ex) {}
+      setTimeout(function(){Services.search.currentEngine = defaultEngine;},100);
       return false;
     }
   };
