@@ -68,6 +68,7 @@ a ec="emacsclient"
 a dpkg='COLUMNS=${COLUMNS:-80} dpkg'
 a psa="ps axuww"
 a ssh="ssh -A"
+a unzip="unzip -UU"
 
 gd() {
     dirs -v

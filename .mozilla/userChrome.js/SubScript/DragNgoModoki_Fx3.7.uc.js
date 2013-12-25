@@ -106,8 +106,8 @@ var DragNGo = {
   /*=== リンク ===*/
     {dir:'U', modifier:'',name:'xpi/jarインストール',obj:'xpi,jar',cmd:function(self,event,info){self.installXpi(info.urls);}},
     {dir:'U', modifier:'',name:'リンクを新しいタブ前面に開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'tab', null);}},
-    //{dir:'D', modifier:'',name:'リンクを新しいタブ後面に開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'tabshifted', null);}},
-    {dir:'D', modifier:'',name:'リンクを新しいタブでaguse.jp検索',obj:'link, textlink',cmd:function(self,event,info){self.searchWithEngine(info.urls, ['aguse.jp'], 'tab');}},
+    {dir:'D', modifier:'',name:'リンクを新しいタブ後面に開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'tabshifted', null);}},
+    //{dir:'D', modifier:'',name:'リンクを新しいタブでaguse.jp検索',obj:'link, textlink',cmd:function(self,event,info){self.searchWithEngine(info.urls, ['aguse.jp'], 'tab');}},
     {dir:'L', modifier:'',name:'リンクを現在のタブ開く',obj:'link, textlink',cmd:function(self,event,info){self.openUrls(info.urls, 'current', null);}},
 
   /*=== 画像 ===*/
