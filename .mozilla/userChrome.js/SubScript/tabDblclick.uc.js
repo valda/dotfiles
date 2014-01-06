@@ -5,6 +5,11 @@
 // @include        main
 // @compatibility  Firefox 4.0 5.0 6.0 7.0
 // @author         Alice0775
+// @version        2012/12/08 22:30 Bug 788290 Bug 788293 Remove E4X 
+// ==/UserScript==
+// @version        2012/02/25 23:00 幅
+// @version        2012/02/10 10:00 tab-icon-imageも見るように
+// @version        2012/01/31 11:00 by Alice0775  12.0a1 about:newtab
 // @version        2011/08/29 11:50 tree_style_tab
 // @version        2011/06/08 11:50 tree_style_tab-0.12.2011060202
 // @version        2010/08/12 Bug 574217 - Land TabCandy on trunk
@@ -13,7 +18,6 @@
 // @version        2010/02/08 19:00 Tree Style Tab のtwistyの処理が変わったようなので修正
 // @version        2010/01/01 00:40 タブが１枚だけの時 double click を拾えない(thanks 音吉)
 // @version        2009/09/10 22:40 mmm e.detailを使うようにした
-// ==/UserScript==
 // @Note
 // @version        2009/03/03 22:40 about:blankならhome表示
 // @version        2008/11/26 selectPrevTabOnClickSelectedTab.uc.jsとの整合
@@ -41,7 +45,7 @@
     //load home if blank
     if (!tab.linkedBrowser.docShell.busyFlags
         && !tab.linkedBrowser.docShell.restoringDocument
-        && tab.linkedBrowser.contentDocument.URL == 'about:blank'){
+        && ("isBlankPageURL" in window ? isBlankPageURL(tab.linkedBrowser.contentDocument.URL) : tab.linkedBrowser.contentDocument.URL == "about:blank")){
       document.getElementById("Browser:Home").doCommand();
       return;
     }
@@ -85,16 +89,20 @@
       } else {
         gBrowser.reloadTab(tab);
       }
-    } else if (x < iconW + tabx + tabw - 18) {
+    } else if (x <= tab.boxObject.screenX + tab.boxObject.width - 18) {
       //タブ幅の0.3倍～右端から18pxの範囲
       //タブを再読み込み
       if (aEvent.altKey) {
         // Bypass proxy and cache.
         tab.linkedBrowser.reloadWithFlags(nsIWebNavigation.LOAD_FLAGS_BYPASS_PROXY | nsIWebNavigation.LOAD_FLAGS_BYPASS_CACHE);
       } else {
-        gBrowser.reloadTab(tab);
+        if (/^moz-neterror/.test(tab.linkedBrowser.contentWindow.document.documentURI)) {
+          tab.linkedBrowser.reloadWithFlags(nsIWebNavigation.LOAD_FLAGS_BYPASS_PROXY | nsIWebNavigation.LOAD_FLAGS_BYPASS_CACHE);
+        } else {
+          gBrowser.reloadTab(tab);
+        }
       }
-    } else {
+    } else if (x > tab.boxObject.screenX + tab.boxObject.width - 18) {
       //右端から18pxの範囲
       //すべてのタブを再読み込み
       if (aEvent.altKey) {
@@ -139,7 +147,9 @@
       return false;
 
     var icon = aEvent.originalTarget.ownerDocument.getAnonymousElementByAttribute(
-                 tab, 'class', 'tab-icon');
+                 tab, 'class', 'tab-icon') ||
+               aEvent.originalTarget.ownerDocument.getAnonymousElementByAttribute(
+                 tab, 'class', 'tab-icon-image');
     var iconX = icon.boxObject.screenX;
     var iconW = icon.boxObject.width;
     var x = aEvent.screenX;
@@ -151,16 +161,14 @@
 
       func = func.replace(
         /{/,
-        <><![CDATA[
-        {
-          var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-                         .getService(Components.interfaces.nsIWindowMediator);
-          var mainWindow = wm.getMostRecentWindow("navigator:browser");
-          if(!mainWindow.tabDblclickisIcon(aEvent) || new Date().getTime() - mainWindow.tabDblclickmousedownTime > mainWindow.tabDblclickTimeWait){
-          } else {
-            return;
-          }
-       ]]></>
+        '{ \
+          var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"] \
+                         .getService(Components.interfaces.nsIWindowMediator); \
+          var mainWindow = wm.getMostRecentWindow("navigator:browser"); \
+          if(!mainWindow.tabDblclickisIcon(aEvent) || new Date().getTime() - mainWindow.tabDblclickmousedownTime > mainWindow.tabDblclickTimeWait){ \
+          } else { \
+            return; \
+          }'
       );
       eval("TreeStyleTabBrowser.prototype.onClick = " + func);
     }
