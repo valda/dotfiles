@@ -10,8 +10,7 @@ URxvt*scrollBar: false
 URxvt*lineSpace: 0
 URxvt*letterSpace: -1
 URxvt*termName: xterm-256color
-URxvt*perl-ext-common: default,matcher,xim-onthespot,clipboard
-URxvt*matcher.button: 2
+URxvt*perl-ext-common: default,xim-onthespot,clipboard
 URxvt*preeditType: OnTheSpot
 
 ! black dark/light
