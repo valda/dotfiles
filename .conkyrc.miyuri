@@ -15,7 +15,7 @@ own_window_transparent yes
 own_window_argb_visual yes
 #own_window_argb_value 64
 gap_x 20
-gap_y 40
+gap_y 80
 minimum_size 330 0
 maximum_width 330
 
@@ -89,13 +89,13 @@ template8 ${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \
 template9 CPU\1 ${freq_g \1}GHz/${exec cat \2 | cut -c1-2}°C - ${cpu cpu\1}% ${goto 170}${color2}${cpubar cpu\1}${color}
 
 TEXT
-${font URW Gothic L:Book:size=20}${color1}System ${hr}${color}${font}
+${font URW Gothic L:Book:size=18}${color1}System ${hr}${color}${font}
 
  ${pre_exec lsb_release -d | cut -f 2}
  ${nodename} ${kernel} on ${machine}
  Uptime: ${uptime}
 
-${font URW Gothic L:Book:size=20}${color1}${voffset 3}Processor ${hr}${color}${font}
+${font URW Gothic L:Book:size=18}${color1}${voffset 3}Processor ${hr}${color}${font}
 
  ${template9 1 /sys/devices/platform/coretemp.0/temp2_input}
  ${template9 2 /sys/devices/platform/coretemp.0/temp3_input}
@@ -105,7 +105,7 @@ ${template7 20 325}${voffset -5}
 ${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
 
-${font URW Gothic L:Book:size=20}${color1}${voffset 3}Memory ${hr}${color}${font}
+${font URW Gothic L:Book:size=18}${color1}${voffset 3}Memory ${hr}${color}${font}
 
  Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}${color}
  buffers/cache: ${buffers}/${cached}
@@ -114,7 +114,7 @@ ${font URW Gothic L:Book:size=20}${color1}${voffset 3}Memory ${hr}${color}${font
 ${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
 ${template8 2 150 200 250 300}
 
-${font URW Gothic L:Book:size=20}${color1}${voffset 3}Disk ${hr}${color}${font}
+${font URW Gothic L:Book:size=18}${color1}${voffset 3}Disk ${hr}${color}${font}
 
 ${goto 10}${template3 md1 Read 20 166}${goto 175}${template3 md1 Write 20 166}${voffset -5}
 ${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
@@ -124,6 +124,6 @@ ${template8 4 150 200 250 300}
  ${template6 /home /home}
  ${template6 /tmp /tmp}
 
-${font URW Gothic L:Book:size=20}${color1}${voffset 3}Network ${hr}${color}${font}
+${font URW Gothic L:Book:size=18}${color1}${voffset 3}Network ${hr}${color}${font}
 
 ${if_up eth0}${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}
