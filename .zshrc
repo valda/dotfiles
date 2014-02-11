@@ -271,11 +271,6 @@ eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 test -e $HOME/z/z.sh && source $HOME/z/z.sh
 
 #-------------------------------------------------------------------------
-# Steam
-#-------------------------------------------------------------------------
-[[ -f "$HOME/.local/share/Steam/setup_debian_environment.sh" ]] && source "$HOME/.local/share/Steam/setup_debian_environment.sh"
-
-#-------------------------------------------------------------------------
 # Cygwin (bash|zsh) here
 #-------------------------------------------------------------------------
 if iscygwin; then
