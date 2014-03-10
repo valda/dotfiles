@@ -48,23 +48,17 @@ override_utf8_locale yes
 #draw_shades yes
 #default_shade_color 185e5c
 draw_outline yes
-#default_outline_color 600222
-default_outline_color 551133
+default_outline_color 330022
 
 ## Color
-#default_color ffffff
-default_color ccffee
+default_color ccddbb
 # Title
-#color1 f26a98
-color1 ee2266
+color1 ca1452
 # Bar
-#color2 ca1452
-color2 cc3355
+color2 ca1452
 # Top Title
-#color3 f2abc3
-color3 dd5577
+color3 f26a98
 # Top 1
-#color4 cef3ac
 color4 ffffff
 #color5
 #color6
@@ -105,7 +99,7 @@ ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Processor ${hr}${color}${f
 
  ${template9 1 /sys/devices/platform/coretemp.0/temp2_input}
  ${template9 2 /sys/devices/platform/coretemp.0/temp3_input}
-${template7 20 325}${voffset -5}
+${template7 20 335}${voffset -5}
 ${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
 
