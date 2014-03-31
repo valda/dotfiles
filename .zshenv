@@ -45,11 +45,6 @@ if [ -x /usr/share/source-highlight/src-hilite-lesspipe.sh ]
     export LESSOPEN='| /usr/share/source-highlight/src-hilite-lesspipe.sh %s'
 fi
 
-if [ -x `which dircolors` ]
-    then
-    eval `dircolors -b`
-fi
-
 if [ -e $HOME/.zshenv.local ]; then
     source $HOME/.zshenv.local
 fi
