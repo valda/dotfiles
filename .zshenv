@@ -26,7 +26,7 @@ if [ -z $USER ]
 fi
 
 export EDITOR=vi
-export PAGER=lv
+export PAGER=less
 export BLOCKSIZE=K
 export PERL_BADLANG=0
 export PGPPATH=$HOME/.pgp
