@@ -120,7 +120,7 @@ ${template8 2 150 200 250 300}
 
 ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Disk ${hr}${color}${font}
 
-${goto 10}${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
+${goto 10}${template3 md1 Read 20 166}${goto 175}${template3 md1 Write 20 166}${voffset -5}
 ${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
 ${template8 4 150 200 250 300}
 
