@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Make sure this is before the 'exec' command or it won't be sourced.
-[ -f /etc/xprofile ] && source /etc/xprofile
-[ -f ~/.xprofile ] && source ~/.xprofile
+[ -f /etc/xprofile ] && . /etc/xprofile
+[ -f ~/.xprofile ] && . ~/.xprofile
 [ -f ~/.Xresources ] && xrdb -load ~/.Xresources
 
 [ -z $GTK_IM_MODULE ] && export GTK_IM_MODULE=fcitx
