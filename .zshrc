@@ -70,13 +70,6 @@ a psa="ps axuww"
 a ssh="ssh -A"
 a ag="ag --pager 'less -R'"
 
-gd() {
-    dirs -v
-    echo -n "select number: "
-    read newdir
-    cd +"$newdir"
-}
-
 resume-ssh-agent() {
     if [ -z "$SSH_AUTH_SOCK" -o  ! -S "$SSH_AUTH_SOCK" ]; then
         test -e "$HOME/.ssh/ssh_agent.env" && source "$HOME/.ssh/ssh_agent.env"
@@ -130,8 +123,8 @@ myabbrev=(
 'llv' '| lv'
 'lg' '| grep'
 'lx' '| xargs -r'
-'0lx' '-print0 | xargs -0 -r'
 'be' 'bundle exec'
+'lp' '| peco'
 )
 
 my-expand-abbrev() {
@@ -275,7 +268,51 @@ fi
 #-------------------------------------------------------------------------
 # z.sh - https://github.com/rupa/z.git
 #-------------------------------------------------------------------------
-test -e $HOME/z/z.sh && source $HOME/z/z.sh
+#test -e $HOME/z/z.sh && source $HOME/z/z.sh
+
+#-------------------------------------------------------------------------
+# cdr
+#-------------------------------------------------------------------------
+autoload -Uz is-at-least
+if is-at-least 4.3.11; then
+  autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+  add-zsh-hook chpwd chpwd_recent_dirs
+  zstyle ':completion:*:*:cdr:*:*' menu selection
+  zstyle ':completion:*' recent-dirs-insert both
+  zstyle ':chpwd:*' recent-dirs-max 500
+  zstyle ':chpwd:*' recent-dirs-default true
+  zstyle ':chpwd:*' recent-dirs-pushd true
+fi
+
+#-------------------------------------------------------------------------
+# peco - https://github.com/peco/peco
+#-------------------------------------------------------------------------
+function peco-select-history() {
+    local tac
+    if which tac > /dev/null; then
+        tac="tac"
+    else
+        tac="tail -r"
+    fi
+    BUFFER=$(\history -n 1 | \
+        eval $tac | \
+        peco --query "$LBUFFER")
+    CURSOR=$#BUFFER
+    zle clear-screen
+}
+zle -N peco-select-history
+bindkey '^r' peco-select-history
+
+function peco-cdr () {
+    local selected_dir=$(cdr -l | awk '{ print $2 }' | peco)
+    if [ -n "$selected_dir" ]; then
+        BUFFER="cd ${selected_dir}"
+        zle accept-line
+    fi
+    zle clear-screen
+}
+zle -N peco-cdr
+bindkey '^[d' peco-cdr
 
 #-------------------------------------------------------------------------
 # Cygwin (bash|zsh) here
