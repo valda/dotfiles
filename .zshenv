@@ -2,29 +2,13 @@
 
 umask 022
 
-#
-# OS ¤ÇÊ¬´ô
-#
-case "$OSTYPE" in
-    cygwin)
-        export CYGWIN=acl
-        export PATH=$HOME/bin:$HOME/opt/bin:$PATH
-        export LANG=ja_JP.UTF-8
-        export LANGUAGE=ja
-        ;;
-    *)
-        limit coredumpsize 0
-        export PATH=$HOME/bin:$HOME/opt/bin:$PATH
-        export LANG=ja_JP.UTF-8
-        export LANGUAGE=ja
-        ;;
-esac
-
 if [ -z $USER ]
     then
     export USER=$LOGNAME
 fi
 
+export LANG=ja_JP.UTF-8
+export LANGUAGE=ja
 export EDITOR=vi
 export PAGER=less
 export BLOCKSIZE=K
@@ -44,6 +28,17 @@ if [ -x /usr/share/source-highlight/src-hilite-lesspipe.sh ]
     export LESS='-R'
     export LESSOPEN='| /usr/share/source-highlight/src-hilite-lesspipe.sh %s'
 fi
+export GOPATH=$HOME/.go
+export PATH=$HOME/bin:$HOME/opt/bin:$PATH:$GOPATH/bin
+
+case "$OSTYPE" in
+    cygwin)
+        export CYGWIN=acl
+        ;;
+    *)
+        limit coredumpsize 0
+        ;;
+esac
 
 if [ -e $HOME/.zshenv.local ]; then
     source $HOME/.zshenv.local
