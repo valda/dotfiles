@@ -242,7 +242,7 @@ preexec() {
 # fi
 
 #-------------------------------------------------------------------------
-if [ -x `which dircolors` ]; then
+if which dircolors > /dev/null; then
     eval `dircolors -b`
 fi
 
@@ -287,42 +287,34 @@ fi
 #-------------------------------------------------------------------------
 # peco - https://github.com/peco/peco
 #-------------------------------------------------------------------------
-function peco-select-history() {
-    local tac
-    if which tac > /dev/null; then
-        tac="tac"
-    else
-        tac="tail -r"
-    fi
-    BUFFER=$(\history -n 1 | \
-        eval $tac | \
-        peco --query "$LBUFFER")
-    CURSOR=$#BUFFER
-    zle clear-screen
-}
-zle -N peco-select-history
-bindkey '^r' peco-select-history
+if which peco > /dev/null; then
+    function peco-select-history() {
+        local tac
+        if which tac > /dev/null; then
+            tac="tac"
+        else
+            tac="tail -r"
+        fi
+        BUFFER=$(\history -n 1 | \
+            eval $tac | \
+            peco --query "$LBUFFER")
+        CURSOR=$#BUFFER
+        zle clear-screen
+    }
+    zle -N peco-select-history
 
-function peco-cdr () {
-    local selected_dir=$(cdr -l | awk '{ print $2 }' | peco)
-    if [ -n "$selected_dir" ]; then
-        BUFFER="cd ${selected_dir}"
-        zle accept-line
-    fi
-    zle clear-screen
-}
-zle -N peco-cdr
-bindkey '^[d' peco-cdr
+    function peco-cdr () {
+        local selected_dir=$(cdr -l | awk '{ print $2 }' | peco)
+        if [ -n "$selected_dir" ]; then
+            BUFFER="cd ${selected_dir}"
+            zle accept-line
+        fi
+        zle clear-screen
+    }
+    zle -N peco-cdr
 
-#-------------------------------------------------------------------------
-# Cygwin (bash|zsh) here
-#-------------------------------------------------------------------------
-if iscygwin; then
-    if [ "$OPENDIR" != "" ]; then
-        OPENDIR=`cygpath "$OPENDIR"`
-        cd "$OPENDIR"
-        unset OPENDIR
-    fi
+    bindkey '^r' peco-select-history
+    bindkey '^[d' peco-cdr
 fi
 
 #-------------------------------------------------------------------------
