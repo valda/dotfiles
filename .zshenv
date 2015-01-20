@@ -30,6 +30,7 @@ if [ -x /usr/share/source-highlight/src-hilite-lesspipe.sh ]
 fi
 export GOPATH=$HOME/.go
 export PATH=$HOME/bin:$HOME/opt/bin:$PATH:$GOPATH/bin
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed -r "s:(jre/)?bin/java::")
 
 case "$OSTYPE" in
     cygwin)
