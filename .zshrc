@@ -252,10 +252,11 @@ fi
 if [ -d "$HOME/.rbenv" ]; then
     export PATH="$HOME/.rbenv/bin:$PATH"
     eval "$(rbenv init -)"
-    rehash () {
-        rbenv rehash
-        builtin rehash
-    }
+    # rbenv-gem-rehash プラグインによって不要
+    # rehash () {
+    #     rbenv rehash
+    #     builtin rehash
+    # }
 fi
 
 #-------------------------------------------------------------------------
