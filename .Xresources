@@ -3,3 +3,40 @@
 *VT100*scrollBar:               false
 
 Emacs*useXIM: false
+
+XTerm*termName: xterm-256color
+XTerm*utf8: 1
+XTerm*locale: true
+XTerm*forcePackedFont: false
+XTerm*selectToClipboard: true
+XTerm*faceName: Ricty
+XTerm*faceNameDoublesize: Ricty
+XTerm*faceSize: 12
+XTerm*saveLines: 2000
+XTerm*geometry: 80x24
+XTerm*foreground: #ffffff
+XTerm*background: #000000
+! black dark/light
+XTerm*color0: #2e3436
+XTerm*color8: #6e706b
+! red dark/light
+XTerm*color1: #cc0000
+XTerm*color9: #ef2929
+! green dark/light
+XTerm*color2: #4e9a06
+XTerm*color10: #8ae234
+! yellow dark/light
+XTerm*color3: #edd400
+XTerm*color11: #fce94f
+! blue dark/light
+XTerm*color4: #3465a4
+XTerm*color12: #729fcf
+! magenta dark/light
+XTerm*color5: #92659a
+XTerm*color13: #c19fbe
+! cyan dark/light
+XTerm*color6: #07c7ca
+XTerm*color14: #63e9e9
+! white dark/light
+XTerm*color7: #d3d7cf
+XTerm*color15: #eeeeec
