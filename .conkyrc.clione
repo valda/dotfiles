@@ -97,14 +97,14 @@ ${font URW Gothic L:Book:size=18}${color1}System ${hr}${color}${font}
 
 ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Processor ${hr}${color}${font}
 
- ${template9 1 /sys/devices/platform/coretemp.0/temp2_input}
- ${template9 2 /sys/devices/platform/coretemp.0/temp2_input}
- ${template9 3 /sys/devices/platform/coretemp.0/temp3_input}
- ${template9 4 /sys/devices/platform/coretemp.0/temp3_input}
- ${template9 5 /sys/devices/platform/coretemp.0/temp4_input}
- ${template9 6 /sys/devices/platform/coretemp.0/temp4_input}
- ${template9 7 /sys/devices/platform/coretemp.0/temp5_input}
- ${template9 8 /sys/devices/platform/coretemp.0/temp5_input}
+ ${template9 1 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp2_input}
+ ${template9 2 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp2_input}
+ ${template9 3 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp3_input}
+ ${template9 4 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp3_input}
+ ${template9 5 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp4_input}
+ ${template9 6 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp4_input}
+ ${template9 7 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp5_input}
+ ${template9 8 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp5_input}
 ${template7 20 335}${voffset -5}
 ${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
