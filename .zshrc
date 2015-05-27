@@ -41,6 +41,10 @@ fpath=($HOME/.zsh/functions/Completion $fpath)
 autoload -Uz compinit
 compinit
 
+if which dircolors > /dev/null; then
+    eval `dircolors -b`
+fi
+
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*:default' menu select true
@@ -69,6 +73,7 @@ a dpkg='COLUMNS=${COLUMNS:-80} dpkg'
 a psa="ps axuww"
 a ssh="ssh -A"
 a ag="ag --pager 'less -R'"
+a chinachu='sudo -u chinachu /home/chinachu/chinachu/chinachu'
 
 resume-ssh-agent() {
     if [ -z "$SSH_AUTH_SOCK" -o  ! -S "$SSH_AUTH_SOCK" ]; then
@@ -240,11 +245,6 @@ preexec() {
 #     PROMPT="`whoami`@%m%~%% "
 #     unset RPROMPT
 # fi
-
-#-------------------------------------------------------------------------
-if which dircolors > /dev/null; then
-    eval `dircolors -b`
-fi
 
 #-------------------------------------------------------------------------
 # rbenv
