@@ -74,6 +74,7 @@ a psa="ps axuww"
 a ssh="ssh -A"
 a ag="ag --pager 'less -R'"
 a chinachu='sudo -u chinachu /home/chinachu/chinachu/chinachu'
+a grep="grep --color=auto"
 
 resume-ssh-agent() {
     if [ -z "$SSH_AUTH_SOCK" -o  ! -S "$SSH_AUTH_SOCK" ]; then
