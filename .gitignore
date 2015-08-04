@@ -3,109 +3,110 @@
 *.log
 *.stackdump
 *~
-/.VirtualBox
-/.android
-/.bash_history
-/.dvdcss
-/.emacs.d/.bm-repository
-/.emacs.d/.session
-/.emacs.d/ac-comphist.dat
-/.emacs.d/anything-c-adaptive-history
-/.emacs.d/custom.el
-/.emacs.d/el-get-backup-*/
-/.emacs.d/el-get/
-/.emacs.d/elpa/
-/.emacs.d/server/server
-/.emacs.d/session.*
-/.emacs.d/tramp
-/.emacs.d/url/cookies
-/.eshell/history
-/.eshell/lastdir
-/.fastri-index
-/.fluxbox/fbrun_history
-/.fluxbox/lastwallpaper
-/.gem
-/.gimp-2.*
-/.gnupg
-/.howm-keys
-/.irb_history
-/.kkcrc
-/.lesshst
-/.migemo-pattern
-/.mlterm/challenge
-/.mozilla/extensions/
-/.mozilla/firefox/
-/.mozilla/plugins/
-/.navi2ch
-/.pit
-/.rainlendar2/
-/.recentf
-/.recently-used.xbel
-/.rnd
-/.session
-/.smplayer
-/.ssh
-/.subversion
-/.thumbnails
-/.unison/
-/.viminfo
-/.wl
-/.zcompdump
-/.zsh-history
-/Access Connections/
-/Alcohol 52%/
-/AppData/
-/Application Data/
-/Bluetooth 交換フォルダ/
-/Contacts/
-/Cookies/
-/Desktop/
-/Documents/
-/Downloads/
-/Dropbox/
-/Favorites/
-/Fuji Xerox/
-/Launchy/
-/Links/
-/Local Settings/
-/Music/
-/My Documents/
-/My Dropbox/
-/My Music/
-/My Pictures/
-/My Videos/
-/My Virtual Machines/
-/NTUSER.DAT*
-/NetHood/
-/Pictures/
-/PrintHood/
-/Recent/
-/Saved Games/
-/Searches/
-/SendTo/
-/SharedFolder/
-/Videos/
-/Visual Studio 2005/
-/Visual Studio Projects/
-/_viminfo
-/bak/
-/chrome/keybindings.html
-/chrome/uAutoPagerize.json
-/desktop.ini
-/disable_compressefolder_for_win7/
-/emacs23-build/
-/fontconfig/
-/mplayer/
-/ntuser.dat*
-/ntuser.ini
-/opt/
-/src/
-/test/
-/tmp/
-/wc/
-/workspace/
-/スタート メニュー/
-/マイ壁紙/
-/伊集院/
-/VirtualBox VMs
-/.mozilla/userChrome.js/uAutoPagerize.json
+.VirtualBox
+.android
+.bash_history
+.dvdcss
+.emacs.d/.bm-repository
+.emacs.d/.session
+.emacs.d/ac-comphist.dat
+.emacs.d/anything-c-adaptive-history
+.emacs.d/custom.el
+.emacs.d/el-get-backup-*/
+.emacs.d/el-get/
+.emacs.d/elpa/
+.emacs.d/server/server
+.emacs.d/session.*
+.emacs.d/tramp
+.emacs.d/url/cookies
+.eshell/history
+.eshell/lastdir
+.fastri-index
+.fluxbox/fbrun_history
+.fluxbox/lastwallpaper
+.gem
+.gimp-2.*
+.gnupg
+.howm-keys
+.irb_history
+.kkcrc
+.lesshst
+.migemo-pattern
+.mlterm/challenge
+.mozilla/extensions/
+.mozilla/firefox/
+.mozilla/plugins/
+.navi2ch
+.pit
+.rainlendar2/
+.recentf
+.recently-used.xbel
+.rnd
+.session
+.smplayer
+.ssh
+.subversion
+.thumbnails
+.unison/
+.viminfo
+.wl
+.zcompdump
+.zsh-history
+Access Connections/
+Alcohol 52%/
+AppData/
+Application Data/
+Bluetooth 交換フォルダ/
+Contacts/
+Cookies/
+Desktop/
+Documents/
+Downloads/
+Dropbox/
+Favorites/
+Fuji Xerox/
+Launchy/
+Links/
+Local Settings/
+Music/
+My Documents/
+My Dropbox/
+My Music/
+My Pictures/
+My Videos/
+My Virtual Machines/
+NTUSER.DAT*
+NetHood/
+Pictures/
+PrintHood/
+Recent/
+Saved Games/
+Searches/
+SendTo/
+SharedFolder/
+Videos/
+Visual Studio 2005/
+Visual Studio Projects/
+_viminfo
+bak/
+chrome/keybindings.html
+chrome/uAutoPagerize.json
+desktop.ini
+disable_compressefolder_for_win7/
+emacs23-build/
+fontconfig/
+mplayer/
+ntuser.dat*
+ntuser.ini
+opt/
+src/
+test/
+tmp/
+wc/
+workspace/
+スタート メニュー/
+マイ壁紙/
+伊集院/
+VirtualBox VMs/
+.mozilla/userChrome.js/uAutoPagerize.json
+.gitconfig
