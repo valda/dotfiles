@@ -1,4 +1,4 @@
-;;
+﻿;;
 ;; WindowsでEmacs風キーバインド
 ;;
 #InstallKeybdHook
@@ -42,6 +42,8 @@ is_target()
 	IfWinActive,ahk_class gdkWindowToplevel ;GIMP, Inkscape 等 GTK アプリケーション
 		Return 1
 	IfWinActive,ahk_class wndclass_desked_gsk ; Visual Studio 2005
+		Return 1
+	ifWinActive,ahk_class MozillaWindowClass ; Firefox
 		Return 1
 	Return 0
 }

@@ -26,17 +26,22 @@
 .fluxbox/lastwallpaper
 .gem
 .gimp-2.*
+.gitconfig
 .gnupg
+.howm-history
 .howm-keys
 .irb_history
 .kkcrc
 .lesshst
 .migemo-pattern
+.mikutter/
 .mlterm/challenge
 .mozilla/extensions/
 .mozilla/firefox/
 .mozilla/plugins/
+.mozilla/userChrome.js/uAutoPagerize.json
 .navi2ch
+.netrc
 .pit
 .rainlendar2/
 .recentf
@@ -85,10 +90,12 @@ Searches/
 SendTo/
 SharedFolder/
 Videos/
+VirtualBox VMs/
 Visual Studio 2005/
 Visual Studio Projects/
 _viminfo
 bak/
+bin/
 chrome/keybindings.html
 chrome/uAutoPagerize.json
 desktop.ini
@@ -107,6 +114,3 @@ workspace/
 スタート メニュー/
 マイ壁紙/
 伊集院/
-VirtualBox VMs/
-.mozilla/userChrome.js/uAutoPagerize.json
-.gitconfig
