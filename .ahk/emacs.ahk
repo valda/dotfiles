@@ -43,7 +43,7 @@ is_target()
 		Return 1
 	IfWinActive,ahk_class wndclass_desked_gsk ; Visual Studio 2005
 		Return 1
-	ifWinActive,ahk_class MozillaWindowClass ; Firefox
+	if(WinActive("ahk_class MozillaWindowClass") && WinActive("ahk_exe firefox.exe"))
 		Return 1
 	Return 0
 }
