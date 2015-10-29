@@ -28,7 +28,8 @@ if [ -x /usr/share/source-highlight/src-hilite-lesspipe.sh ]
     export LESSOPEN='| /usr/share/source-highlight/src-hilite-lesspipe.sh %s'
 fi
 export GOPATH=$HOME/.go
-export PATH=$HOME/bin:$HOME/opt/bin:$PATH:$GOPATH/bin
+#export GTAGSLABEL=pygments
+export PATH=$HOME/opt/global/bin:$HOME/bin:$PATH:$GOPATH/bin
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed -r "s:(jre/)?bin/java::")
 
 case "$OSTYPE" in
