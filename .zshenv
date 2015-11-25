@@ -41,6 +41,35 @@ case "$OSTYPE" in
         ;;
 esac
 
+#-------------------------------------------------------------------------
+# local::lib
+#-------------------------------------------------------------------------
+if [ -d "$HOME/perl5/lib/perl5" ]; then
+    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+fi
+
+#-------------------------------------------------------------------------
+# rbenv
+#-------------------------------------------------------------------------
+if [ -d "$HOME/.rbenv" ]; then
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    eval "$(rbenv init -)"
+    # rbenv-gem-rehash プラグインによって不要
+    # rehash () {
+    #     rbenv rehash
+    #     builtin rehash
+    # }
+fi
+
+#-------------------------------------------------------------------------
+# nodebrew
+#-------------------------------------------------------------------------
+if [ -d "$HOME/.nodebrew" ]; then
+    export PATH=$HOME/.nodebrew/current/bin:$PATH
+    export NODEBREW_ROOT=$HOME/.nodebrew
+fi
+
+#-------------------------------------------------------------------------
 if [ -e $HOME/.zshenv.local ]; then
     source $HOME/.zshenv.local
 fi
