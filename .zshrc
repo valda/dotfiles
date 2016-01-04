@@ -121,6 +121,18 @@ isscreen() {
     return 1
 }
 
+git-pull-subdirs() {
+    local gitdir
+    for gitdir in $(find -maxdepth 2 -type d -name '.git'); do
+        (
+            local dir; dir=`dirname $gitdir`
+            echo '>>>' $dir
+            cd $dir && git pull --rebase
+            echo -e "<<<\n"
+        )
+    done
+}
+
 #-------------------------------------------------------------------------
 # abbrev
 #-------------------------------------------------------------------------
