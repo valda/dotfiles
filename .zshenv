@@ -70,6 +70,16 @@ if [ -d "$HOME/.nodebrew" ]; then
 fi
 
 #-------------------------------------------------------------------------
+# composer
+#-------------------------------------------------------------------------
+if [ -d "$HOME/.composer" ]; then
+    alias composer=$HOME/.composer/composer.phar
+    export PATH=$HOME/.composer/vendor/bin:$PATH
+fi
+
+
+
+#-------------------------------------------------------------------------
 if [ -e $HOME/.zshenv.local ]; then
     source $HOME/.zshenv.local
 fi
