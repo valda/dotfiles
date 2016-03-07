@@ -136,23 +136,39 @@ git-pull-subdirs() {
 #-------------------------------------------------------------------------
 # abbrev
 #-------------------------------------------------------------------------
-typeset -A myabbrev
-myabbrev=(
-'llv' '| lv'
-'lg' '| grep'
-'lx' '| xargs -r'
-'be' 'bundle exec'
-'lp' '| peco'
+typeset -A abbreviations
+abbreviations=(
+    "L"    "| less"
+    "G"    "| grep"
+    "X"    "| xargs"
+    "T"    "| tail"
+    "C"    "| cat"
+    "W"    "| wc"
+    "A"    "| awk"
+    "S"    "| sed"
+    "E"    "2>&1 > /dev/null"
+    "N"    "> /dev/null"
+    "P"    "| peco"
+    'be'   'bundle exec'
 )
 
-my-expand-abbrev() {
-    local left prefix
-    left=$(echo -nE "$LBUFFER" | sed -e "s/[_a-zA-Z0-9]*$//")
-    prefix=$(echo -nE "$LBUFFER" | sed -e "s/.*[^_a-zA-Z0-9]\([_a-zA-Z0-9]*\)$/\1/")
-    LBUFFER=$left${myabbrev[$prefix]:-$prefix}" "
+magic-abbrev-expand() {
+    local MATCH
+    LBUFFER=${LBUFFER%%(#m)[-_a-zA-Z0-9]#}
+    LBUFFER+=${abbreviations[$MATCH]:-$MATCH}
+    zle self-insert
+
 }
-zle -N my-expand-abbrev
-bindkey ' ' my-expand-abbrev
+
+no-magic-abbrev-expand() {
+    LBUFFER+=' '
+
+}
+
+zle -N magic-abbrev-expand
+zle -N no-magic-abbrev-expand
+bindkey " " magic-abbrev-expand
+bindkey "^x " no-magic-abbrev-expand
 
 #-------------------------------------------------------------------------
 # change locale

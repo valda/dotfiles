@@ -30,7 +30,9 @@ fi
 export GOPATH=$HOME/.go
 #export GTAGSLABEL=pygments
 export PATH=$HOME/opt/global/bin:$HOME/bin:$PATH:$GOPATH/bin
-export JAVA_HOME=$(readlink -f /usr/bin/java | sed -r "s:(jre/)?bin/java::")
+if [ -e /usr/bin/java ]; then
+    export JAVA_HOME=$(readlink -f /usr/bin/java | sed -r "s:(jre/)?bin/java::")
+fi
 
 case "$OSTYPE" in
     cygwin)
