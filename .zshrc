@@ -122,15 +122,18 @@ isscreen() {
 }
 
 git-pull-subdirs() {
-    local gitdir
-    for gitdir in $(find -maxdepth 2 -type d -name '.git'); do
-        (
-            local dir; dir=`dirname $gitdir`
-            echo '>>>' $dir
-            cd $dir && git pull --rebase
-            echo -e "<<<\n"
-        )
-    done
+    if which parallel > /dev/null; then
+        find -maxdepth 2 -type d -name '.git' | parallel 'DIR={//} ; echo ">>" $DIR; cd $DIR ; git pull --rebase'
+    else
+        local gitdir
+        for gitdir in $(find -maxdepth 2 -type d -name '.git'); do
+            (
+                local dir; dir=`dirname $gitdir`
+                echo '>>' $dir
+                cd $dir && git pull --rebase
+            )
+        done
+    fi
 }
 
 #-------------------------------------------------------------------------
