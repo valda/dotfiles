@@ -54,7 +54,7 @@ conky.config = {
    --# Color
    default_color = '#FFECEC',
    -- Section Title
-   color1 = '#A92B2B',
+   color1 = '#B92B2B',
    -- Bar
    color2 = '#D87474',
    -- Top Title
