@@ -2,13 +2,21 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 <!--
 // ==UserScript==
-// @name           conqueryModoki4.uc.xul
+// @name           conqueryModoki18.uc.xul
 // @namespace      http://space.geocities.yahoo.co.jp/gl/alice0775
 // @description    コンテキストメニューにQuery To...とサブメニューに検索エンジンリストを追加, 階層化した場合は串刺し検索
 // @description    選択したエンジンで検索, その後エンジンを元に戻す
 // @include        main
-// @compatibility  Firefox 3.0 3.5, 3.6
+// @compatibility  Firefox 40 non-e10s
 // @author         Alice0775
+// @version        2016/04/21 22:00 Update form history
+// @version        2015/10/12 20:00 Nightly44.0a1 fixed contectMenu
+// @version        2015/08/12 20:00 Fixed due to Bug 1134769
+// @version        2014/10/16 07:00 Revert=デフォルトエンジンに戻す は一番最初の奴にするようにした
+// @version        2014/08/22 22:00 Fixed due to Bug 1051017.
+// @version        2014/06/27 08:00 Fixed deprecated search service API.
+// @version        2014/04/18 23:50 Fixed rebuildPopup
+// @version        2014/04/18 23:30 Fixed rebuildPopup
 // @version        2013/09/13 21:00 Bug 856437 Remove Components.lookupMethod
 // @version        2013/09/13 20:00 Bug 738818
 // @version        2013/01/19 20:00 Bug 831008 Disable Mutation Events in chrome/XUL
@@ -87,9 +95,11 @@
                          'LA' : 'Not',
                          'LC' : 'Or',
                         },
+    updateHistory : true, // form history
     // -- config --
 
     _currentEngine:null,
+    _initialized:false,
 
     searchBar: function(){
       var searchBar = null;
@@ -101,19 +111,21 @@
       return searchBar;
     },
 
+    get browserSearchService() {
+      delete this.browserSearchService;
+      return this.browserSearchService = Components.classes["@mozilla.org/browser/search-service;1"]
+                                        .getService(Components.interfaces.nsIBrowserSearchService);
+    },
+
     getDefaultEngine: function() {
-      const nsIBSS = Components.interfaces.nsIBrowserSearchService;
-      const searchService =Components.classes["@mozilla.org/browser/search-service;1"].getService(nsIBSS);
-      return searchService.defaultEngine;
+      return this.browserSearchService.defaultEngine;
     },
 
     getEngineByIndex: function(iEngine) {
-      const nsIBSS = Components.interfaces.nsIBrowserSearchService;
-      const searchService =Components.classes["@mozilla.org/browser/search-service;1"].getService(nsIBSS);
       if (typeof iEngine == 'undefined'|| iEngine == null) {
-        var aEngine = searchService.defaultEngine;
+        var aEngine = this.browserSearchService.defaultEngine;
       }else{
-        var engines = searchService.getVisibleEngines({ });
+        var engines = this.browserSearchService.getVisibleEngines({ });
         var aEngine = engines[iEngine];
       }
       return aEngine;
@@ -209,25 +221,32 @@
       if (useNewWin) {
         openNewWindowWith(submission.uri.spec, null, submission.postData, false)
       }else if (useNewTab) {
-        if (this.getVer() >= 4) { //fx4
-          this.debug("tabshifted " + backGround);
-          openLinkIn(submission.uri.spec,
-                     backGround ? "tabshifted": "tab",
-                     { postData: submission.postData,
-                       relatedToCurrent: true });
-        } else {
-          gBrowser.loadOneTab(submission.uri.spec, null, null, submission.postData, backGround, false);
-        }
-      }else
+        this.debug("tabshifted " + backGround);
+        openLinkIn(submission.uri.spec,
+                   backGround ? "tabshifted": "tab",
+                   { postData: submission.postData,
+                     relatedToCurrent: true });
+      }else {
         gBrowser.loadURI(submission.uri.spec, null, submission.postData, false);
+      }
+      if (this.updateHistory) {
+        if (searchText && !PrivateBrowsingUtils.isWindowPrivate(window)) {
+          var searchBar = this.searchBar();
+          searchBar.FormHistory.update(
+            { op : "bump",
+              fieldname : searchBar._textbox.getAttribute("autocompletesearchparam"),
+              value : searchText },
+            { handleError : function(aError) {
+                Components.utils.reportError("Saving search to form history failed: " + aError.message);
+            }});
+        }
+      }
     },
 
 
     kusizasi: function conqueryModokikusizasi(aEvent) {
       this.hideAllPopup();
 
-      const nsIBSS = Components.interfaces.nsIBrowserSearchService;
-      const searchService =Components.classes["@mozilla.org/browser/search-service;1"].getService(nsIBSS);
       aEvent.preventDefault();
       aEvent.stopPropagation();
 
@@ -304,32 +323,12 @@
               ||  gBrowser;
     },
 
-    _getFocusedWindow: function(){ //現在のウインドウを得る
-        var focusedWindow = document.commandDispatcher.focusedWindow;
-        if (!focusedWindow || focusedWindow == window)
-            return window._content;
-        else
-            return focusedWindow;
-    },
-
     _getselection: function() {  //選択されている文字列を得る
-        var targetWindow = this._getFocusedWindow();
-        var sel = targetWindow.getSelection();
-        // for textfields
-        if (sel && !sel.toString()) {
-          var node = document.commandDispatcher.focusedElement;
-          if (node &&
-              ((typeof node.mozIsTextField == 'function' &&  node.mozIsTextField(true)) ||
-               node.type == "search" ||
-               node.type == "text" || node.type == "textarea") &&
-              'selectionStart' in node &&
-              node.selectionStart != node.selectionEnd) {
-              var offsetStart = Math.min(node.selectionStart, node.selectionEnd);
-              var offsetEnd   = Math.max(node.selectionStart, node.selectionEnd);
-              return node.value.substr(offsetStart, offsetEnd-offsetStart);
-          }
-        }
-        return sel ? sel.toString().replace(/\s/g,' ').replace(/^[\ ]+|[\ ]+$/g,'').replace(/[\ ]+/g,' ') : "";
+      if (gBrowser.selectedTab.linkedBrowser.isRemoteBrowser) {
+        return gContextMenuContentData.selectionInfo.text;
+      } else {
+        return BrowserUtils.getSelectionDetails(window).text;
+      }
     },
 
     hideAllPopup: function(){
@@ -419,10 +418,8 @@
       // popupにメニューを構築, forSearchBar: trueの時検索バー用, falseの時, コンテキスト用
       const kXULNS =
            "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-      const nsIBSS = Components.interfaces.nsIBrowserSearchService;
-      const searchService =Components.classes["@mozilla.org/browser/search-service;1"].getService(nsIBSS);
 
-      var engines = searchService.getVisibleEngines({ });
+      var engines = this.browserSearchService.getVisibleEngines({ });
       var refNode=[];
       var nest = 0;
       refNode[nest] = popup
@@ -482,7 +479,7 @@
           // Since this menu is rebuilt by the observer method whenever a new
           // engine is selected, the "selected" attribute does not need to be
           // explicitly cleared anywhere.
-          if (engines[i] == searchService.currentEngine)
+          if (engines[i] == this.browserSearchService.currentEngine)
             menuitem.setAttribute("selected", "true");
           if (engines[i].iconURI)
             menuitem.setAttribute("src", engines[i].iconURI.spec);
@@ -560,7 +557,18 @@
     tooltipCM: '',
     tooltipSB: '',
 
-    init : function(aEvent){
+    init: function() {
+      this.browserSearchService.init((function browserSearchService_init(aStatus) {
+        if (Components.isSuccessCode(aStatus)) {
+          this._initialized = true;
+          this.observe();
+        } else {
+          Components.utils.reportError("Cannot initialize search service, bailing out: " + aStatus);
+        }
+      }).bind(this));
+    },
+
+    observe : function(){
       for (var a in this.funcSearchbar)
         this.tooltipS += a + ' : ' + this.funcSearchbar[a] + '\n';
       for (var a in this.funcContext)
@@ -600,32 +608,31 @@
         //search.xmlの置き換え
         searchbar.rebuildPopup=function(){
           var popup = searchbar._popup;
+          if (popup) {
+            //Clear the popup, down to the first separator
+            var popup_org = [];
+            do {
+              if (!popup.lastChild)
+                return;
+              var menuitem = popup.lastChild.cloneNode(true);
+              popup_org.push(menuitem);
+              popup.removeChild(popup.lastChild);
+            } while (popup.lastChild && menuitem.localName != "menuseparator")
+            while (popup.lastChild)
+              popup.removeChild(popup.lastChild);
 
-          // Clear the popup, down to the first separator
-          var popup_org = []; //元のメニューをバックアップ
-          var len= popup.childNodes.length;
-          for (var i = len - 1; i > -1; i--) {
-            if (popup.childNodes[i] && popup.childNodes[i].localName != "menuseparator") continue;
-            var ref = i; // 検索バーの管理の直前のセパレータ位置
-            for (var j = ref; j < len; j++) {
-              popup_org[j-ref] = popup.childNodes[j].cloneNode(true);
+            conqueryModoki.makemenu(popup, true); //検索バー用ポップアップメニュー作成
+            //メニューに検索バーの管理と直前のセパレータを追加
+            for (var i = popup_org.length - 1; i > -1; i--) {
+              popup.appendChild(popup_org[i]);
             }
-            while (popup.firstChild) { //メニューを全部消す
-              popup.removeChild(popup.firstChild);
+            if (conqueryModoki.getVer() > 2) { //trunc Gecko/2007070706 Minefield/3.0a7pre でこれがいる
+              document.getAnonymousElementByAttribute(searchbar, "anonid", "open-engine-manager")
+                      .setAttribute("oncommand","document.getElementById('searchbar').openManager(event);");
             }
-            break;
-          }
-          conqueryModoki.makemenu(popup, true); //検索バー用ポップアップメニュー作成
-          //メニューに検索バーの管理と直前のセパレータを追加
-          for (var i = 0; i < popup_org.length; i++) {
-            popup.appendChild(popup_org[i]);
-          }
-          if (conqueryModoki.getVer() > 2) { //trunc Gecko/2007070706 Minefield/3.0a7pre でこれがいる
-            document.getAnonymousElementByAttribute(searchbar, "anonid", "open-engine-manager")
-                    .setAttribute("oncommand","document.getElementById('searchbar').openManager(event);");
           }
           //second search -0.4.2008052301
-          searchbar._engines = searchbar.searchService.getVisibleEngines({ });
+          searchbar._engines = conqueryModoki.browserSearchService.getVisibleEngines({ });
 
           var count = 0;
           var timer = setInterval(function(){
@@ -679,9 +686,11 @@
       if (this.searchBar()){
         var button = document.getAnonymousElementByAttribute(this.searchBar(),
                                                              "anonid", "searchbar-engine-button");
-        button.setAttribute('tooltiptext', this.tooltipSB);
-        button.addEventListener("click", this, false);
-        button.addEventListener("dblclick", this, false);
+        if (button) {
+          button.setAttribute('tooltiptext', this.tooltipSB);
+          button.addEventListener("click", this, false);
+          button.addEventListener("dblclick", this, false);
+        }
       }
     },
 
@@ -788,13 +797,7 @@
     },
 
     engineRevert: function(aEvent){
-      let defaultPrefB = Services.prefs.getDefaultBranch("browser.search.");
-      let nsIPLS = Components.interfaces.nsIPrefLocalizedString;
-      let defaultEngine =Services.search.defaultEngine;
-      try {
-        defaultEngineName = defaultPrefB.getComplexValue("defaultenginename", nsIPLS).data;
-        defaultEngine = Services.search.getEngineByName(defaultEngineName);
-      } catch (ex) {}
+      let defaultEngine = Services.search.getVisibleEngines({ })[0];
       setTimeout(function(){Services.search.currentEngine = defaultEngine;},100);
       return false;
     }

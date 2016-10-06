@@ -1,10 +1,22 @@
 // ==UserScript==
-// @name           DragNgoModoki_Fx3.7.uc.js
+// @name           DragNgoModoki_Fx40.uc.js
 // @namespace      http://space.geocities.yahoo.co.jp/gl/alice0775
 // @description    ファイル名をD&D
 // @include        main
-// @compatibility  Firefox 17
+// @compatibility  Firefox 40 (not e10s)
 // @author         Alice0775
+// @version        2016/06/12 22:00 Fix regression from Update form history
+// @version        2016/04/21 22:00 Update form history
+// @version        2015/08/18 00:50 Fixed 受
+// @version        2015/08/12 18:00 Fixed due to Bug 1134769
+// @version        2014/11/26 21:00 Bug 1103280, Bug 704320
+// @version        2014/11/10 10:00 get rid document.commandDispatcher
+// @version        2014/10/30 10:00 working with addHistoryFindbarFx3.0.uc.js
+// @version        2014/10/07 20:00 adjusts tolerance due to backed out Bug 378775
+// @version        2014/10/07 19:00 Modified to use capturing phase for drop and event.defaultprevent
+// ==/UserScript==
+// @version        2014/07/05 12:00 adjusts tolerance due to Bug 378775
+// @version        2014/05/01 12:00 Fix unnecessary toolbaritem creation
 // @version        2013/10/31 00:00 Bug 821687  Status panel should be attached to the content area
 // @version        2013/09/13 00:00 Bug 856437 Remove Components.lookupMethod
 // @version        2013/08/26 14:00 use FormHistory.update and fixed typo
@@ -19,7 +31,6 @@
 // @version        2013/03/05 00:00 input type=file change event が発火しないのを修正 Fx7+
 // @version        2013/01/29 00:00 draggable="true"もう一度有効
 // @version        2013/01/08 02:00 Bug 827546
-// ==/UserScript==
 // @version        2013/01/01 15:00 Avoid to overwrite data on dragstart. And Bug 789546
 // @version        2012/10/24 23:00 href=javascript://のリンクテキストの処理変更
 // @version        2012/10/06 23:00 Bug 795065 Add privacy status to nsDownload
@@ -140,8 +151,8 @@ var DragNGo = {
     {dir:'RD', modifier:'',name:'画像をD:/hogeに保存(SF)',obj:'image',cmd:function(self,event,info){if('saveFolderModoki' in window){saveFolderModoki.saveLink(info.urls[0], info.texts[0], 'D:\\hoge');}else{ self.saveLinkToLocal(info.urls[0],info.fname[0],'D:/hoge', true);}}},
     {dir:'RD', modifier:'',name:'リンクをD:/に保存(SF)',obj:'link',cmd:function(self,event,info){if('saveFolderModoki' in window){saveFolderModoki.saveLink(info.urls[0], info.texts[0], 'D:\\');}else{ self.saveLinkToLocal(info.urls[0],info.fname[0],'D:/', false);}}},
 */
-    {dir:'RD', modifier:'',name:'画像を名前を受けて保存'  ,obj:'image',cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0], info.nodes[0].ownerDocument, info.nodes[0].ownerDocument);}},
-    {dir:'RD', modifier:'',name:'リンクを名前を受けて保存',obj:'link' ,cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0], info.nodes[0].ownerDocument, info.nodes[0].ownerDocument);}},
+    {dir:'RD', modifier:'',name:'画像を名前を付けて保存'  ,obj:'image',cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0], info.nodes[0].ownerDocument, info.nodes[0].ownerDocument);}},
+    {dir:'RD', modifier:'',name:'リンクを名前を付けて保存',obj:'link' ,cmd:function(self,event,info){self.saveAs(info.urls[0], info.fname[0], info.nodes[0].ownerDocument, info.nodes[0].ownerDocument);}},
 
   /*=== テキストをえでぃたーで開く ===*/
     {dir:'DL', modifier:'',name:'テキストをエディターで開く',obj:'text',cmd:function(self,event,info){self.editText(null, info.texts[0]);}}, // 引数 null: view_source.editor.pathのエディターを使う
@@ -167,7 +178,8 @@ var DragNGo = {
     },
     {dir:'RLU', modifier:'',name:'選択テキスト(プロンプト)を指定ドメイン内で検索',obj:'link, text',
       cmd:function(self,event,info){
-        var _document=document.commandDispatcher.focusedWindow.document;
+        var win = document.commandDispatcher.focusedWindow;
+        var _document = win.document;
         var p = prompt('Input word to search under the domain('+_document.location.hostname+'):', info.texts[0]);
         if(p)
           _document.location.href = 'http://www.google.com/search?as_qdr=y15&q=site:' +
@@ -178,10 +190,10 @@ var DragNGo = {
     {dir:'UDUD', modifier:'',name:'選択範囲をテキストファイルとして保存',obj:'text',
       cmd:function(self){
         // 選択範囲をテキストファイルとして保存する。
-        var _window = document.commandDispatcher.focusedWindow;
-        var sel = _window.getSelection();
+        var win = document.commandDispatcher.focusedWindow;
+        var sel = win.getSelection();
         if (sel && !sel.isCollapsed) {
-          var fname = _window.location.href.match(/[^\/]+$/) + '.txt';
+          var fname = win.location.href.match(/[^\/]+$/) + '.txt';
           fname = decodeURIComponent(fname);
           fname = fname.replace(/[\*\:\?\"\|\/\\<>]/g, '_');
           self.saveTextToLocal(sel.toString(), fname, false);
@@ -341,8 +353,8 @@ var DragNGo = {
       where = 'tabshifted';
     }
     // 検索履歴に残す
-    if (addHistoryEntry)
-      this.searchBardispatchEvent(text);
+    if (typeof addHistoryEntry == "undefined" || addHistoryEntry)
+      this.updateSearchbarHistory(text);
     return true;
   },
 
@@ -363,13 +375,13 @@ var DragNGo = {
   },
 
   //検索バーにテキストをコピー, 疑似イベント発行
-  searchBardispatchEvent: function searchBardispatchEvent(searchText){
+  updateSearchbarHistory: function updateSearchbarHistory(searchText){
     this.copyToSearchBar(searchText);
 
-    var event = document.createEvent("UIEvents");
-    event.initUIEvent("input", true, true, window, 0);
+    //var event = document.createEvent("UIEvents");
+    //event.initUIEvent("input", true, true, window, 0);
     var searchbar = this.searchbar;
-    searchbar.dispatchEvent(event);
+    //searchbar.dispatchEvent(event);
     if (typeof searchbar.FormHistory == "object") {
       if (searchText && !PrivateBrowsingUtils.isWindowPrivate(window)) {
         searchbar.FormHistory.update(
@@ -462,6 +474,8 @@ var DragNGo = {
     if ('onFindAgainCommand' in findbar){ //fx3
       if(findbar.hidden)
         findbar.onFindCommand();
+    if("historyFindbar" in window)
+      historyFindbar._findField2.value = word;
       findbar._findField.value = word;
       var event = document.createEvent("UIEvents");
       event.initUIEvent("input", true, false, window, 0);
@@ -542,7 +556,13 @@ var DragNGo = {
       let privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
                                 .getInterface(Ci.nsIWebNavigation)
                                 .QueryInterface(Ci.nsILoadContext);
-      persist.saveURI( uri, null, null, null, "", file, privacyContext);
+      if (parseInt(Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo).version) < 36) {
+        persist.saveURI( uri, null, null, null, "", file, privacyContext);
+      } else {
+        persist.saveURI( uri, null, null, Ci.nsIHttpChannel.REFERRER_POLICY_NO_REFERRER_WHEN_DOWNGRADE,
+                         null, "", file, privacyContext);
+      }
+
     } catch (ex) {
       alert('failed:\n' + ex);
       file = null;
@@ -1159,7 +1179,8 @@ var DragNGo = {
   // D&Dの方向を得る
   getDirection: function getDirection(event){
     // 認識する最小のマウスの動き
-    const tolerance = 10;
+    const tolerance_x = this.directionChain == "" ? 10/*30*/ : 10;
+    const tolerance_y = this.directionChain == "" ? 10/*30*/ : 10;
     var x = event.screenX;
     var y = event.screenY;
 
@@ -1168,18 +1189,17 @@ var DragNGo = {
         this.lastY = y;
         return this.directionChain;
     }
-
     // 直前の座標と比較, 移動距離が極小のときは無視する
     var distanceX = Math.abs(x - this.lastX);
     var distanceY = Math.abs(y - this.lastY);
-    if (distanceX < tolerance && distanceY < tolerance)
+    if (distanceX < tolerance_x && distanceY < tolerance_y)
       return this.directionChain;
 
     // 方向の決定
     var direction;
-    if (distanceX > distanceY*2)
+    if (distanceX*1.5 >= distanceY)
         direction = x < this.lastX ? "L" : "R";
-    else if (distanceX*2 < distanceY)
+    else if (distanceX*1.5 < distanceY)
         direction = y < this.lastY ? "U" : "D";
     else {
         this.lastX = x;
@@ -1328,7 +1348,6 @@ var DragNGo = {
     if (!supported) {
       return;
     }
-
     //designModeなら何もしない
     if (target.ownerDocument instanceof HTMLDocument && target.ownerDocument.designMode == 'on') {
       self.setStatusMessage('', 0, false);
@@ -1722,7 +1741,7 @@ var DragNGo = {
       case 'dragover':
       case 'drop':
         this.dragover(event);
-        if (event.type == ' drop') {
+        if (event.type == 'drop' && !event.defaultPrevented) {
           this.dragend(event);
         }
         break;
@@ -1745,7 +1764,7 @@ var DragNGo = {
     window.addEventListener('unload', this, false);
     gBrowser.addEventListener('pagehide', this, false);
     gBrowser.addEventListener('dragend', this, false);
-    gBrowser.addEventListener('drop', this, false);
+    gBrowser.addEventListener('drop', this, true);
     gBrowser.addEventListener('dragover', this, false);
     gBrowser.addEventListener('dragenter', this, false);
     gBrowser.addEventListener('dragstart', this, false);
@@ -1757,6 +1776,7 @@ var DragNGo = {
 
     // xxx Bug 574688 adon bar
     var statusbar = document.getElementById("status4evar-status-text") ||
+                    XULBrowserWindow.statusTextField || 
                     document.getElementById("statusbar-display");
     if (!statusbar) {
       var addonbar = document.getElementById("addon-bar");
@@ -1783,7 +1803,7 @@ var DragNGo = {
     window.removeEventListener('unload', this, false);
     gBrowser.removeEventListener('pagehide', this, false);
     gBrowser.removeEventListener('dragend', this, false);
-    gBrowser.removeEventListener('drop', this, false);
+    gBrowser.removeEventListener('drop', this, true);
     gBrowser.removeEventListener('dragover', this, false);
     gBrowser.removeEventListener('dragenter', this, false);
     gBrowser.removeEventListener('dragstart', this, false);

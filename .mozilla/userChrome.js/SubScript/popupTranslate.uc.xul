@@ -8,7 +8,7 @@ display: none;
 
 <overlay id="popupTranslate"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-         xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+         xmlns:html="http://www.w3.org/1999/xhtml"
          >
 <!--
 // ==UserScript==
@@ -18,8 +18,17 @@ display: none;
 // @note                              基本的にメニューでxxx英日を選んでおくこと
 // @include        main
 // @include        chrome://messenger/content/messageWindow.xul
-// @compatibility  Firefox 10-32a1, Tb10-32a1
+// @compatibility  Firefox 27+
 // @author         Alice0775
+// @version        2016/09/10 23:30 revert "Excite"
+// @version        2016/09/10 11:30 Modify Google and remove "Excite", "@nifty翻訳"
+// @version        2014/10/08 11:30 delete bing
+// @version        2014/07/23 09:30 delete debug print
+// @version        2014/07/23 09:30 Weblio 翻訳
+// @version        2014/07/23 06:30 タイムアウト
+// @version        2014/07/20 23:00 Yahoo!翻訳 死亡, 日英は"Google 日英"に
+// @version        2014/06/20 06:00 remove a trailing comma(,)
+// @version        2014/06/09 12:00 時々sendが失敗する
 // @version        2014/05/03 00:00 Google翻訳仕様変更のため
 // @version        2013/02/19 09:00 isJapanese簡易判定
 // @version        2012/10/07 09:00 動かないもの削除
@@ -75,11 +84,11 @@ display: none;
       // 足切り1024文字
       MaximumStringLength : 1024,
       //選択テキストがアルファベットでないなら DefaultJapaneseToOther で翻訳
-      DefaultJapaneseToOther : "Yahoo Translate 日英",
+      DefaultJapaneseToOther : "Google 日英",
 
       timer: null,
       kXULNS:"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
-      TIMEOUT: 20000,
+      TIMEOUT: 15000,
 
       mMenus: [
         /*
@@ -94,166 +103,67 @@ display: none;
           start:"xpathを使用しない場合, 翻訳結果の直前にあるHTML文書の文字列(正規表現の\は\\とする)",
           end:"xpathを使用しない場合, 翻訳結果の直後にあるHTML文書の文字列(正規表現の\は\\とする)",
         },
-        {
-          Description:"Excite英日のxpathを使用しない場合の例",
-          method:'POST',
-          Referer:'http://www.excite.co.jp/world/english/',
-          action:"http://www.excite.co.jp/world/english/",
-          post:"wb_lp=ENJA&before=%%SEL%%",
-          code:"Shift_JIS",
-          start:"<textarea.+name=\"?after\"?[\\s\\w\"'!;:=-~^|#$%&(){}\\[\\]]*>",
-          end:"</textarea>",
-        },
         */
 
         {
           Description:"Excite 英日",
           method:'POST',
-          Referer:'http://www.excite.co.jp/world/english/',
-          action:"http://www.excite.co.jp/world/english/",
-          post:"before=%%SEL%%&wb_lp=ENJA&after=",
+          Referer:'http://www.excite.co.jp/world/english_japanese/',
+          action:"http://www.excite.co.jp/world/english_japanese/",
+          post:"before=%%SEL%%&wb_lp=ENJA&before_lang=EN&after_lang=&after=",
           code:"UTF-8",
           xpath:'.//textarea[@name="after"]',
         },
-
         {
           Description:"Excite 日英",
           method:'POST',
-          Referer:'http://www.excite.co.jp/world/english/',
-          action:"http://www.excite.co.jp/world/english/",
-          post:"before=%%SEL%%&wb_lp=JAEN&after=",
+          Referer:'http://www.excite.co.jp/world/english_japanese/',
+          action:"http://www.excite.co.jp/world/english_japanese/",
+          post:"before=%%SEL%%&wb_lp=JAEN&before_lang=JA&after_lang=&after=",
           code:"UTF-8",
           xpath:'.//textarea[@name="after"]',
         },
 
         {
           Description:"Google 英日",
-          method:'POST',
+          method:'GET',
           Referer:'https://translate.google.com/?tab=yT#en',
-          action:"https://translate.google.com/",
-          post:"client=t&hl=ja&sl=auto&tl=ja&multires=1&prev=btn&ssel=0&tsel=0&uptl=ja&sc=1&text=%%SEL%%",
+          action:"https://translate.google.com/?client=t&hl=ja&sl=auto&tl=ja&multires=1&prev=btn&ssel=0&tsel=0&uptl=ja&sc=1&text=%%SEL%%",
+          post:"",
           code:"UTF-8",
           xpath:'.//span[@id="result_box"]|.//div[@id="result_box"]',
         },
 
         {
           Description:"Google 日英",
-          method:'POST',
+          method:'GET',
           Referer:'https://translate.google.com/?tab=yT#ja',
-          action:"https://translate.google.com/",
-          post:"client=t&hl=ja&sl=ja&tl=en&multires=1&prev=btn&ssel=0&tsel=0&sc=1&text=%%SEL%%",
+          action:"https://translate.google.com/?client=t&hl=ja&sl=ja&tl=en&multires=1&prev=btn&ssel=0&tsel=0&sc=1&text=%%SEL%%",
+          post:"",
           code:"UTF-8",
           xpath:'.//span[@id="result_box"]|.//div[@id="result_box"]',
         },
 
         {
-          Description:"Yahoo Translate 英日",
+          Description:"Weblio 翻訳 英日",
           method:"POST",
-          Referer:"http://honyaku.yahoo.co.jp/transtext",
-          action:"http://honyaku.yahoo.co.jp/transtext",
-          post:"eid=CR-EJ&both=TH&clearFlg=1&text=%%SEL%%",
+          Referer:"http://translate.weblio.jp/",
+          action:"http://translate.weblio.jp/",
+          post:"lp=EJ&lpf=&rt=&translatedText=&tlt=english&prtRt=&originalText=%%SEL%%&sentenceStyle=spoken",
           code:"UTF-8",
-          xpath:'.//textarea[@id="trn_textText"]',
-        },
-
-/*
-       {
-          Description:"Infoseek 英日",
-          method:'GET',
-          Referer:'http://translation.infoseek.co.jp/',
-          action:'http://translation.infoseek.co.jp/?submit='+encodeURI("　翻訳　")+'&ac=Text&lng=en&selector=0&original=%%SEL%%',
-          code:"UTF-8",
-          xpath:'.//textarea[@name="converted"]',
-          prefetchURL:'http://translation.infoseek.co.jp/',      //あらかじめアクセスするURL
-          prefechData:['token']                                  //必要なinput type= hidden の name
-        },
-        {
-          Description:"Infoseek 日英",
-          method:'GET',
-          Referer:'http://translation.infoseek.co.jp/',
-          action:'http://translation.infoseek.co.jp/?submit='+encodeURI("　翻訳　")+'&ac=Text&lng=ja&selector=1&original=%%SEL%%',
-          code:"UTF-8",
-          xpath:'.//textarea[@name="converted"]',
-          prefetchURL:'http://translation.infoseek.co.jp/',      //あらかじめアクセスするURL
-          prefechData:['token']                                  //必要なinput type= hidden の name
-        },
-        {
-          Description:"Live Translate 英日",
-          method:'POST',
-          Referer:'http://www.windowslivetranslator.com/Default.aspx',
-          action:"http://www.windowslivetranslator.com/Default.aspx",
-          post:"__VIEWSTATE=%2FwEPDwULLTEzMTY2NDMxMjFkZA%3D%3D&InputTextVal=%%SEL%%&BrowserLanguagePreference=ja&MaxInputChars=3500&InputURL=http%3A%2F%2F&LangPair%24DDL=en_ja&BtnTransText=%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%81%AE%E7%BF%BB%E8%A8%B3",
-          code:"UTF-8",
-          xpath:'.//textarea[@name="OutputText"]',
-          prefetchURL:'http://www.windowslivetranslator.com/Default.aspx?MKT=en-US&LangPair%24DDL=en_ja',
-          prefechData:['__EVENTVALIDATION'],
-          cookie:"lp=en_ja"
+          xpath:'id("translatedText")'
         },
 
         {
-          Description:"Live Translate 日英",
-          method:'POST',
-          Referer:'http://www.windowslivetranslator.com/Default.aspx',
-          action:"http://www.windowslivetranslator.com/Default.aspx",
-          post:"__VIEWSTATE=%2FwEPDwULLTEzMTY2NDMxMjFkZA%3D%3D&InputTextVal=%%SEL%%&BrowserLanguagePreference=ja&MaxInputChars=3500&InputURL=http%3A%2F%2F&LangPair%24DDL=ja_en&BtnTransText=%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%81%AE%E7%BF%BB%E8%A8%B3",
-          code:"UTF-8",
-          xpath:'.//textarea[@name="OutputText"]',
-          prefetchURL:'http://www.windowslivetranslator.com/Default.aspx?MKT=ja-JP&LangPair%24DDL=ja_en',
-          prefechData:['__EVENTVALIDATION'],
-          cookie:"lp=ja_en"
-        },
-
-*/
-
-        {
-          Description:"Yahoo Translate 日英",
+          Description:"Weblio 翻訳 日英",
           method:"POST",
-          Referer:"http://honyaku.yahoo.co.jp/transtext",
-          action:"http://honyaku.yahoo.co.jp/transtext",
-          post:"eid=CR-JE&both=TH&clearFlg=1&text=%%SEL%%",
+          Referer:"http://translate.weblio.jp/",
+          action:"http://translate.weblio.jp/",
+          post:"lp=JE&lpf=&rt=&translatedText=&tlt=english&prtRt=&originalText=%%SEL%%&sentenceStyle=spoken",
           code:"UTF-8",
-          xpath:'.//textarea[@id="trn_textText"]',
-        },
-
-        {
-          Description:"@nifty翻訳 英日",
-          method:"POST",
-          Referer:"http://honyaku.nifty.com/",
-          action:"http://honyaku-result.nifty.com/LUCNIFTY/text/text.php",
-          post:"SLANG=en&TLANG=ja&XMODE=0&SSRC=%%SEL%%&txtDirection=enja",
-          code:"UTF-8",
-          xpath:'.//textarea[@id="txtTransArea2"]'
-        },
-
-        {
-          Description:"@nifty翻訳 日英",
-          method:"POST",
-          Referer:"http://honyaku.nifty.com/",
-          action:"http://honyaku-result.nifty.com/LUCNIFTY/text/text.php",
-          post:"SLANG=ja&TLANG=en&XMODE=0&SSRC=%%SEL%%&txtDirection=jaen",
-          code:"UTF-8",
-          xpath:'.//textarea[@id="txtTransArea2"]'
-        },
-
-        {
-          Description:"Bing翻訳 英日",
-          method:'GET',
-          Referer:"http://www.microsofttranslator.com/",
-          action:"http://api.microsofttranslator.com/V2/Ajax.svc/Translate?appId=46846E697D3BC6FA50998483EF31894654002928&from=%22%22&to=%22ja%22&loc=en&ctr=Japan&text=%%SEL%%",
-          code:"UTF-8",
-          start:'^"',
-          end:'"$',
-        },
-
-        {
-          Description:"Bing翻訳 日英",
-          method:'GET',
-          Referer:"http://www.microsofttranslator.com/",
-          action:"http://api.microsofttranslator.com/V2/Ajax.svc/Translate?appId=46846E697D3BC6FA50998483EF31894654002928&from=%22%22&to=%22en%22&loc=en&ctr=Japan&text=%%SEL%%",
-          code:"UTF-8",
-          start:'^"',
-          end:'"$',
+          xpath:'id("translatedText")'
         }
+
       ],
 
       init: function(){
@@ -308,7 +218,7 @@ display: none;
         }
         if(engine){
           var prefetch = null;
-          if (engine.prefetchURL){
+          if (typeof engine.prefetchURL != "undefined" && engine.prefetchURL !=""){
             this.getPrefetchResult(sel,engine);
           }else{
             this.getTranslateResult(sel,engine,null);
@@ -570,7 +480,7 @@ display: none;
                     'Cookie': cookie
                    } :
                    {'Referer': engine.Referer,
-                    'Content-Type':'application/x-www-form-urlencoded',
+                    'Content-Type':'application/x-www-form-urlencoded'
                    },
           onload:function(details) {
             var txt = details.responseText.toString();
@@ -585,20 +495,16 @@ display: none;
                 res = RegExp.$1;
               } else {
      //self.debug(txt)
-                var hdoc = self.str2dom(txt);
+                var hdoc = self.str2dom(txt); 
                 var result = hdoc.evaluate(xpath, hdoc, null,
-                             XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
+                             XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
      //self.debug(result.snapshotItem(0));
                var node = result.snapshotLength>0 ? result.snapshotItem(0) : null
-               res = node.textContent;
+               res = node.textContent || node.value;
                node = hdoc = result = null;
               }
             } catch (e) {self.show("取得失敗。");}
-
-
-            res = res.replace(/<br>/ig,'  ').replace(/<p>/ig,'  ').
-                      replace(/&quot;/g,'"').replace(/&amp;/g,'&').
-                      replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+            res = res.replace(/\n/g,'<html:br />');
             if(res != null && res !=='') {
               self.show(res);
             } else {
@@ -669,10 +575,8 @@ display: none;
         });
 
         if(obj.overrideMimeType) req.overrideMimeType(obj.overrideMimeType);
-        setTimeout(function(){
-        if(typeof obj.data == 'string') req.send(obj.data); //may be for post
-        else req.send(null);                                //may be for gett
-        }, 0);
+            if(typeof obj.data == 'string') req.send(obj.data); //may be for post
+            else req.send(null);                                //may be for get
       },
 
       show: function(res){
@@ -695,10 +599,7 @@ display: none;
 
       setValue: function(val){
         var label = document.getElementById("translationResultPopupLabel");
-        while(label.firstChild){
-          label.removeChild(label.firstChild);
-        }
-        if(val!="") label.appendChild(document.createTextNode(val));
+        label.innerHTML = val;
       },
 
       sizeChange: function(){
@@ -846,7 +747,7 @@ display: none;
     <popup id="translationResult"
            style="-moz-appearance:tooltip;display:-moz-popup;font:message-box;background-color:InfoBackground;color:InfoText;border: 1px solid InfoText;width:450px;">
       <vbox id="translationResultPopupBox">
-        <label id="translationResultPopupLabel" flex="1" onclick="popupTranslate.copyToClipboard(this.textContent);"/>
+        <html:div id="translationResultPopupLabel" type="content" flex="1" onclick="popupTranslate.copyToClipboard(this.textContent);"/>
       </vbox>
     </popup>
   </popupset>
