@@ -43,11 +43,11 @@ conky.config = {
    override_utf8_locale = true,
 
    --# Border/Shade/Outline
-   --draw_borders no
-   --border_width 1
-   --stippled_borders 8
-   --draw_shades yes
-   --default_shade_color 111122
+   --draw_borders = true,
+   --border_width = 1,
+   --stippled_borders = 8,
+   --draw_shades = true,
+   --default_shade_color = '#111122',
    draw_outline = true,
    default_outline_color = '#111122',
 

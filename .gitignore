@@ -18,6 +18,7 @@
 .emacs.d/session.*
 .emacs.d/tramp
 .emacs.d/url/cookies
+.emacs.d/url/cache
 .eshell/history
 .eshell/lastdir
 .fastri-index
