@@ -129,8 +129,8 @@ var DragNGo = {
   /*=== Web Search ===*/
     {dir:'R', modifier:'',name:'テキストをConQueryで検索',obj:'text',cmd:function(self,event,info){self.openConQueryPopup(event);}},
     {dir:'UL', modifier:'',name:'テキストを現在のタブでgooウェブ検索(Green Label)',obj:'link, text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['gooウェブ検索(Green Label)'], 'current');}},
-    {dir:'U', modifier:'',name:'テキストを新しいタブでGoogle検索',obj:'text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'tab');}},
-    {dir:'D', modifier:'',name:'テキストを現在のタブでGoogle検索',obj:'text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'current');}},
+    {dir:'D', modifier:'',name:'テキストを新しいタブでGoogle検索',obj:'text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'tab');}},
+    {dir:'U', modifier:'',name:'テキストを現在のタブでGoogle検索',obj:'text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'current');}},
     {dir:'DL', modifier:'',name:'リンクテキストを新しいタブでGoogle検索',obj:'link',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Google'], 'tab');}},
     {dir:'UL', modifier:'',name:'テキストを新しいタブでAmazon.com検索',obj:'link, text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Amazon.com'], 'tab');}},
     {dir:'UR', modifier:'',name:'テキストを新しいタブでYahoo! JAPAN検索',obj:'link, text',cmd:function(self,event,info){self.searchWithEngine(info.texts, ['Yahoo! JAPAN'], 'tab');}},
