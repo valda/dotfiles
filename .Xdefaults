@@ -4,7 +4,7 @@ URxvt*buffered: true
 URxvt*foreground: white
 URxvt*background: rgba:0000/0000/0000/dddd
 URxvt*transparent: false
-URxvt*fading: 15%
+URxvt*fading: 10%
 URxvt*fadeColor: rgba:ffff/ffff/ffff/0000
 URxvt*scrollBar: false
 URxvt*lineSpace: 0
