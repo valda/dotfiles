@@ -18,6 +18,7 @@ setopt sun_keyboard_hack
 setopt extended_glob
 setopt list_types
 setopt no_beep
+setopt no_flowcontrol
 setopt always_last_prompt
 setopt cdable_vars
 setopt sh_word_split
@@ -30,6 +31,7 @@ setopt hist_expire_dups_first
 setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 setopt share_history
+setopt interactivecomments
 
 HISTFILE="$HOME/.zsh-history"
 HISTSIZE=10000
@@ -49,10 +51,9 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*:default' menu select true
 zstyle ':completion:*' use-cache true
+zstyle ':completion:*' ignore-parents parent pwd ..
 
 bindkey -e
-bindkey ";5C" forward-word
-bindkey ";5D" backward-word
 
 autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic
@@ -267,52 +268,64 @@ preexec() {
 }
 
 #-------------------------------------------------------------------------
+# zplug
+#-------------------------------------------------------------------------
+if [ -f ~/.zplug/init.zsh ]; then
+    source ~/.zplug/init.zsh
+
+    zplug "zsh-users/zsh-syntax-highlighting", defer:2
+    zplug "zsh-users/zsh-history-substring-search"
+    zplug "zsh-users/zsh-completions"
+    zplug "stedolan/jq", from:gh-r, as:command, rename-to:jq
+    zplug "b4b4r07/emoji-cli", on:"stedolan/jq"
+    zplug "mrowa44/emojify", as:command
+    zplug "junegunn/fzf-bin", from:gh-r, as:command, rename-to:fzf
+    zplug "junegunn/fzf", as:command, use:"bin/fzf-tmux"
+    zplug "peco/peco", as:command, from:gh-r
+    #zplug "b4b4r07/peco-tmux.sh", as:command, use:'(*).sh', rename-to:'$1'
+    #zplug "b4b4r07/enhancd", use:init.sh
+    #export ENHANCD_DISABLE_HOME=1
+    zplug "mollifier/anyframe"
+
+    if ! zplug check --verbose; then
+        printf "Install? [y/N]: "
+        if read -q; then
+            echo; zplug install
+        fi
+    fi
+
+    zplug load
+fi
+
+#-------------------------------------------------------------------------
 # cdr
 #-------------------------------------------------------------------------
-autoload -Uz is-at-least
-if is-at-least 4.3.11; then
-  autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
-  add-zsh-hook chpwd chpwd_recent_dirs
-  zstyle ':completion:*:*:cdr:*:*' menu selection
-  zstyle ':completion:*' recent-dirs-insert both
-  zstyle ':chpwd:*' recent-dirs-max 500
-  zstyle ':chpwd:*' recent-dirs-default true
-  zstyle ':chpwd:*' recent-dirs-pushd true
+if [[ -n $(echo ${^fpath}/chpwd_recent_dirs(N)) && -n $(echo ${^fpath}/cdr(N)) ]]; then
+    autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+    add-zsh-hook chpwd chpwd_recent_dirs
+    zstyle ':completion:*:*:cdr:*:*' menu selection
+    zstyle ':completion:*' recent-dirs-insert both
+    zstyle ':chpwd:*' recent-dirs-max 500
+    zstyle ':chpwd:*' recent-dirs-default true
+    zstyle ':chpwd:*' recent-dirs-pushd true
 fi
 
 #-------------------------------------------------------------------------
-# peco - https://github.com/peco/peco
+# anyframe
 #-------------------------------------------------------------------------
-if which peco > /dev/null; then
-    function peco-select-history() {
-        local tac
-        if which tac > /dev/null; then
-            tac="tac"
-        else
-            tac="tail -r"
-        fi
-        BUFFER=$(\history -n 1 | \
-            eval $tac | \
-            peco --query "$LBUFFER")
-        CURSOR=$#BUFFER
-        zle clear-screen
-    }
-    zle -N peco-select-history
-
-    function peco-cdr () {
-        local selected_dir=$(cdr -l | awk '{ print $2 }' | peco)
-        if [ -n "$selected_dir" ]; then
-            BUFFER="cd ${selected_dir}"
-            zle accept-line
-        fi
-        zle clear-screen
-    }
-    zle -N peco-cdr
-
-    bindkey '^r' peco-select-history
-    bindkey '^[d' peco-cdr
+if [[ -n $(echo ${^fpath}/anyframe-widget-cdr(N)) ]]; then
+    #zstyle ":anyframe:selector:" use fzf
+    #zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --cycle'
+    bindkey '^[d' anyframe-widget-cdr
+    bindkey '^r' anyframe-widget-put-history
+    bindkey '^xb' anyframe-widget-checkout-git-branch
+    bindkey '^xg' anyframe-widget-cd-ghq-repository
+    bindkey '^xk' anyframe-widget-kill
+    bindkey '^xi' anyframe-widget-insert-git-branch
+    bindkey '^xf' anyframe-widget-insert-filename
 fi
 
 #-------------------------------------------------------------------------
+
 resume-ssh-agent
 chpwd

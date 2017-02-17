@@ -2,8 +2,7 @@
 
 umask 022
 
-if [ -z $USER ]
-    then
+if [ -z $USER ]; then
     export USER=$LOGNAME
 fi
 
