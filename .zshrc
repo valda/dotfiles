@@ -47,6 +47,14 @@ if which dircolors > /dev/null; then
     eval `dircolors -b`
 fi
 
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*' completer _expand _complete _match _prefix _approximate _list _history
+zstyle ':completion:*:messages' format '%F{yellow}%d%f'
+zstyle ':completion:*:warnings' format '%F{red}%BNo matches for:%b %F{yellow}%d%f'
+zstyle ':completion:*:descriptions' format '%F{yellow}%B[%d]%b%f'
+zstyle ':completion:*:corrections' format '%F{yellow}%B[%d] %F{red}(errors: %e)%b%f'
+zstyle ':completion:*:options' description 'yes'
+zstyle ':completion:*' group-name ''
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*:default' menu select true
@@ -76,26 +84,6 @@ a ssh="ssh -A"
 a ag="ag --pager 'less -R'"
 a chinachu='sudo -u chinachu /home/chinachu/chinachu/chinachu'
 a grep="grep --color=auto"
-
-resume-ssh-agent() {
-    if [ -z "$SSH_AUTH_SOCK" -o  ! -S "$SSH_AUTH_SOCK" ]; then
-        test -e "$HOME/.ssh/ssh_agent.env" && source "$HOME/.ssh/ssh_agent.env"
-    else
-        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK; export SSH_AUTH_SOCK" | \
-            tee "$HOME/.ssh/ssh_agent.env" | \
-            awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
-    fi
-    local agent; agent=`which ssh-agent`
-    if [ ! -e "$agent" ]; then
-        echo missing ssh-agent
-        return
-    fi
-    if [ -z "$SSH_AUTH_SOCK" -o ! -S "$SSH_AUTH_SOCK" ]; then
-        "$agent" | grep -e '^SSH_' | tee "$HOME/.ssh/ssh_agent.env" | \
-            awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
-            source "$HOME/.ssh/ssh_agent.env"
-    fi
-}
 
 history-all() {
     history -E 1
@@ -195,47 +183,38 @@ sjis() {
 #-------------------------------------------------------------------------
 # fancy prompt
 #-------------------------------------------------------------------------
+autoload -Uz add-zsh-hook
+autoload -Uz vcs_info
+
+zstyle ':vcs_info:*' formats '%s' '%b' '%i' '%c' '%u'
+zstyle ':vcs_info:*' actionformats '%s' '%b' '%i' '%c' '%u' '%a'
+zstyle ':vcs_info:*' get-revision true
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' max-exports 6
+function _precmd_vcs_info () {
+  LANG=en_US.UTF-8 vcs_info
+}
+add-zsh-hook precmd _precmd_vcs_info
+
 [ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
-PROMPT="%{[36m%}%U%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%%%{[m%}%u "
-RPROMPT='%{[33m%}[%~]%{[m%}'
+PROMPT="%(?.%F{cyan}.%F{red})%U%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%#%u "
 
-#-------------------------------------------------------------------------
-# special functions
-#-------------------------------------------------------------------------
-_update_prompt () {
-    if [ $? = 0 ]; then
-	PROMPT="%{[36m%}%U%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%%%{[m%}%u "
-    else
-	PROMPT="%{[31m%}%U%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%%%{[m%}%u "
-    fi
-}
-
-_update_rprompt () {
+function _precmd_update_rprompt () {
+    local -A GIT_CURRENT_BRANCH
     if [ "`git ls-files 2>/dev/null`" ]; then
-	local -A GIT_CURRENT_BRANCH; GIT_CURRENT_BRANCH=$( git branch &> /dev/null | grep '^\*' | cut -b 3- )
-	RPROMPT="%{[33m%}[%~:$GIT_CURRENT_BRANCH]%{[m%}"
-    else
-	RPROMPT="%{[33m%}[%~]%{[m%}"
+        GIT_CURRENT_BRANCH=$( git branch &> /dev/null | grep '^\*' | cut -b 3- )
     fi
+    RPROMPT="%F{yellow}[%~${GIT_CURRENT_BRANCH:+:$GIT_CURRENT_BRANCH}]%f"
 }
+add-zsh-hook precmd _precmd_update_rprompt
 
-_update_term_title () {
+function _precmd_update_term_title () {
     isemacs || echo -ne "\033]0;${USER}@${HOST}:${PWD/$HOME/~}\007"
 }
+add-zsh-hook precmd _precmd_update_term_title
 
-precmd() {
-    _update_prompt
-    _update_rprompt
-    _update_term_title
-}
-
-chpwd () {
-    _update_rprompt
-    _update_term_title
-}
-
-preexec() {
-    # screen のタイトルを更新
+function _preexec_update_window_title () {
+    # screen/tmux のタイトルを更新
     if isscreen || istmux; then
         emulate -L zsh
         local -a cmd; cmd=(${(z)2})
@@ -266,6 +245,7 @@ preexec() {
             echo -ne "\033k$cmd[1]:t\033\\") 2>/dev/null
     fi
 }
+add-zsh-hook preexec _preexec_update_window_title
 
 #-------------------------------------------------------------------------
 # zplug
@@ -326,6 +306,24 @@ if [[ -n $(echo ${^fpath}/anyframe-widget-cdr(N)) ]]; then
 fi
 
 #-------------------------------------------------------------------------
+function resume-ssh-agent() {
+    if [ -z "$SSH_AUTH_SOCK" -o  ! -S "$SSH_AUTH_SOCK" ]; then
+        test -e "$HOME/.ssh/ssh_agent.env" && source "$HOME/.ssh/ssh_agent.env"
+    else
+        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK; export SSH_AUTH_SOCK" | \
+            tee "$HOME/.ssh/ssh_agent.env" | \
+            awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
+    fi
+    local agent; agent=`which ssh-agent`
+    if [ ! -e "$agent" ]; then
+        echo missing ssh-agent
+        return
+    fi
+    if [ -z "$SSH_AUTH_SOCK" -o ! -S "$SSH_AUTH_SOCK" ]; then
+        "$agent" | grep -e '^SSH_' | tee "$HOME/.ssh/ssh_agent.env" | \
+            awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
+            source "$HOME/.ssh/ssh_agent.env"
+    fi
+}
 
 resume-ssh-agent
-chpwd
