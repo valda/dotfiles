@@ -14,11 +14,12 @@
 .emacs.d/el-get-backup-*/
 .emacs.d/el-get/
 .emacs.d/elpa/
+.emacs.d/projectile-bookmarks.eld
 .emacs.d/server/server
 .emacs.d/session.*
 .emacs.d/tramp
-.emacs.d/url/cookies
 .emacs.d/url/cache
+.emacs.d/url/cookies
 .eshell/history
 .eshell/lastdir
 .fastri-index

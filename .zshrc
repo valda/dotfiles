@@ -314,8 +314,8 @@ fi
 # anyframe
 #-------------------------------------------------------------------------
 if [[ -n $(echo ${^fpath}/anyframe-widget-cdr(N)) ]]; then
-    #zstyle ":anyframe:selector:" use fzf
-    #zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --cycle'
+    zstyle ":anyframe:selector:" use fzf
+    zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --cycle -d 70%'
     bindkey '^[d' anyframe-widget-cdr
     bindkey '^r' anyframe-widget-put-history
     bindkey '^xb' anyframe-widget-checkout-git-branch
