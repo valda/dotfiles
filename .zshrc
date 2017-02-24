@@ -186,27 +186,22 @@ sjis() {
 autoload -Uz add-zsh-hook
 autoload -Uz vcs_info
 
-zstyle ':vcs_info:*' formats '%s' '%b' '%i' '%c' '%u'
-zstyle ':vcs_info:*' actionformats '%s' '%b' '%i' '%c' '%u' '%a'
-zstyle ':vcs_info:*' get-revision true
+[ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
+PROMPT="%(?.%F{cyan}.%F{red})%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%# "
+
+zstyle ':vcs_info:*' enable git svn
 zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' max-exports 6
+zstyle ':vcs_info:*' get-revision true
+zstyle ':vcs_info:git:*' stagedstr "+"
+zstyle ':vcs_info:git:*' unstagedstr "-"
+zstyle ':vcs_info:*' formats ':%F{green}%u%c%b'
+zstyle ':vcs_info:*' actionformats ':%F{green}%u%c%b%F{red}(%a)'
 function _precmd_vcs_info () {
   LANG=en_US.UTF-8 vcs_info
 }
 add-zsh-hook precmd _precmd_vcs_info
+RPROMPT='%F{yellow}[%(5~,%-2~/.../%2~,%~)${vcs_info_msg_0_}%F{yellow}]%f'
 
-[ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
-PROMPT="%(?.%F{cyan}.%F{red})%U%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%#%u "
-
-function _precmd_update_rprompt () {
-    local -A GIT_CURRENT_BRANCH
-    if [ "`git ls-files 2>/dev/null`" ]; then
-        GIT_CURRENT_BRANCH=$( git branch &> /dev/null | grep '^\*' | cut -b 3- )
-    fi
-    RPROMPT="%F{yellow}[%~${GIT_CURRENT_BRANCH:+:$GIT_CURRENT_BRANCH}]%f"
-}
-add-zsh-hook precmd _precmd_update_rprompt
 
 function _precmd_update_term_title () {
     isemacs || echo -ne "\033]0;${USER}@${HOST}:${PWD/$HOME/~}\007"
