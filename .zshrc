@@ -194,8 +194,8 @@ zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:git:*' stagedstr "+"
 zstyle ':vcs_info:git:*' unstagedstr "-"
-zstyle ':vcs_info:*' formats ':%F{green}%u%c%b'
-zstyle ':vcs_info:*' actionformats ':%F{green}%u%c%b%F{red}(%a)'
+zstyle ':vcs_info:*' formats ':%F{green}%b%F{red}%u%c'
+zstyle ':vcs_info:*' actionformats ':%F{green}%b%F{red}%u%c(%a)'
 function _precmd_vcs_info () {
   LANG=en_US.UTF-8 vcs_info
 }
