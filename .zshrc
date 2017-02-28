@@ -37,15 +37,14 @@ HISTFILE="$HOME/.zsh-history"
 HISTSIZE=10000
 SAVEHIST=10000
 WORDCHARS="`echo $WORDCHARS|sed 's!/!!'`"
+if which dircolors > /dev/null; then
+    eval `dircolors -b`
+fi
 
 ## Completion configuration
 fpath=($HOME/.zsh/functions/Completion $fpath)
 autoload -Uz compinit
 compinit
-
-if which dircolors > /dev/null; then
-    eval `dircolors -b`
-fi
 
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*' completer _expand _complete _match _prefix _approximate _list _history
@@ -85,162 +84,30 @@ a ag="ag --pager 'less -R'"
 a chinachu='sudo -u chinachu /home/chinachu/chinachu/chinachu'
 a grep="grep --color=auto"
 
-history-all() {
+function history-all() {
     history -E 1
 }
 
-iscygwin() {
+function iscygwin() {
     [[ "$OSTYPE" = cygwin ]] && return 0
     return 1
 }
 
-isemacs() {
+function isemacs() {
     [[ "$EMACS" != "" ]] && return 0
     return 1
 }
 
-istmux() {
+function istmux() {
     [[ "$TMUX" != "" ]] && return 0
     return 1
 }
 
-isscreen() {
+function isscreen() {
     istmux && return 1
     [[ "${TERM[0,6]}" = screen ]] && return 0
     return 1
 }
-
-git-pull-subdirs() {
-    if which parallel > /dev/null; then
-        find -maxdepth 2 -type d -name '.git' | parallel 'DIR={//} ; echo ">>" $DIR; cd $DIR ; git pull --rebase'
-    else
-        local gitdir
-        for gitdir in $(find -maxdepth 2 -type d -name '.git'); do
-            (
-                local dir; dir=`dirname $gitdir`
-                echo '>>' $dir
-                cd $dir && git pull --rebase
-            )
-        done
-    fi
-}
-
-#-------------------------------------------------------------------------
-# abbrev
-#-------------------------------------------------------------------------
-typeset -A abbreviations
-abbreviations=(
-    "L"    "| less"
-    "G"    "| grep"
-    "X"    "| xargs"
-    "T"    "| tail"
-    "C"    "| cat"
-    "W"    "| wc"
-    "A"    "| awk"
-    "S"    "| sed"
-    "E"    "2>&1 > /dev/null"
-    "N"    "> /dev/null"
-    "P"    "| peco"
-    'be'   'bundle exec'
-)
-
-magic-abbrev-expand() {
-    local MATCH
-    LBUFFER=${LBUFFER%%(#m)[-_a-zA-Z0-9]#}
-    LBUFFER+=${abbreviations[$MATCH]:-$MATCH}
-    zle self-insert
-
-}
-
-no-magic-abbrev-expand() {
-    LBUFFER+=' '
-
-}
-
-zle -N magic-abbrev-expand
-zle -N no-magic-abbrev-expand
-bindkey " " magic-abbrev-expand
-bindkey "^x " no-magic-abbrev-expand
-
-#-------------------------------------------------------------------------
-# change locale
-#-------------------------------------------------------------------------
-utf8() {
-    export LANG=ja_JP.UTF-8
-    isscreen && screen -X encoding utf8
-}
-
-euc() {
-    export LANG=ja_JP.EUC-JP
-    isscreen && screen -X encoding euc
-}
-
-sjis() {
-    export LANG=ja_JP.SJIS
-    isscreen && screen -X encoding sjis
-}
-
-#-------------------------------------------------------------------------
-# fancy prompt
-#-------------------------------------------------------------------------
-autoload -Uz add-zsh-hook
-autoload -Uz vcs_info
-
-[ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
-PROMPT="%(?.%F{cyan}.%F{red})%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%# "
-
-zstyle ':vcs_info:*' enable git svn
-zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' get-revision true
-zstyle ':vcs_info:git:*' stagedstr "+"
-zstyle ':vcs_info:git:*' unstagedstr "-"
-zstyle ':vcs_info:*' formats ':%F{green}%b%F{red}%u%c'
-zstyle ':vcs_info:*' actionformats ':%F{green}%b%F{red}%u%c(%a)'
-function _precmd_vcs_info () {
-  LANG=en_US.UTF-8 vcs_info
-}
-add-zsh-hook precmd _precmd_vcs_info
-RPROMPT='%F{yellow}[%(5~,%-2~/.../%2~,%~)${vcs_info_msg_0_}%F{yellow}]%f'
-
-
-function _precmd_update_term_title () {
-    isemacs || echo -ne "\033]0;${USER}@${HOST}:${PWD/$HOME/~}\007"
-}
-add-zsh-hook precmd _precmd_update_term_title
-
-function _preexec_update_window_title () {
-    # screen/tmux のタイトルを更新
-    if isscreen || istmux; then
-        emulate -L zsh
-        local -a cmd; cmd=(${(z)2})
-        case $cmd[1] in
-            fg)
-                if (( $#cmd == 1 )); then
-                    cmd=(builtin jobs -l %+)
-                else
-                    cmd=(builtin jobs -l $cmd[2])
-                fi
-                ;;
-            %*)
-                cmd=(builtin jobs -l $cmd[1])
-                ;;
-            cd)
-                if (( $#cmd == 2 )); then
-                    cmd[1]=$cmd[2]
-                fi
-                ;&
-            *)
-                echo -ne "\033k$cmd[1]:t\033\\"
-                return
-                ;;
-        esac
-        local -A jt; jt=(${(kv)jobtexts})
-        $cmd >>(read num rest
-            cmd=(${(z)${(e):-\$jt$num}})
-            echo -ne "\033k$cmd[1]:t\033\\") 2>/dev/null
-    fi
-}
-add-zsh-hook preexec _preexec_update_window_title
 
 #-------------------------------------------------------------------------
 # zplug
@@ -301,6 +168,132 @@ if [[ -n $(echo ${^fpath}/anyframe-widget-cdr(N)) ]]; then
 fi
 
 #-------------------------------------------------------------------------
+# abbrev
+#-------------------------------------------------------------------------
+typeset -A abbreviations
+abbreviations=(
+    "L"    "| less"
+    "G"    "| grep"
+    "X"    "| xargs"
+    "T"    "| tail"
+    "C"    "| cat"
+    "W"    "| wc"
+    "A"    "| awk"
+    "S"    "| sed"
+    "E"    "2>&1 > /dev/null"
+    "N"    "> /dev/null"
+    "P"    "| peco"
+    'be'   'bundle exec'
+)
+
+function magic-abbrev-expand() {
+    local MATCH
+    LBUFFER=${LBUFFER%%(#m)[-_a-zA-Z0-9]#}
+    LBUFFER+=${abbreviations[$MATCH]:-$MATCH}
+    zle self-insert
+}
+
+function no-magic-abbrev-expand() {
+    LBUFFER+=' '
+}
+
+zle -N magic-abbrev-expand
+zle -N no-magic-abbrev-expand
+bindkey " " magic-abbrev-expand
+bindkey "^x " no-magic-abbrev-expand
+
+#-------------------------------------------------------------------------
+# fancy prompt
+#-------------------------------------------------------------------------
+autoload -Uz add-zsh-hook
+autoload -Uz vcs_info
+
+[ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
+PROMPT="%(?.%F{cyan}.%F{red})%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%# "
+
+zstyle ':vcs_info:*' enable git svn
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' get-revision true
+zstyle ':vcs_info:git:*' stagedstr "+"
+zstyle ':vcs_info:git:*' unstagedstr "-"
+zstyle ':vcs_info:*' formats ':%F{green}%b%F{red}%u%c'
+zstyle ':vcs_info:*' actionformats ':%F{green}%b%F{red}%u%c(%a)'
+function _precmd_vcs_info () {
+  LANG=en_US.UTF-8 vcs_info
+}
+add-zsh-hook precmd _precmd_vcs_info
+RPROMPT='%F{yellow}[%(5~,%-2~/.../%2~,%~)${vcs_info_msg_0_}%F{yellow}]%f'
+
+function _precmd_update_term_title () {
+    isemacs || echo -ne "\033]0;${USER}@${HOST}:${PWD/$HOME/~}\007"
+}
+add-zsh-hook precmd _precmd_update_term_title
+
+function _preexec_update_window_title () {
+    # screen/tmux のタイトルを更新
+    if isscreen || istmux; then
+        emulate -L zsh
+        local -a cmd; cmd=(${(z)2})
+        case $cmd[1] in
+            fg)
+                if (( $#cmd == 1 )); then
+                    cmd=(builtin jobs -l %+)
+                else
+                    cmd=(builtin jobs -l $cmd[2])
+                fi
+                ;;
+            %*)
+                cmd=(builtin jobs -l $cmd[1])
+                ;;
+            cd)
+                if (( $#cmd == 2 )); then
+                    cmd[1]=$cmd[2]
+                fi
+                ;&
+            *)
+                echo -ne "\033k$cmd[1]:t\033\\"
+                return
+                ;;
+        esac
+        local -A jt; jt=(${(kv)jobtexts})
+        $cmd >>(read num rest
+            cmd=(${(z)${(e):-\$jt$num}})
+            echo -ne "\033k$cmd[1]:t\033\\") 2>/dev/null
+    fi
+}
+add-zsh-hook preexec _preexec_update_window_title
+
+#-------------------------------------------------------------------------
+function utf8() {
+    export LANG=ja_JP.UTF-8
+    isscreen && screen -X encoding utf8
+}
+
+function euc() {
+    export LANG=ja_JP.EUC-JP
+    isscreen && screen -X encoding euc
+}
+
+function sjis() {
+    export LANG=ja_JP.SJIS
+    isscreen && screen -X encoding sjis
+}
+
+function git-pull-subdirs() {
+    if which parallel > /dev/null; then
+        find -maxdepth 2 -type d -name '.git' | parallel 'DIR={//} ; echo ">>" $DIR; cd $DIR ; git pull --rebase'
+    else
+        local gitdir
+        for gitdir in $(find -maxdepth 2 -type d -name '.git'); do
+            (
+                local dir; dir=`dirname $gitdir`
+                echo '>>' $dir
+                cd $dir && git pull --rebase
+            )
+        done
+    fi
+}
+
 function resume-ssh-agent() {
     if [ -z "$SSH_AUTH_SOCK" -o  ! -S "$SSH_AUTH_SOCK" ]; then
         test -e "$HOME/.ssh/ssh_agent.env" && source "$HOME/.ssh/ssh_agent.env"
