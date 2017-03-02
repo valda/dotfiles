@@ -59,6 +59,7 @@ zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*:default' menu select true
 zstyle ':completion:*' use-cache true
 zstyle ':completion:*' ignore-parents parent pwd ..
+zstyle ':completion:*:manuals' separate-sections true
 
 bindkey -e
 
