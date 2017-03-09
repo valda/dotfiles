@@ -42,7 +42,7 @@ if which dircolors > /dev/null; then
 fi
 
 ## Completion configuration
-fpath=($HOME/.zsh/functions/Completion $fpath)
+fpath=($HOME/.zsh/completion $fpath)
 autoload -Uz compinit
 compinit
 

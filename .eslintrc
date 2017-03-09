@@ -20,6 +20,7 @@
     "jsx": true
   },
   "rules": {
+    "comma-spacing": [2, {"before": false, "after": true}],
     "consistent-return": [0],
     "key-spacing": [0],
     "quotes": [0],

@@ -14,7 +14,9 @@
 .emacs.d/el-get-backup-*/
 .emacs.d/el-get/
 .emacs.d/elpa/
+.emacs.d/elscreen
 .emacs.d/projectile-bookmarks.eld
+.emacs.d/recentf
 .emacs.d/server/server
 .emacs.d/session.*
 .emacs.d/tramp
