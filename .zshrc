@@ -129,6 +129,7 @@ if [ -f ~/.zplug/init.zsh ]; then
     #zplug "b4b4r07/enhancd", use:init.sh
     #export ENHANCD_DISABLE_HOME=1
     zplug "mollifier/anyframe"
+    fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
 
     if ! zplug check --verbose; then
         printf "Install? [y/N]: "
@@ -166,6 +167,7 @@ if [[ -n $(echo ${^fpath}/anyframe-widget-cdr(N)) ]]; then
     bindkey '^xk' anyframe-widget-kill
     bindkey '^xi' anyframe-widget-insert-git-branch
     bindkey '^xf' anyframe-widget-insert-filename
+    bindkey '^xc' anyframe-widget-insert-docker-container-id
 fi
 
 #-------------------------------------------------------------------------
@@ -185,6 +187,7 @@ abbreviations=(
     "N"    "> /dev/null"
     "P"    "| peco"
     'be'   'bundle exec'
+    'de'   'docker exec -it'
 )
 
 function magic-abbrev-expand() {

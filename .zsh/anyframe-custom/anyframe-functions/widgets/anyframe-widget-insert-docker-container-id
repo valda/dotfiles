@@ -1,0 +1,4 @@
+docker ps | awk 'NR>1 {print}' \
+  | anyframe-selector-auto \
+  | awk '{print $1}' \
+  | anyframe-action-insert
