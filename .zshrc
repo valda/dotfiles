@@ -82,8 +82,8 @@ a dpkg='COLUMNS=${COLUMNS:-80} dpkg'
 a psa="ps axuww"
 a ssh="ssh -A"
 a ag="ag --pager 'less -R'"
-a chinachu='sudo -u chinachu /home/chinachu/chinachu/chinachu'
 a grep="grep --color=auto"
+a open='xdg-open'
 
 function history-all() {
     history -E 1
