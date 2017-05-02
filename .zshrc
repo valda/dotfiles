@@ -226,7 +226,12 @@ function _precmd_vcs_info () {
   LANG=en_US.UTF-8 vcs_info
 }
 add-zsh-hook precmd _precmd_vcs_info
-RPROMPT='%F{yellow}[%(5~,%-2~/.../%2~,%~)${vcs_info_msg_0_}%F{yellow}]%f'
+#RPROMPT='%F{yellow}[%(5~,%-2~/.../%2~,%~)${vcs_info_msg_0_}%F{yellow}]%f'
+function rprompt_shorten_current_path () {
+    # fish like
+    echo ${${:-/${(j:/:)${(M)${(s:/:)${(D)PWD:h}}#(|.)[^.]}}/${PWD:t}}//\/~/\~}
+}
+RPROMPT='%F{yellow}[%(5~,`rprompt_shorten_current_path`,%~)${vcs_info_msg_0_}%F{yellow}]%f'
 
 function _precmd_update_term_title () {
     isemacs || echo -ne "\033]0;${USER}@${HOST}:${PWD/$HOME/~}\007"
@@ -319,3 +324,13 @@ function resume-ssh-agent() {
 }
 
 resume-ssh-agent
+
+#-------------------------------------------------------------------------
+if [[ "$TERM" == "dumb" ]]; then
+  unsetopt zle
+  unsetopt prompt_cr
+  unsetopt prompt_subst
+  unfunction precmd
+  unfunction preexec
+  PS1='$ '
+fi
