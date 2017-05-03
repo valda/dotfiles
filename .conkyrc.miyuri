@@ -1,108 +1,121 @@
-## General
-background no
-#disable_auto_reload true # 有効にすると exec 系が失敗する
-update_interval 4.0
-#update_interval_on_battery 10.0
-total_run_times 0
-double_buffer yes
-text_buffer_size 8192
+conky.config = {
+   --# General
+   background = false,
+   --disable_auto_reload true # 有効にすると exec 系が失敗する
+   update_interval = 4.0,
+   --update_interval_on_battery 10.0
+   total_run_times = 0,
+   double_buffer = true,
+   text_buffer_size = 8192,
 
-## Window
-own_window yes
-own_window_type normal
-own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
-own_window_transparent yes
-own_window_argb_visual yes
-own_window_argb_value 255
-gap_x 20
-gap_y 80
-minimum_size 340 0
-maximum_width 340
+   --# Window
+   own_window = true,
+   own_window_type = 'desktop',
+   own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+   own_window_transparent = true,
+   own_window_argb_visual = true,
+   own_window_argb_value = 255,
+   gap_x = 20,
+   gap_y = 80,
+   minimum_width = 340, minimum_height = 0,
+   maximum_width = 340,
 
-## Behavior
-alignment top_left
-use_spacer none
-format_human_readable yes
-short_units no
-show_graph_range no
-show_graph_scale no
-draw_graph_borders no
-cpu_avg_samples 2
-net_avg_samples 2
-diskio_avg_samples 2
-top_cpu_separate false
-top_name_width 25
-no_buffers yes
+   --# Behavior
+   alignment = 'top_left',
+   use_spacer = 'none',
+   format_human_readable = true,
+   short_units = false,
+   show_graph_range = false,
+   show_graph_scale = false,
+   draw_graph_borders = false,
+   cpu_avg_samples = 2,
+   net_avg_samples = 2,
+   diskio_avg_samples = 2,
+   top_cpu_separate = false,
+   top_name_width = 20,
+   no_buffers = true,
 
-## Text/Font Settings
-use_xft yes
-xftfont Arial:Bold:size=10
-xftalpha 0.8
-uppercase no
-override_utf8_locale yes
+   --# Text/Font Settings
+   use_xft = true,
+   font = 'Arial:Bold:size=10',
+   xftalpha = 0.8,
+   uppercase = false,
+   override_utf8_locale = true,
 
-## Border/Shade/Outline
-#draw_borders no
-#border_width 1
-#stippled_borders 8
-#draw_shades yes
-#default_shade_color 185e5c
-draw_outline yes
-default_outline_color 111122
+   --# Border/Shade/Outline
+   --draw_borders = true,
+   --border_width = 1,
+   --stippled_borders = 8,
+   --draw_shades = true,
+   --default_shade_color = '185e5c'
+   draw_outline = true,
+   default_outline_color = '#111122',
 
-## Color
-default_color e0eeee
-# Title
-color1 aa8899
-# Bar
-color2 aa8899
-# Top Title
-color3 bbaabb
-# Top 1
-color4 ffffff
-#color5
-#color6
-#color7
-#color8
-#color9
+   --# Color
+   default_color = '#e0eeee',
+   -- Title
+   color1 = '#aa8899',
+   -- Bar
+   color2 = '#aa8899',
+   -- Top Title
+   color3 = '#bbaabb',
+   -- Top 1
+   color4 = '#ffffff',
+   --color5
+   --color6
+   --color7
+   --color8
+   --color9
 
-## Template
-# CPU Graph <num> <height> <width>
-template0 ${cpugraph cpu\1 \2,\3 997788 e0eeee  100 -t}${offset -\3} CPU\1: ${cpu cpu\1}%
-# CPU Top <num> <indent1> <indent2> <indent3> <indent4>
-template1 ${top name \1}${goto \2}${top pid \1}${goto \3}${top cpu \1}${goto \4}${top mem \1}${goto \5}${top io_perc \1}
-# Memory Top <num> <indent1> <indent2> <indent3> <indent4>
-template2 ${top_mem name \1}${goto \2}${top_mem pid \1}${goto \3}${top_mem mem_vsize \1}${goto \4}${top_mem mem_res \1}${goto \5}${top_mem mem \1}
-# Disk I/O Graph <device> <type> <height> <width>
-template3 ${diskiograph_\2 \1 \3,\4 997788 e0eeee 10000 -t}${offset -\4} /dev/\1 \2: ${diskio_\2 \1}
-# Disk I/O Top <num> <indent1> <indent2> <indent3> <indent4>
-template4 ${top_io name \1}${goto \2}${top_io pid \1}${goto \3}${top_io io_read \1}${goto \4}${top_io io_write \1}${goto \5}${top_io io_perc \1}
-# Network Graph <ethN> <type> <height> <width>
-template5 ${\2speedgraph \1 \3,\4 997788 e0eeee 1000 -t}${offset -\4} \1 \2: ${\2speed \1}
-# Disk Bar <name> <path>
-template6 \1 ${goto 55} ${fs_used \2}/${fs_size \2} ${goto 160} ${color2} ${fs_bar 6 \2}${color}
-# Load Average Graph <height> <width>
-template7 ${loadgraph \1,\2 997788 e0eeee 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}
-# Top 5 <template num> <indent1> <indent2> <indent3> <indent4>
-template8 ${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \4 \5}\n ${template\1 3 \2 \3 \4 \5}\n ${template\1 4 \2 \3 \4 \5}\n ${template\1 5 \2 \3 \4 \5}
-# CPU Clock / Temp <num> <coretemp path>
-template9 CPU\1 ${freq_g \1}GHz/${execi 5 cut -c1-2 \2}°C - ${cpu cpu\1}% ${goto 170}${color2}${cpubar cpu\1}${color}
+   --# Template
+   -- CPU Graph <num> <height> <width>
+   template0 = [[
+${cpugraph \1 \2,\3 997788 e0eeee 1000 -t}${offset -\3} CPU\1: ${freq_g \1}GHz - ${cpu cpu\1}%]],
+   -- CPU Top <num> <indent1> <indent2> <indent3> <indent4>
+   template1 = [[
+${top name \1}${goto \2}${top pid \1}${goto \3}${top cpu \1}${goto \4}${top mem \1}${goto \5}${top io_perc \1}]],
+   -- Memory Top <num> <indent1> <indent2> <indent3> <indent4>
+   template2 = [[
+${top_mem name \1}${goto \2}${top_mem pid \1}${goto \3}${top_mem mem_vsize \1}${goto \4}${top_mem mem_res \1}${goto \5}${top_mem mem \1}]],
+   -- Disk I/O Graph <device> <type> <height> <width>
+   template3 = [[
+${diskiograph_\2 \1 \3,\4 997788 e0eeee 10000 -t}${offset -\4} /dev/\1 \2: ${diskio_\2 \1}]],
+   -- Disk I/O Top <num> <indent1> <indent2> <indent3> <indent4>
+   template4 = [[
+${top_io name \1}${goto \2}${top_io pid \1}${goto \3}${top_io io_read \1}${goto \4}${top_io io_write \1}${goto \5}${top_io io_perc \1}]],
+   -- Network Graph <ethN> <type> <height> <width>
+   template5 = [[
+${\2speedgraph \1 \3,\4 997788 e0eeee 1000 -t}${offset -\4} \1 \2: ${\2speed \1}]],
+   -- Disk Bar <name> <path>
+   template6 = [[
+\1 ${goto 55} ${fs_used \2}/${fs_size \2} ${goto 160} ${color2} ${fs_bar 6 \2}${color}]],
+   -- Load Average Graph <height> <width>
+   template7 = [[
+${loadgraph \1,\2 997788 e0eeee 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}]],
+   -- Top 5 <template num> <indent1> <indent2> <indent3> <indent4>
+   template8 = [[
+${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \4 \5}\n ${template\1 3 \2 \3 \4 \5}\n ${template\1 4 \2 \3 \4 \5}\n ${template\1 5 \2 \3 \4 \5}]],
+   -- CPU Clock / Temp <num> <coretemp path>
+   template9 = [[
+CPU\1 ${freq_g \1}GHz/${hwmon 0 temp \2}°C - ${cpu cpu\1}% ${goto 170}${color2}${cpubar cpu\1}${color}]],
 
-TEXT
+};
+
+conky.text = [[
 ${font URW Gothic L:Book:size=18}${color1}System ${hr}${color}${font}
 
- ${pre_exec lsb_release -d | cut -f 2}
- ${nodename} ${kernel} on ${machine}
+ ${execi 600 lsb_release -d | cut -f 2}
+ ${nodename} ${exec uname -v } ${machine}
  Uptime: ${uptime}
 
 ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Processor ${hr}${color}${font}
 
- ${template9 1 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp2_input}
- ${template9 2 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp3_input}
- ${template9 3 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp4_input}
- ${template9 4 /sys/devices/platform/coretemp.0/hwmon/hwmon0/temp5_input}
-${template7 20 325}${voffset -5}
-${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
+ ${template9 1 2}
+ ${template9 2 3}
+ ${template9 3 4}
+ ${template9 4 5}
+${template7 20 335}${voffset -5}
+${voffset 3}${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
 
 ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Memory ${hr}${color}${font}
@@ -110,15 +123,14 @@ ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Memory ${hr}${color}${font
  Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}${color}
  buffers/cache: ${buffers}/${cached}
  Swap: ${swap}/${swapmax} - ${swapperc}%${goto 190}${color2}${swapbar}${color}
-
-${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
+${voffset 3}${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
 ${template8 2 150 200 250 300}
 
 ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Disk ${hr}${color}${font}
 
 ${goto 10}${template3 md1 Read 20 166}${goto 175}${template3 md1 Write 20 166}${voffset -5}
 ${goto 10}${template3 sdc Read 20 166}${goto 175}${template3 sdc Write 20 166}${voffset -5}
-${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
+${voffset 3}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
 ${template8 4 150 200 250 300}
 
  ${template6 / /}
@@ -132,3 +144,4 @@ ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Network ${hr}${color}${fon
 
 ${if_up eth0}${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}
 ${if_up eth1}${template5 eth1 Down 20 166}${goto 175}${template5 eth1 Up 20 166}${voffset -5}${endif}
+]];
