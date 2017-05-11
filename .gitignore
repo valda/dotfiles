@@ -15,6 +15,7 @@
 .emacs.d/el-get/
 .emacs.d/elpa/
 .emacs.d/elscreen
+.emacs.d/ido.last
 .emacs.d/projectile-bookmarks.eld
 .emacs.d/recentf
 .emacs.d/server/server
