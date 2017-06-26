@@ -78,8 +78,6 @@ if [ -d "$HOME/.composer" ]; then
     export PATH=$HOME/.composer/vendor/bin:$PATH
 fi
 
-
-
 #-------------------------------------------------------------------------
 if [ -e $HOME/.zshenv.local ]; then
     source $HOME/.zshenv.local

@@ -42,7 +42,8 @@ if which dircolors > /dev/null; then
 fi
 
 ## Completion configuration
-fpath=($HOME/.zsh/completion $fpath)
+fpath=($HOME/.zsh/completion $HOME/.nodebrew/completions/zsh $fpath)
+test -n "$NODEBREW_ROOT" && fpath=($NODEBREW_ROOT/completions/zsh $fpath)
 autoload -Uz compinit
 compinit
 
@@ -110,12 +111,19 @@ function isscreen() {
     return 1
 }
 
+function isdumb() {
+    [[ "${TERM[0,4]}" = dumb ]] && return 0
+    return 1
+}
+
 #-------------------------------------------------------------------------
 # zplug
 #-------------------------------------------------------------------------
 if [ -f ~/.zplug/init.zsh ]; then
     source ~/.zplug/init.zsh
 
+    zplug "plugins/rsync", from:oh-my-zsh, defer:0
+    zplug "plugins/yarn", from:oh-my-zsh, defer:0
     zplug "zsh-users/zsh-syntax-highlighting", defer:2
     zplug "zsh-users/zsh-history-substring-search"
     zplug "zsh-users/zsh-completions"
@@ -125,11 +133,9 @@ if [ -f ~/.zplug/init.zsh ]; then
     zplug "junegunn/fzf-bin", from:gh-r, as:command, rename-to:fzf
     zplug "junegunn/fzf", as:command, use:"bin/fzf-tmux"
     zplug "peco/peco", as:command, from:gh-r
-    #zplug "b4b4r07/peco-tmux.sh", as:command, use:'(*).sh', rename-to:'$1'
-    #zplug "b4b4r07/enhancd", use:init.sh
-    #export ENHANCD_DISABLE_HOME=1
     zplug "mollifier/anyframe"
     fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
+    zplug "greymd/tmux-xpanes"
 
     if ! zplug check --verbose; then
         printf "Install? [y/N]: "
@@ -326,11 +332,21 @@ function resume-ssh-agent() {
 resume-ssh-agent
 
 #-------------------------------------------------------------------------
-if [[ "$TERM" == "dumb" ]]; then
-  unsetopt zle
-  unsetopt prompt_cr
-  unsetopt prompt_subst
-  unfunction precmd
-  unfunction preexec
-  PS1='$ '
+if isdumb; then
+    unsetopt zle
+    unsetopt prompt_cr
+    unsetopt prompt_subst
+    unfunction precmd
+    unfunction preexec
+    PS1='$ '
+fi
+
+# Start tmux
+if ! isemacs && ! istmux && ! isscreen && ! isdumb && which tmux > /dev/null; then
+    ID=`tmux ls | grep -vm1 attached | cut -d: -f1`
+    if [[ -z "$ID" ]]; then
+        tmux new-session
+    else
+        tmux attach-session -t $ID
+    fi
 fi
