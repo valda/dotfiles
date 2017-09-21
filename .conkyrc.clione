@@ -70,7 +70,7 @@ conky.config = {
    --# Template
    -- CPU Graph <num> <height> <width>
    template0 = [[
-${cpugraph \1 \2,\3 004040 40b0b0 1000 -t}${offset -\3} CPU\1: ${freq_g \1}GHz - ${cpu cpu\1}%]],
+CPU\1 ${freq_g \1}GHz - ${cpu cpu\1}%${goto 150}${color2}${cpubar cpu\1}${color}]],
    -- CPU Top <num> <indent1> <indent2> <indent3> <indent4>
    template1 = [[
 ${top name \1}${goto \2}${top pid \1}${goto \3}${top cpu \1}${goto \4}${top mem \1}${goto \5}${top io_perc \1}]],
@@ -88,7 +88,7 @@ ${top_io name \1}${goto \2}${top_io pid \1}${goto \3}${top_io io_read \1}${goto 
 ${\2speedgraph \1 \3,\4 004040 40b0b0 1000 -t}${offset -\4} \1 \2: ${\2speed \1}]],
    -- Disk Bar <name> <path>
    template6 = [[
-\1 ${goto 55} ${fs_used \2}/${fs_size \2} ${goto 160} ${color2} ${fs_bar 6 \2}${color}]],
+\1 ${goto 55} ${fs_used \2}/${fs_size \2}${goto 170}${color2}${fs_bar 6 \2}${color}]],
    -- Load Average Graph <height> <width>
    template7 = [[
 ${loadgraph \1,\2 004040 40b0b0 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}]],
@@ -97,7 +97,7 @@ ${loadgraph \1,\2 004040 40b0b0 4 -t}${offset -\2} Load Average: ${loadavg}${ali
 ${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \4 \5}\n ${template\1 3 \2 \3 \4 \5}\n ${template\1 4 \2 \3 \4 \5}\n ${template\1 5 \2 \3 \4 \5}]],
    -- CPU Clock / Temp <num> <coretemp path>
    template9 = [[
-CPU\1 ${freq_g \1}GHz/${hwmon 0 temp \2}°C - ${cpu cpu\1}% ${goto 170}${color2}${cpubar cpu\1}${color}]],
+${execigraph 4 "cat /sys/class/hwmon/hwmon0/temp1_input | cut -c -2" \1,\2 004040 40b0b0 100 -t}${offset -\2} Package Temperature: ${hwmon 0 temp 1}°C]],
 
 };
 
@@ -110,15 +110,16 @@ ${font URW Gothic L:Book:size=18}${color1}System ${hr}${color}${font}
 
 ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Processor ${hr}${color}${font}
 
- ${template9 1 2}
- ${template9 2 2}
- ${template9 3 3}
- ${template9 4 3}
- ${template9 5 4}
- ${template9 6 4}
- ${template9 7 5}
- ${template9 8 5}
+ ${template0 1}
+ ${template0 2}
+ ${template0 3}
+ ${template0 4}
+ ${template0 5}
+ ${template0 6}
+ ${template0 7}
+ ${template0 8}
 ${template7 20 335}${voffset -5}
+${template9 20 335}${voffset -5}
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
 
@@ -147,3 +148,4 @@ ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Network ${hr}${color}${fon
 ${if_up eth0}${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}
 ${if_up eth1}${template5 eth1 Down 20 166}${goto 175}${template5 eth1 Up 20 166}${voffset -5}${endif}
 ]];
+
