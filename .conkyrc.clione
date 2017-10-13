@@ -104,7 +104,7 @@ ${execigraph 4 "cat /sys/class/hwmon/hwmon0/temp1_input | cut -c -2" \1,\2 00404
 conky.text = [[
 ${font URW Gothic L:Book:size=18}${color1}System ${hr}${color}${font}
 
- ${execi 600 lsb_release -d | cut -f 2}
+ ${exec lsb_release -d | cut -f 2}
  ${nodename} ${exec uname -v } ${machine}
  Uptime: ${uptime}
 
