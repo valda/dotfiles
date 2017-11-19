@@ -16,7 +16,7 @@ var ucjsMouseGestures = {
 
 	// 設定
 	enableWheelGestures: true,	// ホイールジェスチャ（右クリックしながらマウスホイール）
-	enableRockerGestures: true,	// ロッカージェスチャ（右クリックしながら左クリック、またはその逆）
+	enableRockerGestures: false,	// ロッカージェスチャ（右クリックしながら左クリック、またはその逆）
 
 	_lastX: 0,
 	_lastY: 0,
@@ -97,25 +97,25 @@ var ucjsMouseGestures = {
 		"W-": {
 			name: "Previous Tab",
 			name_ja: "\u524D\u306E\u30BF\u30D6\u3078",	// 前のタブへ
-			command: function() { gBrowser.mTabContainer.advanceSelectedTab(-1, true); }
+			command: function() { document.getElementById('tabbrowser-tabs').advanceSelectedTab(-1, true); }
 		},
 
 		"UL": {
 			name: "Previous Tab",	// 前のタブへ
 			name_ja: "\u524D\u306E\u30BF\u30D6\u3078",	// 前のタブへ
-			command: function() { gBrowser.mTabContainer.advanceSelectedTab(-1, true); }
+			command: function() { document.getElementById('tabbrowser-tabs').advanceSelectedTab(-1, true); }
 		},
 
 		"W+": {
 			name: "Next Tab",
 			name_ja: "\u6B21\u306E\u30BF\u30D6\u3078",	// 次のタブへ
-			command: function() { gBrowser.mTabContainer.advanceSelectedTab(+1, true); }
+			command: function() { document.getElementById('tabbrowser-tabs').advanceSelectedTab(+1, true); }
 		},
 
 		"UR": {
 			name: "Next Tab",	// 次のタブへ
 			name_ja: "\u6B21\u306E\u30BF\u30D6\u3078",	// 次のタブへ
-			command: function() { gBrowser.mTabContainer.advanceSelectedTab(+1, true); }
+			command: function() { document.getElementById('tabbrowser-tabs').advanceSelectedTab(+1, true); }
 		},
 
 		"LU": {
