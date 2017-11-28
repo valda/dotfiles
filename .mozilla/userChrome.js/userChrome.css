@@ -13,3 +13,8 @@
 .tabbrowser-tab[fadein]:not([pinned]):hover .tab-close-button {
     display: -moz-box !important;
 }
+
+/* Global UI font */
+* {
+    font-size: 12pt !important;
+}

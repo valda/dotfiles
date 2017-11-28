@@ -18,7 +18,7 @@ XTerm*forcePackedFont: false
 XTerm*selectToClipboard: true
 XTerm*faceName: Ricty
 XTerm*faceNameDoublesize: Ricty
-XTerm*faceSize: 12
+XTerm*faceSize: 14
 XTerm*saveLines: 2000
 XTerm*geometry: 80x24
 XTerm*foreground: #ffffff
@@ -48,7 +48,7 @@ XTerm*color14: #63e9e9
 XTerm*color7: #d3d7cf
 XTerm*color15: #eeeeec
 
-URxvt*font: xft:Ricty:style=Regular:size=12:antialias=true
+URxvt*font: xft:Ricty:style=Regular:size=14:antialias=true
 URxvt*depth: 32
 URxvt*buffered: true
 URxvt*foreground: white
