@@ -26,11 +26,11 @@ var ucjsMouseGestures = {
 
 	// ジェスチャの定義
 	gestures: {
-		"L<R": {
-			name: "History Back",
-			name_ja: "\u623B\u308B",	// 戻る
-			command: function() { document.getElementById("Browser:Back").doCommand(); }
-		},
+		// "L<R": {
+		// 	name: "History Back",
+		// 	name_ja: "\u623B\u308B",	// 戻る
+		// 	command: function() { document.getElementById("Browser:Back").doCommand(); }
+		// },
 
 		"L": {
 			name: "History Back",
@@ -62,17 +62,17 @@ var ucjsMouseGestures = {
 			command: function() { document.getElementById("Browser:ReloadSkipCache").doCommand(); }
 		},
 
-		"RUD": {
-			name: "Minimize Window",
-			name_ja: "\u30A6\u30A3\u30F3\u30C9\u30A6\u3092\u6700\u5C0F\u5316",	// ウィンドウを最小化
-			command: function() { window.minimize(); }
-		},
+		// "RUD": {
+		// 	name: "Minimize Window",
+		// 	name_ja: "\u30A6\u30A3\u30F3\u30C9\u30A6\u3092\u6700\u5C0F\u5316",	// ウィンドウを最小化
+		// 	command: function() { window.minimize(); }
+		// },
 
-		"RDU": {
-			name: "Restore or Maximize Window",
-			name_ja: "\u30A6\u30A3\u30F3\u30C9\u30A6\u3092\u6700\u5927\u5316 \u307E\u305F\u306F \u30A6\u30A3\u30F3\u30C9\u30A6\u3092\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059",	// ウィンドウを最大化 または ウィンドウを元のサイズに戻す
-			command: function() { window.windowState == 1 ? window.restore() : window.maximize(); }
-		},
+		// "RDU": {
+		// 	name: "Restore or Maximize Window",
+		// 	name_ja: "\u30A6\u30A3\u30F3\u30C9\u30A6\u3092\u6700\u5927\u5316 \u307E\u305F\u306F \u30A6\u30A3\u30F3\u30C9\u30A6\u3092\u5143\u306E\u30B5\u30A4\u30BA\u306B\u623B\u3059",	// ウィンドウを最大化 または ウィンドウを元のサイズに戻す
+		// 	command: function() { window.windowState == 1 ? window.restore() : window.maximize(); }
+		// },
 
 		"LR": {
 			name: "Open new Tab",
@@ -197,6 +197,7 @@ var ucjsMouseGestures = {
 	_isMouseDownR: false,
 	_suppressContext: false,
 	_shouldFireContext: false,
+	_nextPopContextmenu: false,
 
 	handleEvent: function(event)
 	{
@@ -254,8 +255,13 @@ var ucjsMouseGestures = {
 				// [Linux] mousedown直後のcontextmenuを抑止して...
 				if (this._suppressContext || this._isMouseDownR) {
 					this._suppressContext = false;
-					event.preventDefault();
-					event.stopPropagation();
+					if (!this._nextPopContextmenu) {
+						event.preventDefault();
+						event.stopPropagation();
+						this._nextPopContextmenu = true;
+					} else {
+						this._nextPopContextmenu = false;
+					}
 					// [Linux] ...代わりにmouseup後にcontextmenuを発生させる
 					if (this._isMouseDownR) {
 						this._shouldFireContext = true;
