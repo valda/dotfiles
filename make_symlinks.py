@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-import os
+from os import path, listdir, remove, rename, symlink
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -8,30 +8,31 @@ parser.add_option('-f', '--force', action='store_true', dest='force',
                   help='Force overwrite when file exist.')
 (options, args) = parser.parse_args()
 
-home = os.path.expanduser('~')
-dotfiles = os.path.dirname(os.path.realpath(__file__))
+home = path.expanduser('~')
+dotfiles = path.dirname(path.realpath(__file__))
 print 'Source dir: %s' % dotfiles
-for entry in os.listdir(dotfiles):
-    srcfile = os.path.join(dotfiles, entry)
-    if entry in ['.', '..', '.svn', '.git', os.path.basename(__file__)]:
+for entry in listdir(dotfiles):
+    srcfile = path.join(dotfiles, entry)
+    if entry in ['.', '..', '.svn', '.git', path.basename(__file__)]:
         print 'Skip: %s' % entry
         continue
-    newlink = os.path.join(home, entry)
-    if os.path.exists(newlink):
-        if (os.path.islink(newlink) and
-            os.path.realpath(newlink) == os.path.realpath(srcfile)):
+    newlink = path.join(home, entry)
+    if path.exists(newlink):
+        if (path.islink(newlink) and
+            path.realpath(newlink) == path.realpath(srcfile)):
             continue
         print '%s is exists.' % newlink
         if options.force:
             bak = newlink + '.bak'
-            if os.path.exists(bak):
-                os.remove(bak)
-            os.rename(newlink, bak)
-    os.symlink(srcfile, newlink)
-    print "Make symlink: %s -> %s" % (newlink, os.path.join(dotfiles, entry))
+            if path.exists(bak):
+                remove(bak)
+            rename(newlink, bak)
+    else:
+        print "Make symlink: %s -> %s" % (newlink, srcfile)
+        symlink(srcfile, newlink)
 
-for entry in os.listdir(home):
-    homefile = os.path.join(home, entry)
-    if os.path.islink(homefile) and not os.path.exists(homefile):
-        os.remove(homefile)
+for entry in listdir(home):
+    homefile = path.join(home, entry)
+    if path.islink(homefile) and not path.exists(homefile):
+        remove(homefile)
         print 'remove symlink: %s' % homefile
