@@ -197,7 +197,8 @@ var ucjsMouseGestures = {
   _isMouseDownR: false,
   _suppressContext: false,
   _shouldFireContext: false,
-  _nextPopContextmenu: false,
+
+  _lastContextmenuPos: null,
 
   handleEvent: function(event)
   {
@@ -240,10 +241,10 @@ var ucjsMouseGestures = {
           this._suppressContext = true;
         this._stopGesture(event);
         // [Linux] Win32を真似てmouseup後にcontextmenuを発生させる
-        if (this._shouldFireContext) {
-          this._shouldFireContext = false;
-          this._displayContextMenu(event);
-        }
+        //if (this._shouldFireContext) {
+        //  this._shouldFireContext = false;
+        //  this._displayContextMenu(event);
+        //}
       }
       else if (this.enableRockerGestures && event.button == 0 && this._isMouseDownL) {
         this._isMouseDownL = false;
@@ -253,19 +254,15 @@ var ucjsMouseGestures = {
       // [4-1] アクション実行後のコンテキストメニュー表示を抑止する
       // [4-2] 方向が認識されない微小な動きの場合は抑止しない
       // [Linux] mousedown直後のcontextmenuを抑止して...
-      if (this._suppressContext || this._isMouseDownR) {
+      if (this._isFirstContextmenuEvent(event) &&
+          (this._suppressContext || this._isMouseDownR)) {
         this._suppressContext = false;
-        if (!this._nextPopContextmenu) {
-          event.preventDefault();
-          event.stopPropagation();
-          this._nextPopContextmenu = true;
-        } else {
-          this._nextPopContextmenu = false;
-        }
+        event.preventDefault();
+        event.stopPropagation();
         // [Linux] ...代わりにmouseup後にcontextmenuを発生させる
-        if (this._isMouseDownR) {
-          this._shouldFireContext = true;
-        }
+        //if (this._isMouseDownR) {
+        //  this._shouldFireContext = true;
+        //}
       }
       break;
     case "DOMMouseScroll":
@@ -360,8 +357,28 @@ var ucjsMouseGestures = {
     } else {
       throw "Unknown Gesture: " + this._directionChain;
     }
-  }
+  },
 
+  _isFirstContextmenuEvent: function(event)
+  {
+    var result = true;
+    var now = (new Date()).getTime();
+    var last = this._lastContextmenuPos;
+    if (last) {
+      var timedelta = now - last.time;
+      var distanceX = Math.abs(event.screenX - last.screenX);
+      var distanceY = Math.abs(event.screenY - last.screenY);
+      if (timedelta < 600 && distanceX < 3 && distanceY < 3) {
+        result = false;
+      }
+    }
+    this._lastContextmenuPos = {
+      time: now,
+      screenX: event.screenX,
+      screenY: event.screenY,
+    };
+    return result;
+  }
 };
 
 // エントリポイント
