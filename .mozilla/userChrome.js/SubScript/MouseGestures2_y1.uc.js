@@ -83,7 +83,11 @@ var ucjsMouseGestures = {
     "DR": {
       name: "Close current Tab",
       name_ja: "\u30BF\u30D6\u3092\u9589\u3058\u308B",  // タブを閉じる
-      command: function() { document.getElementById("cmd_close").doCommand(); }
+      command: function() {
+        if (!gBrowser.mCurrentTab.pinned) {
+          document.getElementById("cmd_close").doCommand();
+        }
+      }
     },
 
     "DL": {
