@@ -319,15 +319,23 @@ function resume-ssh-agent() {
             tee "$HOME/.ssh/ssh_agent.env" | \
             awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
     fi
-    local agent; agent=`which ssh-agent`
-    if [ ! -e "$agent" ]; then
-        echo missing ssh-agent
+
+    local agent
+    agent="/mnt/c/Users/valda/opt/weasel-pageant-1.1/weasel-pageant -r -a \"/tmp/.weasel-pageant-$USER\""
+    if [ -e "${agent%% *}" ]; then
+        eval ${agent} | grep -e '^SSH_' | tee "$HOME/.ssh/ssh_agent.env" | \
+            awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
+        source "$HOME/.ssh/ssh_agent.env"
         return
     fi
-    if [ -z "$SSH_AUTH_SOCK" -o ! -S "$SSH_AUTH_SOCK" ]; then
-        "$agent" | grep -e '^SSH_' | tee "$HOME/.ssh/ssh_agent.env" | \
+
+    agent=`which ssh-agent`
+    if [ ! -e "${agent}" ]; then
+        echo missing ssh-agent
+    elif [ -z "$SSH_AUTH_SOCK" -o ! -S "$SSH_AUTH_SOCK" ]; then
+        $agent | grep -e '^SSH_' | tee "$HOME/.ssh/ssh_agent.env" | \
             awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
-            source "$HOME/.ssh/ssh_agent.env"
+        source "$HOME/.ssh/ssh_agent.env"
     fi
 }
 
