@@ -84,7 +84,7 @@ var ucjsMouseGestures = {
       name: "Close current Tab",
       name_ja: "\u30BF\u30D6\u3092\u9589\u3058\u308B",  // タブを閉じる
       command: function() {
-        if (!gBrowser.mCurrentTab.pinned) {
+        if (!gBrowser._selectedTab.pinned) {
           document.getElementById("cmd_close").doCommand();
         }
       }
@@ -175,26 +175,26 @@ var ucjsMouseGestures = {
   {
     this._isMac = navigator.platform.indexOf("Mac") == 0;
     this._lang = navigator.language.substring(0, 2);
-    gBrowser.mPanelContainer.addEventListener("mousedown", this, false);
-    gBrowser.mPanelContainer.addEventListener("mousemove", this, false);
-    gBrowser.mPanelContainer.addEventListener("mouseup", this, false);
-    gBrowser.mPanelContainer.addEventListener("contextmenu", this, true);
+    gBrowser.tabpanels.addEventListener("mousedown", this, false);
+    gBrowser.tabpanels.addEventListener("mousemove", this, false);
+    gBrowser.tabpanels.addEventListener("mouseup", this, false);
+    gBrowser.tabpanels.addEventListener("contextmenu", this, true);
     if (this.enableRockerGestures)
-      gBrowser.mPanelContainer.addEventListener("draggesture", this, true);
+      gBrowser.tabpanels.addEventListener("draggesture", this, true);
     if (this.enableWheelGestures)
-      gBrowser.mPanelContainer.addEventListener("DOMMouseScroll", this, false);
+      gBrowser.tabpanels.addEventListener("DOMMouseScroll", this, false);
   },
 
   uninit: function()
   {
-    gBrowser.mPanelContainer.removeEventListener("mousedown", this, false);
-    gBrowser.mPanelContainer.removeEventListener("mousemove", this, false);
-    gBrowser.mPanelContainer.removeEventListener("mouseup", this, false);
-    gBrowser.mPanelContainer.removeEventListener("contextmenu", this, true);
+    gBrowser.tabpanels.removeEventListener("mousedown", this, false);
+    gBrowser.tabpanels.removeEventListener("mousemove", this, false);
+    gBrowser.tabpanels.removeEventListener("mouseup", this, false);
+    gBrowser.tabpanels.removeEventListener("contextmenu", this, true);
     if (this.enableRockerGestures)
-      gBrowser.mPanelContainer.removeEventListener("draggesture", this, true);
+      gBrowser.tabpanels.removeEventListener("draggesture", this, true);
     if (this.enableWheelGestures)
-      gBrowser.mPanelContainer.removeEventListener("DOMMouseScroll", this, false);
+      gBrowser.tabpanels.removeEventListener("DOMMouseScroll", this, false);
   },
 
   _isMouseDownL: false,
@@ -334,7 +334,7 @@ var ucjsMouseGestures = {
         }
         status += " (" + this.gestures[this._directionChain][name] + ")";
       }
-      XULBrowserWindow.statusTextField.label = status;
+      StatusPanel._label = status;
     }
     // 今回の位置を保存
     this._lastX = x;
@@ -346,10 +346,10 @@ var ucjsMouseGestures = {
     try {
       if (this._directionChain)
         this._performAction(event);
-      XULBrowserWindow.statusTextField.label = "";
+      StatusPanel._label = "";
     }
     catch(ex) {
-      XULBrowserWindow.statusTextField.label = ex;
+      StatusPanel._label = ex;
     }
     this._directionChain = "";
   },
