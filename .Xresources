@@ -6,7 +6,7 @@ Emacs*useXIM: false
 
 Xft.autohint: 0
 Xft.lcdfilter: lcddefault
-Xft.hintstyle: hintmedium
+Xft.hintstyle: hintslight
 Xft.hinting: 1
 Xft.antialias: 1
 Xft.rgba: rgb
@@ -48,7 +48,7 @@ XTerm*color14: #63e9e9
 XTerm*color7: #d3d7cf
 XTerm*color15: #eeeeec
 
-URxvt*font: xft:Ricty:style=Regular:size=14:antialias=true
+URxvt*font: xft:Ricty:style=Regular:size=14:antialias=true,xft:Symbola
 URxvt*depth: 32
 URxvt*buffered: true
 URxvt*foreground: white

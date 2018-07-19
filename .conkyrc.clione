@@ -37,7 +37,7 @@ conky.config = {
 
    --# Text/Font Settings
    use_xft = true,
-   font = 'Arial:Bold:size=10',
+   font = 'Arial:Bold:size=8',
    xftalpha = 0.8,
    uppercase = false,
    override_utf8_locale = true,
@@ -102,13 +102,13 @@ ${execigraph 4 "cat /sys/class/hwmon/hwmon0/temp1_input | cut -c -2" \1,\2 00404
 };
 
 conky.text = [[
-${font URW Gothic L:Book:size=18}${color1}System ${hr}${color}${font}
+${font URW Gothic L:Book:size=14}${color1}System ${hr}${color}${font}
 
  ${execi 3600 lsb_release -d | cut -f 2}
  ${nodename} ${exec uname -v } ${machine}
  Uptime: ${uptime}
 
-${font URW Gothic L:Book:size=18}${color1}${voffset 3}Processor ${hr}${color}${font}
+${font URW Gothic L:Book:size=14}${color1}${voffset 3}Processor ${hr}${color}${font}
 
  ${template0 1}
  ${template0 2}
@@ -123,7 +123,7 @@ ${template9 20 335}${voffset -5}
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
 
-${font URW Gothic L:Book:size=18}${color1}${voffset 3}Memory ${hr}${color}${font}
+${font URW Gothic L:Book:size=14}${color1}${voffset 3}Memory ${hr}${color}${font}
 
  Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}${color}
  buffers/cache: ${buffers}/${cached}
@@ -131,7 +131,7 @@ ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Memory ${hr}${color}${font
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
 ${template8 2 150 200 250 300}
 
-${font URW Gothic L:Book:size=18}${color1}${voffset 3}Disk ${hr}${color}${font}
+${font URW Gothic L:Book:size=14}${color1}${voffset 3}Disk ${hr}${color}${font}
 
 ${goto 10}${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
 ${goto 10}${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}
@@ -143,7 +143,7 @@ ${template8 4 150 200 250 300}
  ${template6 /home /home}
  ${template6 /tmp /tmp}
 
-${font URW Gothic L:Book:size=18}${color1}${voffset 3}Network ${hr}${color}${font}
+${font URW Gothic L:Book:size=14}${color1}${voffset 3}Network ${hr}${color}${font}
 
 ${if_up eth0}${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}
 ${if_up eth1}${template5 eth1 Down 20 166}${goto 175}${template5 eth1 Up 20 166}${voffset -5}${endif}
