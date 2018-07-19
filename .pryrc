@@ -1,15 +1,14 @@
 # -*- mode: ruby -*-
 
-#Pry.commands.alias_command 'c', 'continue'
-#Pry.commands.alias_command 's', 'step'
-#Pry.commands.alias_command 'n', 'next'
-#Pry.commands.alias_command 'f', 'finish'
+if defined? PryByebug
+  Pry.commands.alias_command 'c', 'continue'
+  Pry.commands.alias_command 's', 'step'
+  Pry.commands.alias_command 'n', 'next'
+  Pry.commands.alias_command 'f', 'finish'
+end
 
-# For hirb
-begin
-  require 'hirb'
-rescue LoadError
-  # Missing goodies, bummer
+if defined? PryStackExplorer
+  Pry.commands.alias_command 'bt', 'show-stack'
 end
 
 if defined? Hirb
@@ -32,11 +31,6 @@ if defined? Hirb
   Hirb.enable
 end
 
-# For awesome_print
-begin
-  require "awesome_print"
+if defined? AwesomePrint
   AwesomePrint.pry!
-rescue LoadError
-  # Missing goodies, bummer
 end
-
