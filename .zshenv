@@ -55,20 +55,23 @@ fi
 if [ -d "$HOME/.rbenv" ]; then
     export PATH="$HOME/.rbenv/bin:$PATH"
     eval "$(rbenv init -)"
-    # rbenv-gem-rehash プラグインによって不要
-    # rehash () {
-    #     rbenv rehash
-    #     builtin rehash
-    # }
+fi
+
+#-------------------------------------------------------------------------
+# ndenv
+#-------------------------------------------------------------------------
+if [ -d "$HOME/.ndenv" ]; then
+    export PATH="$HOME/.ndenv/bin:$PATH"
+    eval "$(ndenv init -)"
 fi
 
 #-------------------------------------------------------------------------
 # nodebrew
 #-------------------------------------------------------------------------
-if [ -d "$HOME/.nodebrew" ]; then
-    export PATH=$HOME/.nodebrew/current/bin:$PATH
-    export NODEBREW_ROOT=$HOME/.nodebrew
-fi
+#if [ -d "$HOME/.nodebrew" ]; then
+#    export PATH=$HOME/.nodebrew/current/bin:$PATH
+#    export NODEBREW_ROOT=$HOME/.nodebrew
+#fi
 
 #-------------------------------------------------------------------------
 # composer
