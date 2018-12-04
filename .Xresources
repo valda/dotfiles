@@ -48,7 +48,7 @@ XTerm*color14: #63e9e9
 XTerm*color7: #d3d7cf
 XTerm*color15: #eeeeec
 
-URxvt*font: xft:Ricty:style=Regular:size=14:antialias=true,xft:Symbola
+URxvt*font: xft:Ricty:style=Regular:size=14:antialias=true,xft:DejaVu Sans Mono:size=14,xft:Noto Emoji:size=14,xft:Symbola
 URxvt*depth: 32
 URxvt*buffered: true
 URxvt*foreground: white
