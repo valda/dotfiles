@@ -63,6 +63,8 @@ zstyle ':completion:*' ignore-parents parent pwd ..
 zstyle ':completion:*:manuals' separate-sections true
 
 bindkey -e
+bindkey "^[[1;5C" emacs-forward-word
+bindkey "^[[1;5D" emacs-backward-word
 
 autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic

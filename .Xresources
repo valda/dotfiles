@@ -60,8 +60,12 @@ URxvt*scrollBar: false
 URxvt*lineSpace: 0
 URxvt*letterSpace: -1
 URxvt*termName: xterm-256color
-URxvt*perl-ext-common: default,xim-onthespot,clipboard
-URxvt*preeditType: OnTheSpot
+URxvt*perl-ext-common: default,matcher,xim-onthespot,fullscreen,resize-font
+URxvt.url-launcher: /usr/bin/xdg-open
+URxvt.matcher.button: 2
+URxvt.inputMethod: fcitx
+URxvt.preeditType: OnTheSpot
+URxvt.keysym.F11: perl:fullscreen:switch
 
 ! black dark/light
 URxvt*color0: #2e3436
@@ -87,3 +91,5 @@ URxvt*color14: #63e9e9
 ! white dark/light
 URxvt*color7: #d3d7cf
 URxvt*color15: #eeeeec
+
+URxvt.keysym.C-BackSpace: \033[33~
