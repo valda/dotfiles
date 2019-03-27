@@ -37,7 +37,7 @@ conky.config = {
 
    --# Text/Font Settings
    use_xft = true,
-   font = 'Arial:Bold:size=10',
+   font = 'Arial:Bold:size=8',
    xftalpha = 0.8,
    uppercase = false,
    override_utf8_locale = true,
@@ -47,18 +47,18 @@ conky.config = {
    --border_width = 1,
    --stippled_borders = 8,
    --draw_shades = true,
-   --default_shade_color = '185e5c'
+   --default_shade_color = '#111122',
    draw_outline = true,
-   default_outline_color = '#111122',
+   default_outline_color = '#003344',
 
    --# Color
-   default_color = '#e0eeee',
-   -- Title
-   color1 = '#aa8899',
+   default_color = '#ccbbbb',
+   -- Section Title
+   color1 = '#ffffff',
    -- Bar
-   color2 = '#aa8899',
+   color2 = '#aaaabb',
    -- Top Title
-   color3 = '#bbaabb',
+   color3 = '#ddddff',
    -- Top 1
    color4 = '#ffffff',
    --color5
@@ -70,7 +70,7 @@ conky.config = {
    --# Template
    -- CPU Graph <num> <height> <width>
    template0 = [[
-${cpugraph \1 \2,\3 997788 e0eeee 1000 -t}${offset -\3} CPU\1: ${freq_g \1}GHz - ${cpu cpu\1}%]],
+CPU\1 ${freq_g \1}GHz - ${cpu cpu\1}%${goto 150}${color2}${cpubar cpu\1}${color}]],
    -- CPU Top <num> <indent1> <indent2> <indent3> <indent4>
    template1 = [[
 ${top name \1}${goto \2}${top pid \1}${goto \3}${top cpu \1}${goto \4}${top mem \1}${goto \5}${top io_perc \1}]],
@@ -79,46 +79,47 @@ ${top name \1}${goto \2}${top pid \1}${goto \3}${top cpu \1}${goto \4}${top mem 
 ${top_mem name \1}${goto \2}${top_mem pid \1}${goto \3}${top_mem mem_vsize \1}${goto \4}${top_mem mem_res \1}${goto \5}${top_mem mem \1}]],
    -- Disk I/O Graph <device> <type> <height> <width>
    template3 = [[
-${diskiograph_\2 \1 \3,\4 997788 e0eeee 10000 -t}${offset -\4} /dev/\1 \2: ${diskio_\2 \1}]],
+${diskiograph_\2 \1 \3,\4 333344 eeeeff 10000 -t}${offset -\4} /dev/\1 \2: ${diskio_\2 \1}]],
    -- Disk I/O Top <num> <indent1> <indent2> <indent3> <indent4>
    template4 = [[
 ${top_io name \1}${goto \2}${top_io pid \1}${goto \3}${top_io io_read \1}${goto \4}${top_io io_write \1}${goto \5}${top_io io_perc \1}]],
    -- Network Graph <ethN> <type> <height> <width>
    template5 = [[
-${\2speedgraph \1 \3,\4 997788 e0eeee 1000 -t}${offset -\4} \1 \2: ${\2speed \1}]],
+${\2speedgraph \1 \3,\4 333344 eeeeff 1000 -t}${offset -\4} \1 \2: ${\2speed \1}]],
    -- Disk Bar <name> <path>
    template6 = [[
-\1 ${goto 55} ${fs_used \2}/${fs_size \2} ${goto 160} ${color2} ${fs_bar 6 \2}${color}]],
+\1 ${goto 55} ${fs_used \2}/${fs_size \2}${goto 170}${color2}${fs_bar 6 \2}${color}]],
    -- Load Average Graph <height> <width>
    template7 = [[
-${loadgraph \1,\2 997788 e0eeee 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}]],
+${loadgraph \1,\2 333344 eeeeff 4 -t}${offset -\2} Load Average: ${loadavg}${alignr}Processes: ${running_processes}/${processes}]],
    -- Top 5 <template num> <indent1> <indent2> <indent3> <indent4>
    template8 = [[
 ${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \4 \5}\n ${template\1 3 \2 \3 \4 \5}\n ${template\1 4 \2 \3 \4 \5}\n ${template\1 5 \2 \3 \4 \5}]],
    -- CPU Clock / Temp <num> <coretemp path>
    template9 = [[
-CPU\1 ${freq_g \1}GHz/${hwmon 0 temp \2}°C - ${cpu cpu\1}% ${goto 170}${color2}${cpubar cpu\1}${color}]],
+${execigraph 4 "cat /sys/class/hwmon/hwmon0/temp1_input | cut -c -2" \1,\2 333344 eeeeff 100 -t}${offset -\2} Package Temperature: ${hwmon 0 temp 1}°C]],
 
 };
 
 conky.text = [[
-${font URW Gothic L:Book:size=18}${color1}System ${hr}${color}${font}
+${font URW Gothic L:Book:size=16}${color1}System ${hr}${color}${font}
 
- ${execi 600 lsb_release -d | cut -f 2}
+ ${execi 3600 lsb_release -d | cut -f 2}
  ${nodename} ${exec uname -v } ${machine}
  Uptime: ${uptime}
 
-${font URW Gothic L:Book:size=18}${color1}${voffset 3}Processor ${hr}${color}${font}
+${font URW Gothic L:Book:size=16}${color1}${voffset 3}Processor ${hr}${color}${font}
 
- ${template9 1 2}
- ${template9 2 3}
- ${template9 3 4}
- ${template9 4 5}
+ ${template0 1}
+ ${template0 2}
+ ${template0 3}
+ ${template0 4}
 ${template7 20 335}${voffset -5}
+${template9 20 335}${voffset -5}
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
 
-${font URW Gothic L:Book:size=18}${color1}${voffset 3}Memory ${hr}${color}${font}
+${font URW Gothic L:Book:size=16}${color1}${voffset 3}Memory ${hr}${color}${font}
 
  Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}${color}
  buffers/cache: ${buffers}/${cached}
@@ -126,9 +127,10 @@ ${font URW Gothic L:Book:size=18}${color1}${voffset 3}Memory ${hr}${color}${font
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
 ${template8 2 150 200 250 300}
 
-${font URW Gothic L:Book:size=18}${color1}${voffset 3}Disk ${hr}${color}${font}
+${font URW Gothic L:Book:size=16}${color1}${voffset 3}Disk ${hr}${color}${font}
 
-${goto 10}${template3 md1 Read 20 166}${goto 175}${template3 md1 Write 20 166}${voffset -5}
+${goto 10}${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
+${goto 10}${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}
 ${goto 10}${template3 sdc Read 20 166}${goto 175}${template3 sdc Write 20 166}${voffset -5}
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
 ${template8 4 150 200 250 300}
@@ -140,7 +142,7 @@ ${template8 4 150 200 250 300}
  ${template6 /tmp /tmp}
  ${template6 /data /data}
 
-${font URW Gothic L:Book:size=18}${color1}${voffset 3}Network ${hr}${color}${font}
+${font URW Gothic L:Book:size=16}${color1}${voffset 3}Network ${hr}${color}${font}
 
 ${if_up eth0}${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}
 ${if_up eth1}${template5 eth1 Down 20 166}${goto 175}${template5 eth1 Up 20 166}${voffset -5}${endif}
