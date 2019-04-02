@@ -58,11 +58,12 @@ if [ -d "$HOME/.rbenv" ]; then
 fi
 
 #-------------------------------------------------------------------------
-# ndenv
+# nodenv
 #-------------------------------------------------------------------------
-if [ -d "$HOME/.ndenv" ]; then
-    export PATH="$HOME/.ndenv/bin:$PATH"
-    eval "$(ndenv init -)"
+export NODENV_ROOT=$HOME/.nodenv
+if [ -d "$NODENV_ROOT" ]; then
+    export PATH="$NODENV_ROOT/bin:$PATH"
+    eval "$(nodenv init -)"
 fi
 
 #-------------------------------------------------------------------------
