@@ -16,9 +16,8 @@ XTerm*utf8: 1
 XTerm*locale: true
 XTerm*forcePackedFont: false
 XTerm*selectToClipboard: true
-XTerm*faceName: Ricty
-XTerm*faceNameDoublesize: Ricty
-XTerm*faceSize: 14
+xterm*faceName: DejaVu Sans Mono:size=10
+xterm*font: 7x13
 XTerm*saveLines: 2000
 XTerm*geometry: 80x24
 XTerm*foreground: #ffffff

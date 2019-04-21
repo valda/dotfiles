@@ -18,9 +18,9 @@
 }
 
 /* Global UI font */
-* {
+/* * {
     font-size: 11pt !important;
-}
+} */
 
 toolbarbutton#alltabs-button {
     -moz-binding: url("userChrome.xml#js");
