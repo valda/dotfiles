@@ -135,16 +135,15 @@ ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Disk ${hr}${color}${font}
 
 ${goto 10}${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
 ${goto 10}${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}
+${goto 10}${template3 sdc Read 20 166}${goto 175}${template3 sdc Write 20 166}${voffset -5}
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
 ${template8 4 150 200 250 300}
 
  ${template6 / /}
- ${template6 /var /var}
  ${template6 /home /home}
  ${template6 /tmp /tmp}
 
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Network ${hr}${color}${font}
 
-${if_up eth0}${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}
-${if_up eth1}${template5 eth1 Down 20 166}${goto 175}${template5 eth1 Up 20 166}${voffset -5}${endif}
+${if_up enp0s31f6}${template5 enp0s31f6 Down 20 166}${goto 175}${template5 enp0s31f6 Up 20 166}${voffset -5}${endif}
 ]];
