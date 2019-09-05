@@ -3,8 +3,10 @@
 // @namespace      http://space.geocities.yahoo.co.jp/gl/alice0775
 // @description    Downloads Status Modoki
 // @include        main
-// @compatibility  Firefox 57
+// @compatibility  Firefox 69+
 // @author         Alice0775
+// @version        2019/05/21 08:30 fix 69.0a1 Bug 1551320 - Replace all createElement calls in XUL documents with createXULElement
+// @version        2018/10/27 12:00 fix for 64+
 // @version        2018/06/12 21:00 fix for private window mode
 // @version        2018/06/07 12:00 fix file name for history
 // @version        2018/02/10 12:00 try catch error when DO_NOT_DELETE_HISTORY = true
@@ -66,20 +68,20 @@ var ucjsDownloadsStatusModoki = {
     };
 
 
-    var toolbar = document.createElement("vbox");
+    var toolbar = document.createXULElement("vbox");
     toolbar.setAttribute("id", "downloadsStatusModokiBar");
     toolbar.setAttribute("collapsed", true);
 
     var bottombox = document.getElementById("browser-bottombox");
     bottombox.appendChild(toolbar);
-    var browser = toolbar.appendChild(document.createElement("browser"));
+    var browser = toolbar.appendChild(document.createXULElement("browser"));
     browser.setAttribute("disablehistory", true);
     browser.setAttribute("remote", false);
     browser.setAttribute("id", "ucjsDownloadsStatusModoki");
     browser.addEventListener("load", function(event){ucjsDownloadsStatusModoki.onload(event)}, true);
     browser.setAttribute("src", "chrome://browser/content/downloads/contentAreaDownloadsView.xul");
 
-    var menuitem = document.createElement("menuitem");
+    var menuitem = document.createXULElement("menuitem");
     menuitem.setAttribute("id", "toggle_downloadsStatusModokiBar");
     menuitem.setAttribute("type", "checkbox");
     menuitem.setAttribute("autocheck", false);
@@ -229,7 +231,12 @@ var ucjsDownloadsStatusModoki = {
         max-width: calc(100% - 50px) !important; 
         min-width: calc(100% - 50px) !important; 
       } 
- 
+
+      .download-state[state="0"] * .downloadTarget,
+      .download-state[state="4"] * .downloadTarget { 
+        padding-bottom:0px; 
+      } 
+
       .downloadTarget:-moz-system-metric(windows-default-theme) { 
         margin-top:2px; 
         /*padding-bottom:10px;  windows7 ?*/
@@ -288,24 +295,24 @@ var ucjsDownloadsStatusModoki = {
       return doc.documentElement.getAttribute(name);
     };
 
-    var button = doc.createElement("button");
+    var button = doc.createXULElement("button");
     button.setAttribute("label", "Clear");
     button.setAttribute("id", "ucjs_clearListButton");
     button.setAttribute("accesskey", "C");
     button.setAttribute("oncommand", "ucjsDownloadsStatusModoki_clearDownloads();");
     var ref = doc.getElementById("downloadCommands");
-    var vbox = doc.createElement("vbox");
-    var box = vbox.appendChild(doc.createElement("hbox"));
+    var vbox = doc.createXULElement("vbox");
+    var box = vbox.appendChild(doc.createXULElement("hbox"));
     box.appendChild(button);
-    box.appendChild(doc.createElement("spacer")).setAttribute("flex", 1);
-    var textbox = doc.createElement("textbox");
+    box.appendChild(doc.createXULElement("spacer")).setAttribute("flex", 1);
+    var textbox = doc.createXULElement("textbox");
     textbox.setAttribute("id", "downloadFilter");
     textbox.setAttribute("clickSelectsAll", true);
     textbox.setAttribute("type", "search");
     textbox.setAttribute("placeholder", "Search...");
     textbox.setAttribute("oncommand", "ucjsDownloadsStatusModoki_doSearch(this.value);");
     box.appendChild(textbox);
-    var closebtn = doc.createElement("toolbarbutton");
+    var closebtn = doc.createXULElement("toolbarbutton");
     closebtn.setAttribute("id", "ucjsDownloadsStatusModoki-closebutton");
     closebtn.setAttribute("class", "close-icon");
     closebtn.setAttribute("tooltiptext", "Close this bar");

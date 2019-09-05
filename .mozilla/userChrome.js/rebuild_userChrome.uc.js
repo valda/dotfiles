@@ -4,8 +4,10 @@
 // @description    userChrome.js用のスクリプトのキャッシュをクリアーし,新しいウインドウを開く
 // @charset        utf-8
 // @include        main
-// @compatibility  Firefox 61
+// @compatibility  Firefox 69
 // @author         Alice0775
+// Date 2019/05/21 08:30 fix 69.0a1 Bug 1534407 - Enable browser.xhtml by default, Bug 1551320 - Replace all CreateElement calls in XUL documents with CreateXULElement
+// @version        2019/04/19 14:00 Fixed 68a1 due to Bug 1519502 - Convert menu bindings to a Custom Element
 // @version        2018/04/14 00:00 de XUL
 // @version        2017/11/23 23:00 Services :(
 // @version        2017/11/14 21:00 use nsIFile instead nsILocalFile
@@ -77,7 +79,7 @@
     },
 
     createElement: function(localName, arryAttribute) {
-      let elm = document.createElement(localName);
+      let elm = document.createXULElement(localName);
       for(let i = 0; i < arryAttribute.length; i++) {
         elm.setAttribute(arryAttribute[i].attr, arryAttribute[i].value);
       }
@@ -96,7 +98,7 @@
           ]), ref);
       let popup = menu.appendChild(this.createElement("menupopup",
         [{attr: "id", value:"userChromejs_options"},
-         {attr: "onpopupshowing", value:"userChromejs.onpopup()"},
+         /*{attr: "onpopupshowing", value:"userChromejs.onpopup()"},*/
          {attr: "context", value:""}
         ]));
       popup.appendChild(this.createElement("menuitem",
@@ -140,6 +142,7 @@
         this.addonbar.addEventListener('drop', this ,true);
       }
       this.addPrefListener(userChromejs.readLaterPrefListener); // 登録処理
+      document.getElementById("menu_ToolsPopup").addEventListener("popupshowing", function(event) {if (event.target == this) userChromejs.onpopup(event);}, false);
     },
     uninit: function(){
       if ("nsDragAndDrop" in window && this.statusDisplay) {
@@ -314,7 +317,7 @@
       var flag = this.getPref("userChrome.enable.reuse",'bool',true);
       this.setPref("userChrome.enable.reuse",'bool',!flag);
     },
-    onpopup: function(){
+    onpopup: function(event){
       var menu;
       var flag = this.getPref("userChrome.enable.reuse",'bool',true);
       var menuitem = document.getElementById('userChrome_setting');
@@ -325,10 +328,10 @@
         menupopup.removeChild(menupopup.lastChild);
       }
 
-      var menuseparator = document.createElement('menuseparator');
+      var menuseparator = document.createXULElement('menuseparator');
       menupopup.appendChild(menuseparator);
 
-      menuitem = document.createElement('menuitem');
+      menuitem = document.createXULElement('menuitem');
       menuitem.setAttribute('label','userCrome.js \u306e \u6709\u52b9/\u7121\u52b9');
       menuitem.setAttribute('oncommand','userChromejs.chgDirStat("*");');
       menuitem.setAttribute('onclick','userChromejs.clickDirMenuitem(event,true);');
@@ -357,17 +360,17 @@
         if(!flg) continue;
 
 
-        menu = document.createElement('menu');
+        menu = document.createXULElement('menu');
         menu.setAttribute('label','chrome/' + (dirName=="root"?"":dirName) );
         menu.setAttribute('onclick','userChromejs.clickDirMenu(event);');
         if(userChrome_js.dirDisable[dirName])
           menu.setAttribute('style', 'font-style:italic;');
         menu.dirName = dirName;
 
-        menupopup = document.createElement('menupopup');
-        menupopup.setAttribute('onpopupshowing','event.stopPropagation();');
+        menupopup = document.createXULElement('menupopup');
+        //menupopup.setAttribute('onpopupshowing','event.stopPropagation();');
 
-        menuitem = document.createElement('menuitem');
+        menuitem = document.createXULElement('menuitem');
         menuitem.setAttribute('label','chrome/' + (dirName=="root"?"":dirName) + ' \u30d5\u30a9\u30eb\u30c0\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u6709\u52b9/\u7121\u52b9');
         menuitem.setAttribute('oncommand', 'userChromejs.chgDirStat(this.dirName);');
         menuitem.setAttribute('onclick','userChromejs.clickDirMenuitem(event);');
@@ -376,7 +379,7 @@
         menuitem.dirName = dirName;
         menupopup.appendChild(menuitem);
 
-        menuseparator = document.createElement('menuseparator');
+        menuseparator = document.createXULElement('menuseparator');
         menupopup.appendChild(menuseparator);
 
         var flg = false;
@@ -384,7 +387,7 @@
           var script = userChrome_js.scripts[i];
           if(script.dir != dirName) continue;
             flg = true;
-            menuitem = document.createElement('menuitem');
+            menuitem = document.createXULElement('menuitem');
             menuitem.setAttribute('label',script.filename);
             menuitem.setAttribute('oncommand','userChromejs.chgScriptStat(this.script.filename);');
             menuitem.setAttribute('onclick','userChromejs.clickScriptMenu(event);');
@@ -400,11 +403,11 @@
           var script = userChrome_js.overlays[i];
           if(script.dir != dirName) continue;
             if(flg){
-              menuseparator = document.createElement('menuseparator');
+              menuseparator = document.createXULElement('menuseparator');
               menupopup.appendChild(menuseparator);
             }
             flg = false;
-            menuitem = document.createElement('menuitem');
+            menuitem = document.createXULElement('menuitem');
             menuitem.setAttribute('label',script.filename);
             menuitem.setAttribute('oncommand','userChromejs.chgScriptStat(this.script.filename);');
             menuitem.setAttribute('onclick','userChromejs.clickScriptMenu(event);');
