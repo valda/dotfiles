@@ -23,6 +23,9 @@
 .emacs.d/tramp
 .emacs.d/url/cache
 .emacs.d/url/cookies
+.emacs.d/network-security.data
+.emacs.d/transient/
+.emacs.d/tutorial/
 .eshell/history
 .eshell/lastdir
 .fastri-index

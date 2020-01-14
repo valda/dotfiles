@@ -98,7 +98,7 @@ function iscygwin() {
 }
 
 function isemacs() {
-    [[ "$EMACS" != "" ]] && return 0
+    [[ "$INSIDE_EMACS" != "" ]] && return 0
     return 1
 }
 

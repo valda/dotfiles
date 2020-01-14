@@ -21,7 +21,7 @@ conky.config = {
    maximum_width = 340,
 
    --# Behavior
-   alignment = 'top_left',
+   alignment = 'middle_left',
    use_spacer = 'none',
    format_human_readable = true,
    short_units = false,

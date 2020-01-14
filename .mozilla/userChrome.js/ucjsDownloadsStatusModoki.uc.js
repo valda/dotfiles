@@ -5,6 +5,7 @@
 // @include        main
 // @compatibility  Firefox 69+
 // @author         Alice0775
+// @version        2019/09/08 19:30 fix scrollbox
 // @version        2019/05/21 08:30 fix 69.0a1 Bug 1551320 - Replace all createElement calls in XUL documents with createXULElement
 // @version        2018/10/27 12:00 fix for 64+
 // @version        2018/06/12 21:00 fix for private window mode
@@ -28,7 +29,7 @@
 // @version        2013/12/16 18:31 fix pref name
 // @version        2013/12/16 18:30
 // @note
-// ==/UserScript== 
+// ==/UserScript==
 var ucjsDownloadsStatusModoki = {
   _summary: null,
   _list: null,
@@ -50,13 +51,13 @@ var ucjsDownloadsStatusModoki = {
     XPCOMUtils.defineLazyModuleGetter(window, "Downloads",
               "resource://gre/modules/Downloads.jsm");
 
-    var style = ` 
-      @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul); 
-      #ucjsDownloadsStatusModoki { 
-        width: 100%; 
-        max-height: 100px; 
-        height: 35px; 
-      } 
+    var style = `
+      @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+      #ucjsDownloadsStatusModoki {
+        width: 100%;
+        max-height: 100px;
+        height: 39px;
+      }
      `.replace(/\s+/g, " ");
     var sspi = document.createProcessingInstruction(
       'xml-stylesheet',
@@ -185,106 +186,111 @@ var ucjsDownloadsStatusModoki = {
   onload: function(event) {
     var doc = event.originalTarget;
     var win = doc.defaultView;
- 
-    var style = ` 
-      @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul); 
-      #contentAreaDownloadsView { 
-        -moz-box-orient: horizontal; 
-        background-color: -moz-dialog; 
-        padding: 0; 
-      } 
- 
-      #downloadsRichListBox { 
-        max-height:35px; 
-        background-color: -moz-dialog; 
-      } 
- 
-      #downloadsRichListBox .scrollbox-innerbox { 
-        display:inline !important; 
-      } 
- 
-      richlistitem { 
-        min-width:200px; 
-        max-width:200px; 
-        max-height:33px; 
-        font-size: 13px; 
+
+    var style = `
+      @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+      #contentAreaDownloadsView {
+        -moz-box-orient: horizontal;
+        background-color: -moz-dialog;
+        padding: 0;
+      }
+
+      #contentAreaDownloadsView > stack:first-child {
+      }
+
+      #downloadsRichListBox {
+        background-color: -moz-dialog;
+        display:inline-block !important;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        border: none;
+      }
+
+      :root
+      {
+        --downloads-item-height: 38px;
+      }
+      richlistitem {
+        min-width:200px;
+        max-width:200px;
+        font-size: 13px;
         border-width: 0 1px 0 0;
         border-style: solid;
         border-color: black;
-       } 
- 
-      richlistitem vbox { 
-      } 
- 
-      .downloadTypeIcon { 
-        height:16px; 
-        width: 16px; 
-        -moz-margin-end: 0px; 
-        -moz-margin-start: 1px; 
-         padding-right: 0; 
-         padding-left: 1px; 
-      } 
- 
-      .downloadTarget { 
-        margin-top:1px; 
-        padding-bottom:16px; 
-        max-width: calc(100% - 50px) !important; 
-        min-width: calc(100% - 50px) !important; 
-      } 
+       }
+
+      richlistitem vbox {
+      }
+
+      .downloadTypeIcon {
+        height:16px;
+        width: 16px;
+        -moz-margin-end: 0px;
+        -moz-margin-start: 1px;
+         padding-right: 0;
+         padding-left: 1px;
+      }
+
+      .downloadTarget {
+        margin-top:1px;
+        padding-bottom:16px;
+        max-width: calc(100% - 50px) !important;
+        min-width: calc(100% - 50px) !important;
+      }
 
       .download-state[state="0"] * .downloadTarget,
-      .download-state[state="4"] * .downloadTarget { 
-        padding-bottom:0px; 
-      } 
+      .download-state[state="4"] * .downloadTarget {
+        padding-bottom:0px;
+      }
 
-      .downloadTarget:-moz-system-metric(windows-default-theme) { 
-        margin-top:2px; 
+      .downloadTarget:-moz-system-metric(windows-default-theme) {
+        margin-top:2px;
         /*padding-bottom:10px;  windows7 ?*/
-      } 
- 
-      .downloadProgress { 
-        margin-top:-16px; 
+      }
+
+      .downloadProgress {
+        margin-top:-16px;
         margin-bottom: -1px;
         height:12px;
         margin-inline-end: 0 !important;
-      } 
- 
-      .progress-bar { 
-        -moz-appearance:none !important; 
-        background-color: lime !important; 
-      } 
- 
-      .progress-remainder { 
-      } 
- 
-      .downloadDetails { 
-        margin-top:-12px; 
-      } 
-
-       .download-state:not(:-moz-any([state="-1"], [state="5"], [state="0"], [state="4"], [state="7"]))      .downloadDetails {
-         margin-top:-17px; 
       }
 
-      richlistitem[selected] .downloadDetails { 
-      opacity: 1; 
-      } 
- 
-      .downloadButton { 
-        padding: 0; 
-        margin: 0; 
-      } 
- 
-     button > .button-box { 
-        -moz-padding-start: 0px; 
-        -moz-padding-end: 1px; 
-        padding-right: 0 !important; 
-        padding-left: 0 !important; 
-      } 
- 
-     #downloadFilter { 
-       width: 150px; 
-     } 
- 
+      .progress-bar {
+        -moz-appearance:none !important;
+        background-color: lime !important;
+      }
+
+      .progress-remainder {
+      }
+
+      .downloadDetails {
+        margin-top:-12px;
+      }
+
+       .download-state:not(:-moz-any([state="-1"], [state="5"], [state="0"], [state="4"], [state="7"]))      .downloadDetails {
+         margin-top:-17px;
+      }
+
+      richlistitem[selected] .downloadDetails {
+      opacity: 1;
+      }
+
+      .downloadButton {
+        padding: 0;
+        margin: 0;
+      }
+
+     button > .button-box {
+        -moz-padding-start: 0px;
+        -moz-padding-end: 1px;
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+      }
+
+     #downloadFilter {
+       width: 150px;
+     }
+
      `.replace(/\s+/g, " ");
     var sspi = doc.createProcessingInstruction(
       'xml-stylesheet',
@@ -406,5 +412,3 @@ var ucjsDownloadsStatusModoki = {
 
 }
 ucjsDownloadsStatusModoki.init();
-
-
