@@ -1,4 +1,4 @@
-/* :::::::: Sub-Script/Overlay Loader v3.0.58mod ::::::::::::::: */
+/* :::::::: Sub-Script/Overlay Loader v3.0.60mod no bind version ::::::::::::::: */
 
 // automatically includes all files ending in .uc.xul and .uc.js from the profile's chrome folder
 
@@ -14,6 +14,8 @@
 // 4.Support window.userChrome_js.loadOverlay(overlay [,observer]) //
 // Modified by Alice0775
 //
+// Date 2019/12/11 01:30 fix 72 revert the code for sidebar, use "load" in config.js(2019/12/11 01:30), 
+// Date 2019/08/11 21:30 fix 70.0a1  Bug 1551344 - Remove XULDocument code
 // Date 2019/05/21 08:30 fix 69.0a1 Bug 1534407 - Enable browser.xhtml by default, Bug 1551320 - Replace all CreateElement calls in XUL documents with CreateXULElement
 // Date 2018/08/10 01:30 fix 63.0a1
 // Date 2018/08/02 19:30 for userChrome.xml
@@ -522,7 +524,7 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
       } catch (e) {
         return;
       }
-      if (!(doc instanceof XULDocument || doc instanceof HTMLDocument))
+      if (!(/*doc instanceof XULDocument ||*/ doc instanceof HTMLDocument))
           return;
 
       var script, aScript, url;

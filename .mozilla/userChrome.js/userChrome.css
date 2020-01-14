@@ -1,8 +1,9 @@
 @charset "utf-8";
 /*
- * Do not remove the @namespace line -- it's required for correct functioning
+@import "userChromeCSS/SidebarModoki.uc.js.css";
+@import "userChromeCSS/ucjsDownloadsStatusModoki.uc.js.css";
  */
-@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"); /* set default namespace to XUL */
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 /* ブックマークの"タブですべて開く"を非表示 */
 .openintabs-menuitem, .bookmarks-actions-menuseparator { display: none !important; }
