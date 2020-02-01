@@ -47,6 +47,7 @@
 .mozilla/firefox/
 .mozilla/plugins/
 .mozilla/userChrome.js/uAutoPagerize.json
+.mozilla/native-messaging-hosts/
 .navi2ch
 .netrc
 .pit

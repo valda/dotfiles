@@ -41,27 +41,6 @@ if which dircolors > /dev/null; then
     eval `dircolors -b`
 fi
 
-## Completion configuration
-fpath=($HOME/.zsh/completion $HOME/.nodebrew/completions/zsh $fpath)
-test -n "$NODEBREW_ROOT" && fpath=($NODEBREW_ROOT/completions/zsh $fpath)
-autoload -Uz compinit
-compinit
-
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*' completer _expand _complete _match _prefix _approximate _list _history
-zstyle ':completion:*:messages' format '%F{yellow}%d%f'
-zstyle ':completion:*:warnings' format '%F{red}%BNo matches for:%b %F{yellow}%d%f'
-zstyle ':completion:*:descriptions' format '%F{yellow}%B[%d]%b%f'
-zstyle ':completion:*:corrections' format '%F{yellow}%B[%d] %F{red}(errors: %e)%b%f'
-zstyle ':completion:*:options' description 'yes'
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*:default' menu select true
-zstyle ':completion:*' use-cache true
-zstyle ':completion:*' ignore-parents parent pwd ..
-zstyle ':completion:*:manuals' separate-sections true
-
 bindkey -e
 bindkey "^[[1;5C" emacs-forward-word
 bindkey "^[[1;5D" emacs-backward-word
@@ -121,62 +100,112 @@ function isdumb() {
 #-------------------------------------------------------------------------
 # zplug
 #-------------------------------------------------------------------------
-if [ -f ~/.zplug/init.zsh ]; then
-    source ~/.zplug/init.zsh
+# if [ -f ~/.zplug/init.zsh ]; then
+#     source ~/.zplug/init.zsh
 
-    zplug "plugins/rsync", from:oh-my-zsh, defer:0
-    zplug "plugins/yarn", from:oh-my-zsh, defer:0
-    zplug "zsh-users/zsh-syntax-highlighting", defer:2
-    zplug "zsh-users/zsh-history-substring-search"
-    zplug "zsh-users/zsh-completions"
-    zplug "stedolan/jq", from:gh-r, as:command, rename-to:jq
-    zplug "b4b4r07/emoji-cli", on:"stedolan/jq"
-    zplug "mrowa44/emojify", as:command
-    zplug "junegunn/fzf-bin", from:gh-r, as:command, rename-to:fzf
-    zplug "junegunn/fzf", as:command, use:"bin/fzf-tmux"
-    zplug "peco/peco", as:command, from:gh-r
-    zplug "mollifier/anyframe"
-    fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
-    zplug "greymd/tmux-xpanes"
+#     zplug "plugins/rsync", from:oh-my-zsh, defer:0
+#     zplug "plugins/yarn", from:oh-my-zsh, defer:0
+#     zplug "zsh-users/zsh-syntax-highlighting", defer:2
+#     zplug "zsh-users/zsh-history-substring-search"
+#     zplug "zsh-users/zsh-completions"
+#     zplug "stedolan/jq", from:gh-r, as:command, rename-to:jq
+#     zplug "b4b4r07/emoji-cli", on:"stedolan/jq"
+#     zplug "mrowa44/emojify", as:command
+#     zplug "junegunn/fzf-bin", from:gh-r, as:command, rename-to:fzf
+#     zplug "junegunn/fzf", as:command, use:"bin/fzf-tmux"
+#     zplug "peco/peco", as:command, from:gh-r
+#     zplug "mollifier/anyframe"
+#     fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
+#     zplug "greymd/tmux-xpanes"
 
-    if ! zplug check --verbose; then
-        printf "Install? [y/N]: "
-        if read -q; then
-            echo; zplug install
-        fi
-    fi
+#     if ! zplug check --verbose; then
+#         printf "Install? [y/N]: "
+#         if read -q; then
+#             echo; zplug install
+#         fi
+#     fi
 
-    zplug load
+#     zplug load
+# fi
+
+#-------------------------------------------------------------------------
+# Zinit
+#-------------------------------------------------------------------------
+if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
+    print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
+    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
+    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
+        print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
+        print -P "%F{160}▓▒░ The clone has failed.%f"
 fi
+source "$HOME/.zinit/bin/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+#zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-completions
+zinit light zdharma/fast-syntax-highlighting
+#zinit ice pick"async.zsh" src"pure.zsh";  zinit light sindresorhus/pure
+zinit ice from"gh-r" as"program";         zinit load junegunn/fzf-bin
+zinit ice as"program" pick"bin/fzf-tmux"; zinit load junegunn/fzf
+#zinit ice from"gh-r" as"program" mv"jq* -> jq"; zinit load stedolan/jq
+zinit light mollifier/anyframe
+zinit snippet OMZ::plugins/rsync/rsync.plugin.zsh
+zinit snippet OMZ::plugins/yarn/yarn.plugin.zsh
+
+#-------------------------------------------------------------------------
+# Completion configuration
+#-------------------------------------------------------------------------
+fpath=($HOME/.zsh/completion $HOME/.nodebrew/completions/zsh $fpath)
+test -n "$NODEBREW_ROOT" && fpath=($NODEBREW_ROOT/completions/zsh $fpath)
+autoload -Uz compinit
+compinit
+
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*' completer _expand _complete _match _prefix _approximate _list _history
+zstyle ':completion:*:messages' format '%F{yellow}%d%f'
+zstyle ':completion:*:warnings' format '%F{red}%BNo matches for:%b %F{yellow}%d%f'
+zstyle ':completion:*:descriptions' format '%F{yellow}%B[%d]%b%f'
+zstyle ':completion:*:corrections' format '%F{yellow}%B[%d] %F{red}(errors: %e)%b%f'
+zstyle ':completion:*:options' description 'yes'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*:default' menu select true
+zstyle ':completion:*' use-cache true
+zstyle ':completion:*' ignore-parents parent pwd ..
+zstyle ':completion:*:manuals' separate-sections true
 
 #-------------------------------------------------------------------------
 # cdr
 #-------------------------------------------------------------------------
-if [[ -n $(echo ${^fpath}/chpwd_recent_dirs(N)) && -n $(echo ${^fpath}/cdr(N)) ]]; then
-    autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
-    add-zsh-hook chpwd chpwd_recent_dirs
-    zstyle ':completion:*:*:cdr:*:*' menu selection
-    zstyle ':completion:*' recent-dirs-insert both
-    zstyle ':chpwd:*' recent-dirs-max 500
-    zstyle ':chpwd:*' recent-dirs-default true
-    zstyle ':chpwd:*' recent-dirs-pushd true
-fi
+autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+add-zsh-hook chpwd chpwd_recent_dirs
+zstyle ':completion:*:*:cdr:*:*' menu selection
+zstyle ':completion:*' recent-dirs-insert both
+zstyle ':chpwd:*' recent-dirs-max 500
+zstyle ':chpwd:*' recent-dirs-default true
+zstyle ':chpwd:*' recent-dirs-pushd true
 
 #-------------------------------------------------------------------------
 # anyframe
 #-------------------------------------------------------------------------
-if [[ -n $(echo ${^fpath}/anyframe-widget-cdr(N)) ]]; then
-    zstyle ":anyframe:selector:" use fzf
-    zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
-    bindkey '^[d' anyframe-widget-cdr
-    bindkey '^r' anyframe-widget-put-history
-    bindkey '^xb' anyframe-widget-checkout-git-branch
-    bindkey '^xg' anyframe-widget-cd-ghq-repository
-    bindkey '^xk' anyframe-widget-kill
-    bindkey '^xi' anyframe-widget-insert-git-branch
-    bindkey '^xf' anyframe-widget-insert-filename
-    bindkey '^xc' anyframe-widget-insert-docker-container-id
-fi
+zstyle ":anyframe:selector:" use fzf
+zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
+bindkey '^[d' anyframe-widget-cdr
+bindkey '^r' anyframe-widget-put-history
+bindkey '^xb' anyframe-widget-checkout-git-branch
+bindkey '^xg' anyframe-widget-cd-ghq-repository
+bindkey '^xk' anyframe-widget-kill
+bindkey '^xi' anyframe-widget-insert-git-branch
+bindkey '^xf' anyframe-widget-insert-filename
+bindkey '^xc' anyframe-widget-insert-docker-container-id
+
+#-------------------------------------------------------------------------
+# zmv
+#-------------------------------------------------------------------------
+autoload -Uz zmv
+alias zmv='noglob zmv -W'
 
 #-------------------------------------------------------------------------
 # abbrev
