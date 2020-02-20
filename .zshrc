@@ -152,6 +152,7 @@ zinit ice as"program" pick"bin/fzf-tmux"; zinit load junegunn/fzf
 zinit light mollifier/anyframe
 zinit snippet OMZ::plugins/rsync/rsync.plugin.zsh
 zinit snippet OMZ::plugins/yarn/yarn.plugin.zsh
+zinit light 39e/zsh-completions-anyenv
 
 #-------------------------------------------------------------------------
 # Completion configuration

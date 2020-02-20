@@ -14,6 +14,7 @@
 // 4.Support window.userChrome_js.loadOverlay(overlay [,observer]) //
 // Modified by Alice0775
 //
+// @version       2019/12/11 fix for 73 Bug 1601094 - Rename remaining .xul files to .xhtml in browser and Bug 1601093 - Rename remaining .xul files to .xhtml in toolkit
 // Date 2019/12/11 01:30 fix 72 revert the code for sidebar, use "load" in config.js(2019/12/11 01:30), 
 // Date 2019/08/11 21:30 fix 70.0a1  Bug 1551344 - Remove XULDocument code
 // Date 2019/05/21 08:30 fix 69.0a1 Bug 1534407 - Enable browser.xhtml by default, Bug 1551320 - Replace all CreateElement calls in XUL documents with CreateXULElement
@@ -114,7 +115,10 @@
   if(/^(about:(blank|newtab|home))/i.test(location.href)) return;
   //コモンダイアログに対するオーバーレイが今のところ無いので時間短縮のためスキップすることにした
   if(location.href =='chrome://global/content/commonDialog.xul') return;
+  if(location.href =='chrome://global/content/commonDialog.xhtml') return;
+  if(location.href =='chrome://global/content/selectDialog.xhtml') return;
   if(location.href =='chrome://global/content/alerts/alert.xul') return;
+  if(location.href =='chrome://global/content/alerts/alert.xhtml') return;
   if(/\.html?$/i.test(location.href)) return;
   window.userChrome_js = {
     USE_0_63_FOLDER: USE_0_63_FOLDER,
