@@ -152,13 +152,11 @@ zinit ice as"program" pick"bin/fzf-tmux"; zinit load junegunn/fzf
 zinit light mollifier/anyframe
 zinit snippet OMZ::plugins/rsync/rsync.plugin.zsh
 zinit snippet OMZ::plugins/yarn/yarn.plugin.zsh
-zinit light 39e/zsh-completions-anyenv
 
 #-------------------------------------------------------------------------
 # Completion configuration
 #-------------------------------------------------------------------------
-fpath=($HOME/.zsh/completion $HOME/.nodebrew/completions/zsh $fpath)
-test -n "$NODEBREW_ROOT" && fpath=($NODEBREW_ROOT/completions/zsh $fpath)
+test -d "$HOME/.zsh/completions" && fpath=($HOME/.zsh/completions $fpath)
 autoload -Uz compinit
 compinit
 
