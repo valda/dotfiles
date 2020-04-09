@@ -37,15 +37,15 @@ Xft.hinting: 1
 Xft.antialias: 1
 Xft.rgba: rgb
 
-XTerm.termName: xterm-256color
-XTerm.utf8: 1
-XTerm.locale: true
-XTerm.forcePackedFont: false
-XTerm.selectToClipboard: true
-XTerm.faceName: DejaVu Sans Mono:size=10
-XTerm.font: 7x13
-XTerm.saveLines: 2000
-XTerm.geometry: 80x24
+XTerm*termName: xterm-256color
+XTerm*utf8: 1
+XTerm*locale: true
+XTerm*forcePackedFont: false
+XTerm*selectToClipboard: true
+XTerm*faceName: DejaVu Sans Mono:size=12
+XTerm*cjkWidth : true
+XTerm*saveLines: 2000
+XTerm*geometry: 80x24
 
 URxvt.font: xft:Ricty:style=Regular:size=14:antialias=true,xft:DejaVu Sans Mono:size=14,xft:Noto Emoji:size=14,xft:Symbola
 URxvt.depth: 32

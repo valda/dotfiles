@@ -149,14 +149,15 @@ zinit light zdharma/fast-syntax-highlighting
 zinit ice from"gh-r" as"program";         zinit load junegunn/fzf-bin
 zinit ice as"program" pick"bin/fzf-tmux"; zinit load junegunn/fzf
 #zinit ice from"gh-r" as"program" mv"jq* -> jq"; zinit load stedolan/jq
-zinit light mollifier/anyframe
+fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
+zinit light mollifier/anyframe 
 zinit snippet OMZ::plugins/rsync/rsync.plugin.zsh
 zinit snippet OMZ::plugins/yarn/yarn.plugin.zsh
 
 #-------------------------------------------------------------------------
 # Completion configuration
 #-------------------------------------------------------------------------
-test -d "$HOME/.zsh/completions" && fpath=($HOME/.zsh/completions $fpath)
+fpath=($HOME/.zsh/completions(N-/) $fpath)
 autoload -Uz compinit
 compinit
 
