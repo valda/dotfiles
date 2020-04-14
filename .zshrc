@@ -350,7 +350,7 @@ function resume-ssh-agent() {
     fi
 
     local agent
-    agent="/mnt/c/Users/valda/opt/weasel-pageant-1.1/weasel-pageant -r -a \"/tmp/.weasel-pageant-$USER\""
+    agent="/mnt/c/Users/valda/opt/weasel-pageant/weasel-pageant -r -a \"/tmp/.weasel-pageant-$USER\""
     if [ -e "${agent%% *}" ]; then
         eval ${agent} | grep -e '^SSH_' | tee "$HOME/.ssh/ssh_agent.env" | \
             awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
