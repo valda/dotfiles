@@ -150,7 +150,7 @@ zinit ice from"gh-r" as"program";         zinit load junegunn/fzf-bin
 zinit ice as"program" pick"bin/fzf-tmux"; zinit load junegunn/fzf
 #zinit ice from"gh-r" as"program" mv"jq* -> jq"; zinit load stedolan/jq
 fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
-zinit light mollifier/anyframe 
+zinit light mollifier/anyframe
 zinit snippet OMZ::plugins/rsync/rsync.plugin.zsh
 zinit snippet OMZ::plugins/yarn/yarn.plugin.zsh
 
@@ -350,7 +350,7 @@ function resume-ssh-agent() {
     fi
 
     local agent
-    agent="/mnt/c/Users/valda/opt/weasel-pageant/weasel-pageant -r -a \"/tmp/.weasel-pageant-$USER\""
+    agent="/mnt/c/Users/$USER/scoop/apps/weasel-pageant/current/weasel-pageant -r -a \"/tmp/.weasel-pageant-$USER\""
     if [ -e "${agent%% *}" ]; then
         eval ${agent} | grep -e '^SSH_' | tee "$HOME/.ssh/ssh_agent.env" | \
             awk 'BEGIN {FS="[=;]"} {printf "setenv %s %s\n", $1, $2}' > "$HOME/.ssh/ssh_agent.screenrc"
