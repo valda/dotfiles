@@ -13,6 +13,8 @@
 .emacs.d/.session
 .emacs.d/ac-comphist.dat
 .emacs.d/anything-c-adaptive-history
+.emacs.d/company-statistics-cache.el
+.emacs.d/custom.el
 .emacs.d/el-get-backup-*/
 .emacs.d/el-get/
 .emacs.d/elpa/
