@@ -1,4 +1,4 @@
-## -*- coding: utf-8-unix -*-
+## -*- mode: sh; coding: utf-8-unix -*-
 
 ###
 # Set shell options
@@ -277,6 +277,7 @@ add-zsh-hook precmd _precmd_update_term_title
 
 function _preexec_update_window_title () {
     # screen/tmux のタイトルを更新
+    if isemacs; then return; fi
     if isscreen || istmux; then
         emulate -L zsh
         local -a cmd; cmd=(${(z)2})
@@ -378,14 +379,4 @@ if isdumb; then
     unfunction precmd
     unfunction preexec
     PS1='$ '
-fi
-
-# Start tmux
-if ! isemacs && ! istmux && ! isscreen && ! isdumb && which tmux > /dev/null; then
-    ID=`tmux ls | grep -vm1 attached | cut -d: -f1`
-    if [[ -z "$ID" ]]; then
-        tmux new-session
-    else
-        tmux attach-session -t $ID
-    fi
 fi

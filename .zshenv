@@ -1,4 +1,4 @@
-## (*'-')/.zshenv
+## -*- mode: sh; coding: utf-8-unix -*-
 
 umask 022
 
