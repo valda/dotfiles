@@ -41,6 +41,8 @@ is_target()
 ;     Return 1
   IfWinActive,ahk_class vcxsrv/x X rl
     Return 1
+  IfWinActive,ahk_class X410_XAppWin
+    Return 1
   IfWinActive,ahk_class IrfanView
     Return 1
   IfWinActive,ahk_class mintty
