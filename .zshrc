@@ -334,12 +334,32 @@ function git-pull-subdirs() {
         local gitdir
         for gitdir in $(find -maxdepth 2 -type d -name '.git'); do
             (
-                local dir; dir=`dirname $gitdir`
+                local dir=$(dirname $gitdir)
                 echo '>>' $dir
                 cd $dir && git pull --rebase
             )
         done
     fi
+}
+
+function rbenv-update {
+    local env_root=$(rbenv root)
+    (
+        cd $env_root
+        git pull
+        cd $env_root/plugins
+        git-pull-subdirs
+    )
+}
+
+function nodenv-update {
+    local env_root=$(nodenv root)
+    (
+        cd $env_root
+        git pull
+        cd $env_root/plugins
+        git-pull-subdirs
+    )
 }
 
 function resume-ssh-agent() {
