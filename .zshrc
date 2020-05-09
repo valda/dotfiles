@@ -252,7 +252,7 @@ autoload -Uz add-zsh-hook
 autoload -Uz vcs_info
 
 [ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
-PROMPT="%(?.%F{cyan}.%F{red})%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%# "
+PROMPT='%(?.%F{cyan}.%F{red})%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%# '
 
 zstyle ':vcs_info:*' enable git svn
 zstyle ':vcs_info:*' check-for-changes true
@@ -265,7 +265,6 @@ function _precmd_vcs_info () {
   LANG=en_US.UTF-8 vcs_info
 }
 add-zsh-hook precmd _precmd_vcs_info
-#RPROMPT='%F{yellow}[%(5~,%-2~/.../%2~,%~)${vcs_info_msg_0_}%F{yellow}]%f'
 function rprompt_shorten_current_path () {
     # fish like
     echo ${${:-/${(j:/:)${(M)${(s:/:)${(D)PWD:h}}#(|.)[^.]}}/${PWD:t}}//\/~/\~}
@@ -381,4 +380,10 @@ if isdumb; then
     unfunction precmd
     unfunction preexec
     PS1='$ '
+fi
+
+if isemacs; then
+  unsetopt prompt_cr
+  PROMPT=$RPROMPT$'\n'$PROMPT
+  unset RPROMPT
 fi
