@@ -1,0 +1,78 @@
+AllCops:
+  Exclude:
+    - 'bin/*'
+    - 'db/schema.rb'
+    - 'vendor/**/*'
+  DisplayCopNames: true
+
+Style/AsciiComments:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 110
+
+Style/Documentation:
+  Exclude:
+    - 'db/migrate/*'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'db/migrate/*'
+
+Metrics/AbcSize:
+  Exclude:
+    - 'db/migrate/*'
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/Lambda:
+  Enabled: false
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Layout/SpaceInLambdaLiteral:
+  EnforcedStyle: require_space
+
+# Style/TrailingCommaInArrayLiteral:
+#   EnforcedStyleForMultiline: comma
+
+# Style/TrailingCommaInHashLiteral:
+#   EnforcedStyleForMultiline: comma
+
+# Style/TrailingCommaInArguments:
+#   EnforcedStyleForMultiline: comma
+
+Metrics/BlockLength:
+  Exclude:
+    - Gemfile
+    - 'spec/**/*'
+    - 'lib/tasks/**/*'
+
+Lint/Loop:
+  Enabled: false
+
+Style/InfiniteLoop:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+#Layout/AlignParameters:
+#  EnforcedStyle: with_fixed_indentation
