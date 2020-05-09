@@ -191,7 +191,9 @@ zstyle ':chpwd:*' recent-dirs-pushd true
 # anyframe
 #-------------------------------------------------------------------------
 zstyle ":anyframe:selector:" use fzf
-zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
+if istmux && ! isemacs; then
+    zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
+fi
 bindkey '^[d' anyframe-widget-cdr
 bindkey '^r' anyframe-widget-put-history
 bindkey '^xb' anyframe-widget-checkout-git-branch
