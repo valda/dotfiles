@@ -57,6 +57,9 @@ is_target()
     Return 1
   IfWinActive,ahk_class wndclass_desked_gsk ; Visual Studio 2005
     Return 1
+  IfWinActive,ahk_exe Code.exe 
+    Return 1
+  IfWinActive,ahk_exe WindowsTerminal.exe
   Return 0
 }
 

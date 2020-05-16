@@ -33,3 +33,4 @@ ForegroundColour=191,191,191
 BackgroundColour=0,0,0
 CursorColour=191,191,191
 BoldAsFont=no
+BoldAsColour=yes
