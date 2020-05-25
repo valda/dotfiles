@@ -47,7 +47,7 @@ XTerm*cjkWidth : true
 XTerm*saveLines: 2000
 XTerm*geometry: 80x24
 
-URxvt.font: xft:Ricty:style=Regular:size=14:antialias=true,xft:DejaVu Sans Mono:size=14,xft:Noto Emoji:size=14,xft:Symbola
+URxvt.font: xft:Cica:style=Regular:size=14:antialias=true,xft:Symbola
 URxvt.depth: 32
 URxvt.buffered: true
 URxvt.background: rgba:2700/2800/2200/dddd
