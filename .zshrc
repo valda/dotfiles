@@ -407,3 +407,13 @@ if isemacs; then
   PROMPT=$RPROMPT$'\n'$PROMPT
   unset RPROMPT
 fi
+
+# Start tmux
+if ! isemacs && ! istmux && ! isscreen && ! isdumb && which tmux > /dev/null; then
+    ID=`tmux ls | grep -vm1 attached | cut -d: -f1`
+    if [[ -z "$ID" ]]; then
+        tmux new-session
+    else
+        tmux attach-session -t $ID
+    fi
+fi
