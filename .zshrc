@@ -342,26 +342,6 @@ function git-pull-subdirs() {
     fi
 }
 
-function rbenv-update {
-    local env_root=$(rbenv root)
-    (
-        cd $env_root
-        git pull
-        cd $env_root/plugins
-        git-pull-subdirs
-    )
-}
-
-function nodenv-update {
-    local env_root=$(nodenv root)
-    (
-        cd $env_root
-        git pull
-        cd $env_root/plugins
-        git-pull-subdirs
-    )
-}
-
 function resume-ssh-agent() {
     if [ -z "$SSH_AUTH_SOCK" -o  ! -S "$SSH_AUTH_SOCK" ]; then
         test -e "$HOME/.ssh/ssh_agent.env" && source "$HOME/.ssh/ssh_agent.env"
