@@ -190,18 +190,21 @@ zstyle ':chpwd:*' recent-dirs-pushd true
 #-------------------------------------------------------------------------
 # anyframe
 #-------------------------------------------------------------------------
-zstyle ":anyframe:selector:" use fzf
-if istmux && ! isemacs; then
-    zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
+if ! isemacs; then
+    zstyle ":anyframe:selector:" use fzf
+    if istmux; then
+        zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
+    fi
+
+    bindkey '^[d' anyframe-widget-cdr
+    bindkey '^r' anyframe-widget-put-history
+    bindkey '^xb' anyframe-widget-checkout-git-branch
+    bindkey '^xg' anyframe-widget-cd-ghq-repository
+    bindkey '^xk' anyframe-widget-kill
+    bindkey '^xi' anyframe-widget-insert-git-branch
+    bindkey '^xf' anyframe-widget-insert-filename
+    bindkey '^xc' anyframe-widget-insert-docker-container-id
 fi
-bindkey '^[d' anyframe-widget-cdr
-bindkey '^r' anyframe-widget-put-history
-bindkey '^xb' anyframe-widget-checkout-git-branch
-bindkey '^xg' anyframe-widget-cd-ghq-repository
-bindkey '^xk' anyframe-widget-kill
-bindkey '^xi' anyframe-widget-insert-git-branch
-bindkey '^xf' anyframe-widget-insert-filename
-bindkey '^xc' anyframe-widget-insert-docker-container-id
 
 #-------------------------------------------------------------------------
 # zmv
