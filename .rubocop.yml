@@ -16,6 +16,7 @@ Style/Documentation:
     - 'db/migrate/*'
 
 Metrics/MethodLength:
+  Max: 20
   Exclude:
     - 'db/migrate/*'
 
@@ -47,14 +48,14 @@ Lint/AmbiguousBlockAssociation:
 Layout/SpaceInLambdaLiteral:
   EnforcedStyle: require_space
 
-# Style/TrailingCommaInArrayLiteral:
-#   EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: no_comma
 
-# Style/TrailingCommaInHashLiteral:
-#   EnforcedStyleForMultiline: comma
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: no_comma
 
-# Style/TrailingCommaInArguments:
-#   EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: no_comma
 
 Metrics/BlockLength:
   Exclude:
