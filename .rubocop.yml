@@ -80,3 +80,6 @@ Style/NumericLiterals:
 
 Style/StringLiterals:
   Enabled: false
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent

@@ -10,6 +10,7 @@
 .emacs.d/.bm-repository
 .emacs.d/.emacs.desktop
 .emacs.d/.emacs.desktop.lock
+.emacs.d/.lsp-session-v1
 .emacs.d/.session
 .emacs.d/ac-comphist.dat
 .emacs.d/anything-c-adaptive-history
@@ -49,9 +50,9 @@
 .mlterm/challenge
 .mozilla/extensions/
 .mozilla/firefox/
+.mozilla/native-messaging-hosts/
 .mozilla/plugins/
 .mozilla/userChrome.js/uAutoPagerize.json
-.mozilla/native-messaging-hosts/
 .navi2ch
 .netrc
 .pit
@@ -121,9 +122,9 @@ opt/
 src/
 test/
 tmp/
+tst
 wc/
 workspace/
 スタート メニュー/
 マイ壁紙/
 伊集院/
-tst
