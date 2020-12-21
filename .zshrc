@@ -190,7 +190,7 @@ zstyle ':chpwd:*' recent-dirs-pushd true
 #-------------------------------------------------------------------------
 # anyframe
 #-------------------------------------------------------------------------
-if ! isemacs; then
+#if ! isemacs; then
     zstyle ":anyframe:selector:" use fzf
     if istmux; then
         zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
@@ -204,7 +204,7 @@ if ! isemacs; then
     bindkey '^xi' anyframe-widget-insert-git-branch
     bindkey '^xf' anyframe-widget-insert-filename
     bindkey '^xc' anyframe-widget-insert-docker-container-id
-fi
+#fi
 
 #-------------------------------------------------------------------------
 # zmv
@@ -386,9 +386,13 @@ if isdumb; then
 fi
 
 if isemacs; then
-  unsetopt prompt_cr
-  PROMPT=$RPROMPT$'\n'$PROMPT
-  unset RPROMPT
+    unsetopt prompt_cr
+    PROMPT=$RPROMPT$'\n'$PROMPT
+    unset RPROMPT
+
+    if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+        . ~/.emacs.d/elpa/vterm-*/etc/emacs-vterm-zsh.sh
+    fi
 fi
 
 # Start tmux

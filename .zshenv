@@ -23,7 +23,7 @@ export DISABLE_AUTO_TITLE=true
 #export GST_ID3_TAG_ENCODING=CP932
 if [ -x /usr/share/source-highlight/src-hilite-lesspipe.sh ]
     then
-    export LESS='-R'
+    export LESS='-R -j5 --no-init'
     export LESSOPEN='| /usr/share/source-highlight/src-hilite-lesspipe.sh %s'
 fi
 export GOPATH=$HOME/.go
