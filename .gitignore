@@ -13,7 +13,9 @@
 .emacs.d/.lsp-session-v1
 .emacs.d/.session
 .emacs.d/ac-comphist.dat
+.emacs.d/amx-items
 .emacs.d/anything-c-adaptive-history
+.emacs.d/bookmarks
 .emacs.d/company-statistics-cache.el
 .emacs.d/custom.el
 .emacs.d/el-get-backup-*/
@@ -24,6 +26,7 @@
 .emacs.d/network-security.data
 .emacs.d/projectile-bookmarks.eld
 .emacs.d/recentf
+.emacs.d/request/
 .emacs.d/server/server
 .emacs.d/session.*
 .emacs.d/tramp
