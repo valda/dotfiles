@@ -86,3 +86,6 @@ Layout/FirstArrayElementIndentation:
 
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
+
+Lint/RedundantSplatExpansion :
+  AllowPercentLiteralArrayArgument: true

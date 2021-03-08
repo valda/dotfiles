@@ -24,6 +24,7 @@
 .emacs.d/elscreen
 .emacs.d/ido.last
 .emacs.d/network-security.data
+.emacs.d/org-roam.db
 .emacs.d/projectile-bookmarks.eld
 .emacs.d/recentf
 .emacs.d/request/
