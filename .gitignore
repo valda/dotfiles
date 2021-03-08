@@ -30,6 +30,7 @@
 .emacs.d/request/
 .emacs.d/server/server
 .emacs.d/session.*
+.emacs.d/straight/
 .emacs.d/tramp
 .emacs.d/transient/
 .emacs.d/tutorial/
