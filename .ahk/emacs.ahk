@@ -49,8 +49,6 @@ is_target()
     Return 1
   IfWinActive,ahk_class PuTTY
     Return 1
-  IfWinActive,Blender ahk_class GHOST_WindowClass
-    Return 1
   IfWinActive,ahk_class TscShellContainerClass ;リモートデスクトップ接続
     Return 1
   IfWinActive,ahk_class gdkWindowToplevel ; GIMP, Inkscape 等 GTK アプリケーション
@@ -60,6 +58,9 @@ is_target()
   IfWinActive,ahk_exe Code.exe 
     Return 1
   IfWinActive,ahk_exe WindowsTerminal.exe
+    Return 1
+  IfWinActive,ahk_exe blender.exe
+    Return 1
   Return 0
 }
 

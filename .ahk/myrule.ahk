@@ -10,3 +10,7 @@ WheelUp::Send,{Volume_Up}
 WheelDown::Send,{Volume_Down}
 MButton::Send,{Volume_Mute}
 #IfWinActive
+
+#IfWinActive,ahk_exe blender.exe
+XButton1::MButton
+#IfWinActive
