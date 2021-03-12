@@ -7,14 +7,15 @@
 .android
 .bash_history
 .dvdcss
-.emacs.d/.bm-repository
 .emacs.d/.emacs.desktop
 .emacs.d/.emacs.desktop.lock
 .emacs.d/.lsp-session-v1
+.emacs.d/.org-id-locations
 .emacs.d/.session
 .emacs.d/ac-comphist.dat
 .emacs.d/amx-items
 .emacs.d/anything-c-adaptive-history
+.emacs.d/bm-repository
 .emacs.d/bookmarks
 .emacs.d/company-statistics-cache.el
 .emacs.d/custom.el
