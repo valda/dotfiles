@@ -48,6 +48,9 @@ Lint/AmbiguousBlockAssociation:
 Layout/SpaceInLambdaLiteral:
   EnforcedStyle: require_space
 
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: table
+
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: no_comma
 
