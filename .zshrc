@@ -153,6 +153,7 @@ fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
 zinit light mollifier/anyframe
 zinit snippet OMZ::plugins/rsync/rsync.plugin.zsh
 zinit snippet OMZ::plugins/yarn/yarn.plugin.zsh
+zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX"; zinit light dylanaraps/pfetch
 
 #-------------------------------------------------------------------------
 # Completion configuration
@@ -391,7 +392,7 @@ if isemacs; then
     unset RPROMPT
 
     if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
-        . ~/.emacs.d/elpa/vterm-*/etc/emacs-vterm-zsh.sh
+        . ~/.emacs.d/straight/build/vterm/etc/emacs-vterm-zsh.sh
     fi
 fi
 
