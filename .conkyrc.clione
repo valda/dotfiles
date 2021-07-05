@@ -118,7 +118,7 @@ ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Processor ${hr}${color}${f
  ${template0 6}
  ${template0 7}
  ${template0 8}
-${template7 20 335}${voffset -5}
+${voffset 5}${template7 20 335}${voffset -5}
 ${template9 20 335}${voffset -5}
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
@@ -128,20 +128,19 @@ ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Memory ${hr}${color}${font
  Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}${color}
  buffers/cache: ${buffers}/${cached}
  Swap: ${swap}/${swapmax} - ${swapperc}%${goto 190}${color2}${swapbar}${color}
-${voffset 3}${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
+${voffset 5}${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
 ${template8 2 150 200 250 300}
 
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Disk ${hr}${color}${font}
 
-${goto 10}${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
-${goto 10}${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}
-${goto 10}${template3 sdc Read 20 166}${goto 175}${template3 sdc Write 20 166}${voffset -5}
-${voffset 3}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
-${template8 4 150 200 250 300}
-
  ${template6 / /}
  ${template6 /home /home}
- ${template6 /tmp /tmp}
+ ${template6 /tmp /tmp}${voffset 5}
+${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
+${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}
+${template3 sdc Read 20 166}${goto 175}${template3 sdc Write 20 166}${voffset -5}
+${voffset 3}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
+${template8 4 150 200 250 300}
 
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Network ${hr}${color}${font}
 

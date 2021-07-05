@@ -98,37 +98,6 @@ function isdumb() {
 }
 
 #-------------------------------------------------------------------------
-# zplug
-#-------------------------------------------------------------------------
-# if [ -f ~/.zplug/init.zsh ]; then
-#     source ~/.zplug/init.zsh
-
-#     zplug "plugins/rsync", from:oh-my-zsh, defer:0
-#     zplug "plugins/yarn", from:oh-my-zsh, defer:0
-#     zplug "zsh-users/zsh-syntax-highlighting", defer:2
-#     zplug "zsh-users/zsh-history-substring-search"
-#     zplug "zsh-users/zsh-completions"
-#     zplug "stedolan/jq", from:gh-r, as:command, rename-to:jq
-#     zplug "b4b4r07/emoji-cli", on:"stedolan/jq"
-#     zplug "mrowa44/emojify", as:command
-#     zplug "junegunn/fzf-bin", from:gh-r, as:command, rename-to:fzf
-#     zplug "junegunn/fzf", as:command, use:"bin/fzf-tmux"
-#     zplug "peco/peco", as:command, from:gh-r
-#     zplug "mollifier/anyframe"
-#     fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
-#     zplug "greymd/tmux-xpanes"
-
-#     if ! zplug check --verbose; then
-#         printf "Install? [y/N]: "
-#         if read -q; then
-#             echo; zplug install
-#         fi
-#     fi
-
-#     zplug load
-# fi
-
-#-------------------------------------------------------------------------
 # Zinit
 #-------------------------------------------------------------------------
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
@@ -142,25 +111,31 @@ source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-#zinit light zsh-users/zsh-autosuggestions
+zinit ice wait lucid
 zinit light zsh-users/zsh-completions
 zinit light zdharma/fast-syntax-highlighting
-#zinit ice pick"async.zsh" src"pure.zsh";  zinit light sindresorhus/pure
-zinit ice from"gh-r" as"program";         zinit load junegunn/fzf-bin
-zinit ice as"program" pick"bin/fzf-tmux"; zinit load junegunn/fzf
-#zinit ice from"gh-r" as"program" mv"jq* -> jq"; zinit load stedolan/jq
+#zinit ice pick"async.zsh" src"pure.zsh"
+#zinit light sindresorhus/pure
+zinit snippet OMZP::rsync
+zinit snippet OMZP::yarn
+zinit ice from"gh-r" as"program"
+zinit load junegunn/fzf-bin
+zinit ice as"program" has"tmux" pick"bin/fzf-tmux"
+zinit load junegunn/fzf
 fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
 zinit light mollifier/anyframe
-zinit snippet OMZ::plugins/rsync/rsync.plugin.zsh
-zinit snippet OMZ::plugins/yarn/yarn.plugin.zsh
-zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX"; zinit light dylanaraps/pfetch
+zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX"
+zinit light dylanaraps/pfetch
+zinit ice as"program" has"tmux" pick"bin/xpanes"
+zinit light "greymd/tmux-xpanes"
+zinit ice from"gh-r" as"program" mv"docker* -> docker-compose" bpick"*linux*"
+zinit load docker/compose
 
 #-------------------------------------------------------------------------
 # Completion configuration
 #-------------------------------------------------------------------------
 fpath=($HOME/.zsh/completions(N-/) $fpath)
-autoload -Uz compinit
-compinit
+autoload -Uz compinit && compinit
 
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*' completer _expand _complete _match _prefix _approximate _list _history
