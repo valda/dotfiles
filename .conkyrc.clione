@@ -16,12 +16,12 @@ conky.config = {
    own_window_argb_visual = true,
    own_window_argb_value = 255,
    gap_x = 20,
-   gap_y = 80,
+   gap_y = 60,
    minimum_width = 340, minimum_height = 0,
    maximum_width = 340,
 
    --# Behavior
-   alignment = 'middle_left',
+   alignment = 'top_left',
    use_spacer = 'none',
    format_human_readable = true,
    short_units = false,
@@ -135,6 +135,7 @@ ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Disk ${hr}${color}${font}
 
  ${template6 / /}
  ${template6 /home /home}
+ ${template6 /var/log /var/log}
  ${template6 /tmp /tmp}${voffset 5}
 ${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
 ${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}

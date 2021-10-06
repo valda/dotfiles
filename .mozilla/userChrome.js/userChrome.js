@@ -1,4 +1,4 @@
-/* :::::::: Sub-Script/Overlay Loader v3.0.60mod no bind version ::::::::::::::: */
+/* :::::::: Sub-Script/Overlay Loader v3.0.61mod no bind version ::::::::::::::: */
 
 // automatically includes all files ending in .uc.xul and .uc.js from the profile's chrome folder
 
@@ -14,6 +14,8 @@
 // 4.Support window.userChrome_js.loadOverlay(overlay [,observer]) //
 // Modified by Alice0775
 //
+// @version       2021/08/05 fix for 92+ port Bug 1723723 - Switch JS consumers from getURLSpecFromFile to either getURLSpecFromActualFile or getURLSpecFromDir
+// @version       2021/06/25 skip for in-content dialog etc.
 // @version       2019/12/11 fix for 73 Bug 1601094 - Rename remaining .xul files to .xhtml in browser and Bug 1601093 - Rename remaining .xul files to .xhtml in toolkit
 // Date 2019/12/11 01:30 fix 72 revert the code for sidebar, use "load" in config.js(2019/12/11 01:30), 
 // Date 2019/08/11 21:30 fix 70.0a1  Bug 1551344 - Remove XULDocument code
@@ -279,7 +281,7 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
         //}catch(e){}
         if (description =="" || !description)
           description = aFile.leafName;
-        var url = fph.getURLSpecFromFile(aFile);
+        var url = fph.getURLSpecFromActualFile(aFile);
 
         return {
           filename: aFile.leafName,
@@ -460,8 +462,8 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
           aObserver.observe = aObserver;
         }
         if (!doc) doc = document;
-        if (!(doc instanceof XULDocument))
-          return 0;
+        /*if (!(doc instanceof XULDocument))
+          return 0;*/
         var observer = {
           observe:function (subject, topic, data) {
             if (topic == 'xul-overlay-merged') {
@@ -696,6 +698,11 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
       if( !/^(about:|chrome:)/.test(event.originalTarget.location.href) )return;
       var doc = event.originalTarget;
       var href = doc.location.href;
+      // skip for in-content dialog etc.
+      if(href =='chrome://global/content/commonDialog.xhtml') return;
+      if(href =='chrome://global/content/selectDialog.xhtml') return;
+      if(href =='chrome://global/content/alerts/alert.xhtml') return;
+
       if (that.INFO) that.debug("load Sidebar " +  href);
       setTimeout(function(doc){that.runScripts(doc);
         setTimeout(function(doc){that.runOverlays(doc);}, 0, doc);
