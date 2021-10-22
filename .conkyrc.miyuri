@@ -16,7 +16,7 @@ conky.config = {
    own_window_argb_visual = true,
    own_window_argb_value = 255,
    gap_x = 20,
-   gap_y = 80,
+   gap_y = 60,
    minimum_width = 340, minimum_height = 0,
    maximum_width = 340,
 
@@ -97,7 +97,7 @@ ${loadgraph \1,\2 333344 eeeeff 4 -t}${offset -\2} Load Average: ${loadavg}${ali
 ${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \4 \5}\n ${template\1 3 \2 \3 \4 \5}\n ${template\1 4 \2 \3 \4 \5}\n ${template\1 5 \2 \3 \4 \5}]],
    -- CPU Clock / Temp <num> <coretemp path>
    template9 = [[
-${execigraph 4 "cat /sys/class/hwmon/hwmon0/temp1_input | cut -c -2" \1,\2 333344 eeeeff 100 -t}${offset -\2} Package Temperature: ${hwmon 0 temp 1}°C]],
+${execigraph 4 "cat /sys/class/thermal/thermal_zone0/temp | cut -c -2" \1,\2 333344 eeeeff 100 -t}${offset -\2} Package Temperature: ${hwmon 0 temp 1}°C]],
 
 };
 
@@ -114,7 +114,7 @@ ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Processor ${hr}${color}${f
  ${template0 2}
  ${template0 3}
  ${template0 4}
-${template7 20 335}${voffset -5}
+${voffset 5}${template7 20 335}${voffset -5}
 ${template9 20 335}${voffset -5}
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
@@ -124,26 +124,23 @@ ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Memory ${hr}${color}${font
  Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}${color}
  buffers/cache: ${buffers}/${cached}
  Swap: ${swap}/${swapmax} - ${swapperc}%${goto 190}${color2}${swapbar}${color}
-${voffset 3}${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
+${voffset 5}${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
 ${template8 2 150 200 250 300}
 
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Disk ${hr}${color}${font}
 
-${goto 10}${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
-${goto 10}${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}
-${goto 10}${template3 sdc Read 20 166}${goto 175}${template3 sdc Write 20 166}${voffset -5}
+ ${template6 / /}
+ ${template6 /home /home}
+ ${template6 /var /var}
+ ${template6 /tmp /tmp}${voffset 5}
+${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5}
+${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}
+${template3 sdc Read 20 166}${goto 175}${template3 sdc Write 20 166}${voffset -5}
+${template3 sdd Read 20 166}${goto 175}${template3 sdd Write 20 166}${voffset -5}
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
 ${template8 4 150 200 250 300}
-
- ${template6 / /}
- ${template6 /usr /usr}
- ${template6 /var /var}
- ${template6 /home /home}
- ${template6 /tmp /tmp}
- ${template6 /data /data}
 
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Network ${hr}${color}${font}
 
 ${if_up eth0}${template5 eth0 Down 20 166}${goto 175}${template5 eth0 Up 20 166}${voffset -5}${endif}
-${if_up eth1}${template5 eth1 Down 20 166}${goto 175}${template5 eth1 Up 20 166}${voffset -5}${endif}
 ]];

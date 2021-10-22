@@ -49,7 +49,7 @@ autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic
 
 alias a=alias
-a rm=" rm -i"
+a rm=" rm -I"
 a sudo=" sudo"
 a ls="ls -F --color --show-control-chars --group-directories-first"
 a ll="ls -l"
