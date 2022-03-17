@@ -116,6 +116,8 @@ zinit light zsh-users/zsh-completions
 zinit light zdharma/fast-syntax-highlighting
 #zinit ice pick"async.zsh" src"pure.zsh"
 #zinit light sindresorhus/pure
+zinit snippet OMZL::git.zsh
+zinit snippet OMZP::git
 zinit snippet OMZP::rsync
 zinit snippet OMZP::yarn
 zinit ice from"gh-r" as"program"
@@ -128,8 +130,11 @@ zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX"
 zinit light dylanaraps/pfetch
 zinit ice as"program" has"tmux" pick"bin/xpanes"
 zinit light "greymd/tmux-xpanes"
-zinit ice from"gh-r" as"program" mv"docker* -> docker-compose" bpick"*linux*"
+zinit ice from"gh-r" as"program" mv"docker-compose* -> docker-compose"
 zinit load docker/compose
+zinit wait lucid is-snippet as"completion" for \
+      OMZP::docker/_docker \
+      OMZP::docker-compose/_docker-compose
 
 #-------------------------------------------------------------------------
 # Completion configuration

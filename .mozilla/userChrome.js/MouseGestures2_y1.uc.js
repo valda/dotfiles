@@ -15,7 +15,7 @@
 var ucjsMouseGestures = {
 
   // 設定
-  enableWheelGestures: true,    // ホイールジェスチャ（右クリックしながらマウスホイール）
+  enableWheelGestures: false,    // ホイールジェスチャ（右クリックしながらマウスホイール）
   enableRockerGestures: false,  // ロッカージェスチャ（右クリックしながら左クリック、またはその逆）
 
   _lastX: 0,
