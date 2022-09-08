@@ -28,7 +28,7 @@ if [ -x /usr/share/source-highlight/src-hilite-lesspipe.sh ]
 fi
 export GOPATH=$HOME/.go
 #export GTAGSLABEL=pygments
-export PATH=$HOME/opt/global/bin:$HOME/bin:$PATH:$GOPATH/bin
+export PATH=$HOME/opt/global/bin:$HOME/bin:$HOME/.local/bin:$PATH:$GOPATH/bin
 if [ -e /usr/bin/java ]; then
     export JAVA_HOME=$(readlink -f /usr/bin/java | sed -r "s:(jre/)?bin/java::")
 fi

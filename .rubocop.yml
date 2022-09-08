@@ -9,7 +9,7 @@ Style/AsciiComments:
   Enabled: false
 
 Metrics/LineLength:
-  Max: 110
+  Max: 120
 
 Style/Documentation:
   Exclude:
@@ -50,6 +50,9 @@ Layout/SpaceInLambdaLiteral:
 
 Layout/HashAlignment:
   EnforcedHashRocketStyle: table
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
 
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: no_comma
@@ -95,3 +98,9 @@ Lint/RedundantSplatExpansion :
 
 Style/IfUnlessModifier:
   Enabled: false
+
+Naming/VariableNumber:
+  CheckSymbols: false
+
+Layout/ExtraSpacing:
+  AllowBeforeTrailingComments: true

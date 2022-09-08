@@ -371,8 +371,10 @@ if isemacs; then
     PROMPT=$RPROMPT$'\n'$PROMPT
     unset RPROMPT
 
-    if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
-        . ~/.emacs.d/straight/build/vterm/etc/emacs-vterm-zsh.sh
+    if [[ "$INSIDE_EMACS" = 'vterm' ]] \
+           && [[ -n ${EMACS_VTERM_PATH} ]] \
+           && [[ -f ${EMACS_VTERM_PATH}/etc/emacs-vterm-zsh.sh ]]; then
+        source ${EMACS_VTERM_PATH}/etc/emacs-vterm-zsh.sh
     fi
 fi
 
