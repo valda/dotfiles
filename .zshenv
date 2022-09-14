@@ -14,7 +14,7 @@ export BLOCKSIZE=K
 export PERL_BADLANG=0
 export PGPPATH=$HOME/.pgp
 export NETHACKOPTIONS="noautopickup"
-export GREP_COLOR="01;34"
+export GREP_COLORS="mt=01;34"
 export LV='-Ou8 -c'
 export TZ='JST-9'
 export GISTY_DIR=$HOME/wc/gists
