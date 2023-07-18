@@ -103,7 +103,7 @@ function isdumb() {
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
     print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
     command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
+    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.zinit/bin" && \
         print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
         print -P "%F{160}▓▒░ The clone has failed.%f"
 fi
@@ -113,7 +113,7 @@ autoload -Uz _zinit
 
 zinit ice wait lucid
 zinit light zsh-users/zsh-completions
-zinit light zdharma/fast-syntax-highlighting
+zinit light zdharma-continuum/fast-syntax-highlighting
 #zinit ice pick"async.zsh" src"pure.zsh"
 #zinit light sindresorhus/pure
 zinit snippet OMZL::git.zsh
@@ -130,7 +130,7 @@ zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX"
 zinit light dylanaraps/pfetch
 zinit ice as"program" has"tmux" pick"bin/xpanes"
 zinit light "greymd/tmux-xpanes"
-zinit ice from"gh-r" as"program" mv"docker-compose* -> docker-compose"
+zinit ice from"gh-r" as"program" mv"docker-compose* -> docker-compose" bpick"*linux*"
 zinit load docker/compose
 zinit wait lucid is-snippet as"completion" for \
       OMZP::docker/_docker \
