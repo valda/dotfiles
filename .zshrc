@@ -120,10 +120,11 @@ zinit snippet OMZL::git.zsh
 zinit snippet OMZP::git
 zinit snippet OMZP::rsync
 zinit snippet OMZP::yarn
-zinit ice from"gh-r" as"program"
-zinit load junegunn/fzf-bin
-zinit ice as"program" has"tmux" pick"bin/fzf-tmux"
-zinit load junegunn/fzf
+#zinit ice from"gh-r" as"program"
+#zinit load junegunn/fzf-bin
+#zinit ice as"program" has"tmux" pick"bin/fzf-tmux"
+#zinit load junegunn/fzf
+zinit pack for fzf
 fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
 zinit light mollifier/anyframe
 zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX"
@@ -133,7 +134,6 @@ zinit light "greymd/tmux-xpanes"
 zinit ice from"gh-r" as"program" mv"docker-compose* -> docker-compose" bpick"*linux*"
 zinit load docker/compose
 zinit wait lucid is-snippet as"completion" for \
-      OMZP::docker/_docker \
       OMZP::docker-compose/_docker-compose
 
 #-------------------------------------------------------------------------
@@ -171,21 +171,19 @@ zstyle ':chpwd:*' recent-dirs-pushd true
 #-------------------------------------------------------------------------
 # anyframe
 #-------------------------------------------------------------------------
-#if ! isemacs; then
-    zstyle ":anyframe:selector:" use fzf
-    if istmux; then
-        zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
-    fi
+zstyle ":anyframe:selector:" use fzf
+if istmux; then
+    zstyle ":anyframe:selector:fzf:" command 'fzf-tmux --extended --exact --no-sort --cycle'
+fi
 
-    bindkey '^[d' anyframe-widget-cdr
-    bindkey '^r' anyframe-widget-put-history
-    bindkey '^xb' anyframe-widget-checkout-git-branch
-    bindkey '^xg' anyframe-widget-cd-ghq-repository
-    bindkey '^xk' anyframe-widget-kill
-    bindkey '^xi' anyframe-widget-insert-git-branch
-    bindkey '^xf' anyframe-widget-insert-filename
-    bindkey '^xc' anyframe-widget-insert-docker-container-id
-#fi
+bindkey '^[d' anyframe-widget-cdr
+bindkey '^r' anyframe-widget-put-history
+bindkey '^xb' anyframe-widget-checkout-git-branch
+bindkey '^xg' anyframe-widget-cd-ghq-repository
+bindkey '^xk' anyframe-widget-kill
+bindkey '^xi' anyframe-widget-insert-git-branch
+bindkey '^xf' anyframe-widget-insert-filename
+bindkey '^xc' anyframe-widget-insert-docker-container-id
 
 #-------------------------------------------------------------------------
 # zmv
