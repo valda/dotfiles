@@ -103,38 +103,54 @@ function isdumb() {
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
     print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
     command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.zinit/bin" && \
-        print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
-        print -P "%F{160}▓▒░ The clone has failed.%f"
+    if ! command git clone https://github.com/zdharma-continuum/zinit "$HOME/.zinit/bin" 2> /tmp/zinit_install_err.log; then
+        print -P "%F{160}▓▒░ The clone has failed. Check /tmp/zinit_install_err.log for details.%f"
+        cat /tmp/zinit_install_err.log
+        return 1
+    fi
+    print -P "%F{33}▓▒░ %F{34}Installation successful.%f"
 fi
+
 source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-zinit ice wait lucid
+
+# プラグインとスニペットのロード
+# 補完系は早めにロード
+zinit ice wait"0" lucid
 zinit light zsh-users/zsh-completions
-zinit light zdharma-continuum/fast-syntax-highlighting
-#zinit ice pick"async.zsh" src"pure.zsh"
-#zinit light sindresorhus/pure
+
+# Oh My Zshのスニペット（gitとか）
+zinit ice wait"0" lucid
 zinit snippet OMZL::git.zsh
+zinit ice wait"0" lucid
 zinit snippet OMZP::git
+zinit ice wait"1" lucid
 zinit snippet OMZP::rsync
+zinit ice wait"1" lucid
 zinit snippet OMZP::yarn
-#zinit ice from"gh-r" as"program"
-#zinit load junegunn/fzf-bin
-#zinit ice as"program" has"tmux" pick"bin/fzf-tmux"
-#zinit load junegunn/fzf
+
+# fzf関連（packでシンプルに）
 zinit pack for fzf
-fpath=($HOME/.zsh/anyframe-custom(N-/) $fpath)
+zinit ice wait"0" lucid
 zinit light mollifier/anyframe
-zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX"
+fpath=($HOME/.zsh/anyframe-custom $fpath)
+
+# プログラム系（遅延ロードで軽量化）
+zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX" wait"2" lucid
 zinit light dylanaraps/pfetch
-zinit ice as"program" has"tmux" pick"bin/xpanes"
+zinit ice as"program" has"tmux" pick"bin/xpanes" wait"1" lucid
 zinit light "greymd/tmux-xpanes"
-zinit ice from"gh-r" as"program" mv"docker-compose* -> docker-compose" bpick"*linux*"
-zinit load docker/compose
-zinit wait lucid is-snippet as"completion" for \
-      OMZP::docker-compose/_docker-compose
+
+# Docker Compose関連（V2前提で補完のみ入れる）
+# zinit pack for docker-compose がエラー出るので、補完だけOh My Zshスニペットで対応
+zinit ice wait"0" lucid as"completion"
+zinit snippet https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/docker-compose/_docker-compose
+
+# シンタックスハイライトは最後にロード
+zinit ice wait"1" lucid atload"zinit cdreplay -q"
+zinit light zdharma-continuum/fast-syntax-highlighting
 
 #-------------------------------------------------------------------------
 # Completion configuration

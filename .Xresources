@@ -52,7 +52,7 @@ Xft.rgba: rgb
 *.saveLines: 2000
 *.geometry: 80x24
 
-URxvt.font: xft:Cica:style=Regular:size=14:antialias=true,xft:Symbola
+URxvt.font: xft:Cica:style=Regular:size=15:antialias=true,xft:Symbola
 URxvt.intensityStyles: false
 URxvt.buffered: true
 URxvt.depth: 32
