@@ -1,36 +1,5 @@
-! special
-*background: #002732
-*foreground: #8d9fa1
-*cursorColor: #8d9fa1
-*pointerColorBackground: #586e75
-*pointerColorForeground: #93a1a1
-
-! black dark/light
-*color0: #073642
-*color8: #002732
-! red dark/light
-*color1: #dc322f
-*color9: #cb4b16
-! green dark/light
-*color2: #859900
-*color10: #586e75
-! yellow dark/light
-*color3: #b58900
-*color11: #8d9fa1
-! blue dark/light
-*color4: #268bd2
-*color12: #839496
-! magenta dark/light
-*color5: #d33682
-*color13: #6c71c4
-! cyan dark/light
-*color6: #2aa198
-*color14: #93a1a1
-! white dark/light
-*color7: #eee8d5
-*color15: #fdf6e3
-
-Emacs*useXIM: false
+!#include ".Xresources.d/colors-solarized"
+#include ".Xresources.d/colors-catppuccin-macchiato"
 
 Xft.autohint: 0
 Xft.lcdfilter: lcddefault
@@ -38,6 +7,8 @@ Xft.hintstyle: hintslight
 Xft.hinting: 1
 Xft.antialias: 1
 Xft.rgba: rgb
+
+Emacs*useXIM: false
 
 ! XTerm/UXTerm
 *.termName: xterm-256color
@@ -52,11 +23,13 @@ Xft.rgba: rgb
 *.saveLines: 2000
 *.geometry: 80x24
 
+! URxvt
 URxvt.font: xft:Cica:style=Regular:size=15:antialias=true,xft:Symbola
 URxvt.intensityStyles: false
 URxvt.buffered: true
 URxvt.depth: 32
-URxvt.background: [95]#002732
+!URxvt.background: [95]#002732
+URxvt.background: [95]#24273a
 URxvt.cursorBlink: true
 URxvt.pointerBlank: true
 URxvt.transparent: false
