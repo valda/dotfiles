@@ -1,0 +1,20 @@
+set convert-meta off
+set meta-flag on
+set output-meta on
+set completion-ignore-case on
+set bell-style none
+
+# Ctrl+左右 で単語単位で移動
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+# PgUp/PgDn で履歴検索
+"\e[5~": history-search-backward
+"\e[6~": history-search-forward
+
+# 補完候補をメニュー形式で表示（like zsh）
+set show-all-if-ambiguous on
+set menu-complete-display-prefix on
+
+# 補完候補に色をつける
+set colored-stats on
