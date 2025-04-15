@@ -1,5 +1,4 @@
 #!/bin/sh
-
 # Usage: ./stow-all.sh [-v] [-n]
 
 OPTIND=1
@@ -17,8 +16,8 @@ done
 shift $((OPTIND - 1))
 
 TARGET="$HOME"
-set -- $(find . -mindepth 1 -maxdepth 1 -type d)
-CMD="stow $VERBOSE $DRY_RUN -t $TARGET $*"
+DIRS=$(find . -mindepth 1 -maxdepth 1 -type d ! -name '.git' | sed 's|^\./||' | tr '\n' ' ')
+CMD="stow $VERBOSE $DRY_RUN -t $TARGET $DIRS"
 
 echo "Preview of command:"
 echo "$CMD"
