@@ -59,7 +59,7 @@ a c="/usr/bin/clear"
 a h="history -E"
 a d="date"
 a j="jobs"
-a ec="emacsclient"
+a ec='emacsclient -r --no-wait'
 a dpkg='COLUMNS=${COLUMNS:-80} dpkg'
 a psa="ps axuww"
 a ssh="ssh -A"
@@ -249,33 +249,11 @@ bindkey "^x " no-magic-abbrev-expand
 #-------------------------------------------------------------------------
 # fancy prompt
 #-------------------------------------------------------------------------
-# autoload -Uz add-zsh-hook
-# autoload -Uz vcs_info
-
-# [ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
-# PROMPT='%(?.%F{cyan}.%F{red})%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%# '
-
-# zstyle ':vcs_info:*' enable git svn
-# zstyle ':vcs_info:*' check-for-changes true
-# zstyle ':vcs_info:*' get-revision true
-# zstyle ':vcs_info:git:*' stagedstr "+"
-# zstyle ':vcs_info:git:*' unstagedstr "-"
-# zstyle ':vcs_info:*' formats ':%F{green}%b%F{red}%u%c'
-# zstyle ':vcs_info:*' actionformats ':%F{green}%b%F{red}%u%c(%a)'
-# function _precmd_vcs_info () {
-#   LANG=en_US.UTF-8 vcs_info
-# }
-# add-zsh-hook precmd _precmd_vcs_info
-# function rprompt_shorten_current_path () {
-#     # fish like
-#     echo ${${:-/${(j:/:)${(M)${(s:/:)${(D)PWD:h}}#(|.)[^.]}}/${PWD:t}}//\/~/\~}
-# }
-# RPROMPT='%F{yellow}[%(5~,`rprompt_shorten_current_path`,%~)${vcs_info_msg_0_}%F{yellow}]%f'
+autoload -Uz add-zsh-hook
 
 function _precmd_update_term_title () {
     isemacs || echo -ne "\033]0;${USER}@${HOST}:${PWD/$HOME/~}\007"
 }
-add-zsh-hook precmd _precmd_update_term_title
 
 function _preexec_update_window_title () {
     # screen/tmux のタイトルを更新
@@ -310,10 +288,20 @@ function _preexec_update_window_title () {
             echo -ne "\033k$cmd[1]:t\033\\") 2>/dev/null
     fi
 }
+
+add-zsh-hook precmd _precmd_update_term_title
 add-zsh-hook preexec _preexec_update_window_title
 
-# starshipプロンプト起動
-eval "$(starship init zsh)"
+if [[ $TERM == linux ]]; then
+    unset STARSHIP_CONFIG
+    autoload -Uz colors && colors
+
+    [ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
+    PROMPT='%(?.%F{cyan}.%F{red})%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%# '
+else
+    # starshipプロンプト起動
+    eval "$(starship init zsh)"
+fi
 
 #-------------------------------------------------------------------------
 function utf8() {
