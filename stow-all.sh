@@ -17,7 +17,7 @@ shift $((OPTIND - 1))
 
 TARGET="$HOME"
 DIRS=$(find . -mindepth 1 -maxdepth 1 -type d ! -name '.git' | sed 's|^\./||' | tr '\n' ' ')
-CMD="stow $VERBOSE $DRY_RUN -t $TARGET --no-folding $DIRS"
+CMD="stow $VERBOSE $DRY_RUN -t $TARGET $DIRS"
 
 echo "Preview of command:"
 echo "$CMD"
