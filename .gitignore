@@ -6,3 +6,4 @@
 *~
 .stow-local-ignore
 eshell/.eshell/history
+.aider*
