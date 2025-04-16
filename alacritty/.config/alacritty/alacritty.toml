@@ -11,15 +11,15 @@ opacity = 0.95        # URxvt.backgroundの[95]透過を再現
 
 # フォント設定
 [font]
-normal = { family = "Cica", style = "Regular" }
-size = 15.0
+normal = { family = "MomiageMono Nerd Font", style = "Regular" }
+size = 14.0
 offset = { x = -1, y = -1 }
 
 # # カラー設定
 # [colors.primary]
 # background = "#002732"  # URxvt.backgroundから
 # foreground = "#8d9fa1"  # *foregroundから
-# 
+#
 # [colors.normal]
 # black = "#073642"       # *color0
 # red = "#dc322f"         # *color1
@@ -29,7 +29,7 @@ offset = { x = -1, y = -1 }
 # magenta = "#d33682"     # *color5
 # cyan = "#2aa198"        # *color6
 # white = "#eee8d5"       # *color7
-# 
+#
 # [colors.bright]
 # black = "#002732"       # *color8
 # red = "#cb4b16"         # *color9
