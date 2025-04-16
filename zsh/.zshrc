@@ -152,6 +152,8 @@ zinit ice wait"0" lucid as"completion"
 zinit snippet https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/docker-compose/_docker-compose
 
 # シンタックスハイライトは最後にロード
+typeset -A FAST_HIGHLIGHT_STYLES
+FAST_HIGHLIGHT_STYLES[path-to-dir]='fg=magenta,bold' # path-to-dirのunderlineうざすぎ
 zinit ice wait"1" lucid atload"zinit cdreplay -q"
 zinit light zdharma-continuum/fast-syntax-highlighting
 

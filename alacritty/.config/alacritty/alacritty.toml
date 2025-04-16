@@ -1,0 +1,45 @@
+general.import = [
+  "./catppuccin-macchiato.toml"
+]
+
+# ウィンドウ設定
+[window]
+padding.x = 5
+padding.y = 5
+decorations = "full"  # 枠なし派なら"none"に
+opacity = 0.95        # URxvt.backgroundの[95]透過を再現
+
+# フォント設定
+[font]
+normal = { family = "Cica", style = "Regular" }
+size = 15.0
+offset = { x = -1, y = -1 }
+
+# # カラー設定
+# [colors.primary]
+# background = "#002732"  # URxvt.backgroundから
+# foreground = "#8d9fa1"  # *foregroundから
+# 
+# [colors.normal]
+# black = "#073642"       # *color0
+# red = "#dc322f"         # *color1
+# green = "#859900"       # *color2
+# yellow = "#b58900"      # *color3
+# blue = "#268bd2"        # *color4
+# magenta = "#d33682"     # *color5
+# cyan = "#2aa198"        # *color6
+# white = "#eee8d5"       # *color7
+# 
+# [colors.bright]
+# black = "#002732"       # *color8
+# red = "#cb4b16"         # *color9
+# green = "#586e75"       # *color10
+# yellow = "#8d9fa1"      # *color11
+# blue = "#839496"        # *color12
+# magenta = "#6c71c4"     # *color13
+# cyan = "#93a1a1"        # *color14
+# white = "#fdf6e3"       # *color15
+
+# シェル設定
+[terminal]
+shell = { program = "/bin/zsh", args = ["-l"] }
