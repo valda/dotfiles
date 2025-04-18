@@ -48,24 +48,23 @@ bindkey "^[[1;5D" emacs-backward-word
 autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic
 
-alias a=alias
-a rm=" rm -I"
-a sudo=" sudo"
-a ls="ls -F --color --show-control-chars --group-directories-first"
-a ll="ls -l"
-a la="ll -a"
-a patch="patch -b --verbose"
-a c="/usr/bin/clear"
-a h="history -E"
-a d="date"
-a j="jobs"
-a ec='emacsclient -r --no-wait'
-a dpkg='COLUMNS=${COLUMNS:-80} dpkg'
-a psa="ps axuww"
-a ssh="ssh -A"
-a ag="ag --pager 'less -R'"
-a grep="grep --color=auto"
-a open='xdg-open'
+alias rm=" rm -I"
+alias sudo=" sudo"
+alias ls="ls -F --color --show-control-chars --group-directories-first"
+alias ll="ls -l"
+alias la="ll -a"
+alias patch="patch -b --verbose"
+alias c="/usr/bin/clear"
+alias h="history -E"
+alias d="date"
+alias j="jobs"
+alias ec='emacsclient -r --no-wait'
+alias dpkg='COLUMNS=${COLUMNS:-80} dpkg'
+alias psa="ps axuww"
+alias ssh="ssh -A"
+alias ag="ag --pager 'less -R'"
+alias grep="grep --color=auto"
+alias open='xdg-open'
 
 function history-all() {
     history -E 1
@@ -251,8 +250,6 @@ bindkey "^x " no-magic-abbrev-expand
 #-------------------------------------------------------------------------
 # fancy prompt
 #-------------------------------------------------------------------------
-autoload -Uz add-zsh-hook
-
 function _precmd_update_term_title () {
     isemacs || echo -ne "\033]0;${USER}@${HOST}:${PWD/$HOME/~}\007"
 }
@@ -388,7 +385,7 @@ fi
 
 # Start tmux
 if ! isemacs && ! istmux && ! isscreen && ! isdumb && which tmux > /dev/null; then
-    ID=`tmux ls | grep -vm1 attached | cut -d: -f1`
+    ID=$(tmux list-sessions 2>/dev/null | awk -F: '!/attached/ { print $1; exit }')
     if [[ -z "$ID" ]]; then
         tmux new-session
     else
