@@ -137,9 +137,13 @@ zinit light mollifier/anyframe
 fpath=($HOME/.zsh/anyframe-custom $fpath)
 
 # プログラム系（遅延ロードで軽量化）
-zinit ice from"gh-r" as"program" pick"starship" \
-      atload"export STARSHIP_CONFIG=$HOME/.config/starship.toml"
-zinit light starship/starship
+# zinit ice from"gh-r" as"program" pick"starship" \
+#       atload"export STARSHIP_CONFIG=$HOME/.config/starship.toml"
+# zinit light starship/starship
+
+zinit ice depth=1
+zinit light romkatv/powerlevel10k
+
 zinit ice as"program" pick"$ZPFX/bin/pfetch" make"PREFIX=$ZPFX" wait"2" lucid
 zinit light dylanaraps/pfetch
 zinit ice as"program" has"tmux" pick"bin/xpanes" wait"1" lucid
@@ -248,7 +252,7 @@ bindkey " " magic-abbrev-expand
 bindkey "^x " no-magic-abbrev-expand
 
 #-------------------------------------------------------------------------
-# fancy prompt
+# Window Title と Term Title の更新
 #-------------------------------------------------------------------------
 function _precmd_update_term_title () {
     isemacs || echo -ne "\033]0;${USER}@${HOST}:${PWD/$HOME/~}\007"
@@ -290,17 +294,6 @@ function _preexec_update_window_title () {
 
 add-zsh-hook precmd _precmd_update_term_title
 add-zsh-hook preexec _preexec_update_window_title
-
-if [[ $TERM == linux ]]; then
-    unset STARSHIP_CONFIG
-    autoload -Uz colors && colors
-
-    [ -f /etc/debian_chroot ] && debian_chroot=`cat /etc/debian_chroot`
-    PROMPT='%(?.%F{cyan}.%F{red})%B`whoami`@%m${debian_chroot:+($debian_chroot)}%b%f%# '
-else
-    # starshipプロンプト起動
-    eval "$(starship init zsh)"
-fi
 
 #-------------------------------------------------------------------------
 function utf8() {
@@ -392,3 +385,7 @@ if ! isemacs && ! istmux && ! isscreen && ! isdumb && which tmux > /dev/null; th
         tmux attach-session -t $ID
     fi
 fi
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+ZLE_RPROMPT_INDENT=0
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
