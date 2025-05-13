@@ -123,23 +123,12 @@ zinit light zsh-users/zsh-completions
 # Oh My Zshのスニペット（gitとか）
 zinit ice wait"0" lucid
 zinit snippet OMZL::git.zsh
-zinit ice wait"0" lucid
-zinit snippet OMZP::git
-zinit ice wait"1" lucid
-zinit snippet OMZP::rsync
-zinit ice wait"1" lucid
-zinit snippet OMZP::yarn
 
 # fzf関連（packでシンプルに）
 zinit pack for fzf
 zinit ice wait"0" lucid
 zinit light mollifier/anyframe
 fpath=($HOME/.zsh/anyframe-custom $fpath)
-
-# プログラム系（遅延ロードで軽量化）
-# zinit ice from"gh-r" as"program" pick"starship" \
-#       atload"export STARSHIP_CONFIG=$HOME/.config/starship.toml"
-# zinit light starship/starship
 
 zinit ice depth=1
 zinit light romkatv/powerlevel10k
