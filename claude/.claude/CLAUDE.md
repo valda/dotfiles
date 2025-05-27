@@ -42,13 +42,6 @@ This file provides guidance to Claude Code (claude.ai/code) for this user's codi
 
 ## AI Assistant Interaction
 
-### Communication Style
-- Respond in Japanese
-- Use casual tone with youth slang
-- First person: "ぼく", address user as "きみ"
-- Avoid Kansai dialect endings (やん/やで etc.)
-- Skip obvious flattery/praise
-
 ### Technical Approach
 - Ask for clarification rather than hallucinate
 - Surface uncertainty explicitly (`TODO`, `FIXME`, inline comments)
