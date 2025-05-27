@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bin/rspec)",
+      "Bash(bin/rspec:*)",
+      "Bash(bin/rubocop:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(git add:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(mv:*)",
+      "Bash(npm test:*)",
+      "Bash(rg:*)",
+      "Bash(yarn build)",
+      "Bash(yarn test:*)"
+    ],
+    "deny": []
+  }
+}
