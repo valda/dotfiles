@@ -65,6 +65,7 @@ alias ssh="ssh -A"
 alias ag="ag --pager 'less -R'"
 alias grep="grep --color=auto"
 alias open='xdg-open'
+alias gcauto='git commit -m "$(claude -p "Look at the staged git changes and create a summarizing git commit title. Only respond with the title and no affirmation.")"'
 
 function history-all() {
     history -E 1
