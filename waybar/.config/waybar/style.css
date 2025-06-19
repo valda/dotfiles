@@ -16,7 +16,7 @@
     border-radius: 1rem;
     margin: 5px;
     padding: 0 1rem;
-    background-color: @surface0;
+    background-color: @crust;
     margin-left: 1rem;
 }
 
@@ -45,7 +45,7 @@
 #custom-lock,
 #language,
 #custom-power {
-    background-color: @surface0;
+    background-color: @crust;
     padding: 0.5rem 1rem;
     margin: 5px 0;
 }
