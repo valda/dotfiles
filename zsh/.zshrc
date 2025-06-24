@@ -171,6 +171,9 @@ zstyle ':completion:*' use-cache true
 zstyle ':completion:*' ignore-parents parent pwd ..
 zstyle ':completion:*:manuals' separate-sections true
 
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/bin/terraform terraform
+
 #-------------------------------------------------------------------------
 # cdr
 #-------------------------------------------------------------------------
@@ -284,6 +287,26 @@ function _preexec_update_window_title () {
 
 add-zsh-hook precmd _precmd_update_term_title
 add-zsh-hook preexec _preexec_update_window_title
+
+#-------------------------------------------------------------------------
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
+
+if [ -d "$HOME/.rbenv" ]; then
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    if command -v rbenv >/dev/null 2>&1; then
+        eval "$(rbenv init -)"
+    fi
+fi
+
+if [ -d "$HOME/.nodenv" ]; then
+    export NODENV_ROOT=$HOME/.nodenv
+    export PATH="$NODENV_ROOT/bin:$PATH"
+    if command -v nodenv >/dev/null 2>&1; then
+        eval "$(nodenv init -)"
+    fi
+fi
 
 #-------------------------------------------------------------------------
 function utf8() {
