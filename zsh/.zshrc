@@ -390,7 +390,7 @@ if isemacs; then
 fi
 
 # Start tmux
-if ! isemacs && ! istmux && ! isscreen && ! isdumb && which tmux > /dev/null; then
+if ! isemacs && ! istmux && ! isscreen && ! isdumb && command -v tmux > /dev/null 2>&1; then
     ID=$(tmux list-sessions 2>/dev/null | awk -F: '!/attached/ { print $1; exit }')
     if [[ -z "$ID" ]]; then
         tmux new-session
