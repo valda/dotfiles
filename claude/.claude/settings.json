@@ -28,6 +28,7 @@
       "Bash(psql:*)",
       "Bash(mysql:*)",
       "Bash(mongod:*)",
+      "Bash(bin/rails db:*)",
       "mcp__supabase__execute_sql"
     ]
   }
