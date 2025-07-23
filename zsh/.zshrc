@@ -308,6 +308,14 @@ if [ -d "$HOME/.nodenv" ]; then
     fi
 fi
 
+
+# bun completions
+[ -s "/home/valda/.bun/_bun" ] && source "/home/valda/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
 #-------------------------------------------------------------------------
 function utf8() {
     export LANG=ja_JP.UTF-8
