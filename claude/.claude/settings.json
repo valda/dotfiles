@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
       "Bash(bin/rspec)",
@@ -49,12 +50,12 @@
       }
     ]
   },
-  "feedbackSurveyState": {
-    "lastShownTime": 1754026674637
-  },
   "statusLine": {
     "type": "command",
     "command": "bun x ccusage statusline"
   },
-  "$schema": "https://json.schemastore.org/claude-code-settings.json"
+  "feedbackSurveyState": {
+    "lastShownTime": 1754026674637
+  },
+  "model": "opusplan"
 }
