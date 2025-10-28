@@ -58,5 +58,5 @@
   "feedbackSurveyState": {
     "lastShownTime": 1754026674637
   },
-  "model": "opusplan"
+  "alwaysThinkingEnabled": true
 }
