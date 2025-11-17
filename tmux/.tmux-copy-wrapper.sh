@@ -49,8 +49,8 @@ if is_remote && supports_osc52; then
   esac
 elif is_wsl; then
   case "$1" in
-    --paste) powershell.exe -Command "[Console]::Out.Write((Get-Clipboard))" | tr -d '\r' ;;
-    --paste-oneline) powershell.exe -Command "[Console]::Out.Write((Get-Clipboard))" | tr -d '\r\n' ;;
+    --paste) powershell.exe -NoProfile -Command "Get-Clipboard -Raw" | tr -d '\r' ;;
+    --paste-oneline) powershell.exe -NoProfile -Command "Get-Clipboard -Raw" | tr -d '\r\n' ;;
     *) clip.exe ;;
   esac
 elif is_wayland; then
