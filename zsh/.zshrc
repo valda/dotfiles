@@ -347,6 +347,15 @@ function git-pull-subdirs() {
     fi
 }
 
+function docker() {
+  if [[ "$*" =~ "compose down -v" ]] || [[ "$*" =~ "compose down".*"-v" ]]; then
+    echo "⚠️  ボリューム削除しようとしてるけど、本当にいい？ (y/N)"
+    read -r confirm
+    [[ "$confirm" =~ ^[Yy]$ ]] || return 1
+  fi
+  command docker "$@"
+}
+
 function resume-ssh-agent() {
     local agent
     agent=`which wsl2-ssh-agent`
