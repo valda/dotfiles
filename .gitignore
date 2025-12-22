@@ -7,3 +7,4 @@
 .stow-local-ignore
 eshell/.eshell/history
 .aider*
+.claude/settings.local.json
