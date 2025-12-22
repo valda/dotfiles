@@ -55,8 +55,8 @@
     "type": "command",
     "command": "bun x ccusage statusline"
   },
+  "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754026674637
-  },
-  "alwaysThinkingEnabled": true
+  }
 }
