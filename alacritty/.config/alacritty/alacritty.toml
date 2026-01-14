@@ -11,7 +11,7 @@ opacity = 0.95        # URxvt.backgroundの[95]透過を再現
 
 # フォント設定
 [font]
-normal = { family = "MomiageMono Nerd Font", style = "Regular" }
+normal = { family = "terminal-font", style = "Regular" }
 size = 14.0
 offset = { x = -1, y = -1 }
 
