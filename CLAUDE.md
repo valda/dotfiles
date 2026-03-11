@@ -23,9 +23,6 @@ This is a GNU Stow-based dotfiles repository managing configuration files for a 
 
 # Install specific package only
 stow -t ~ package_name
-
-# Alternative Python symlink manager
-python make_symlinks.py [--force]
 ```
 
 ### Git Workflow
@@ -38,6 +35,7 @@ python make_symlinks.py [--force]
 Each directory is a "stow package" that mirrors the home directory structure:
 - Direct dotfiles: `package/.dotfile` → `~/.dotfile`
 - XDG config: `package/.config/app/` → `~/.config/app/`
+- **注意**: `stow-all.sh` は `.git` 以外の全ディレクトリをパッケージ扱いする。リポジトリルートに新しいディレクトリを作る際は stow 対象になることを意識すること
 
 ### Core Packages
 - **hypr/**: Hyprland compositor config with custom scripts
@@ -49,9 +47,8 @@ Each directory is a "stow package" that mirrors the home directory structure:
 
 ### Important Files
 - `stow-all.sh`: Main installation script
-- `make_symlinks.py`: Alternative symlink manager
 - `hypr/.config/hypr/scripts/`: Custom Hyprland helper scripts
-- `claude/.claude/CLAUDE.md`: User's global Claude preferences (already symlinked to ~/.claude/)
+- `claude/.claude/`: User's Claude AI 設定（settings.json, commands/ など。stow で ~/.claude/ にシンリンク）
 
 ## Development Notes
 - The repository supports both Wayland (primary) and X11 environments
