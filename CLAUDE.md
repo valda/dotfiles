@@ -48,7 +48,8 @@ Each directory is a "stow package" that mirrors the home directory structure:
 ### Important Files
 - `stow-all.sh`: Main installation script
 - `hypr/.config/hypr/scripts/`: Custom Hyprland helper scripts
-- `claude/.claude/`: User's Claude AI 設定（settings.json, commands/ など。stow で ~/.claude/ にシンリンク）
+- `claude/.claude/`: User's Claude AI 設定（CLAUDE.md, commands/ など。stow で ~/.claude/ にシンリンク）
+  - **注意**: `settings.json` はマシン固有の状態（permissions, plugins等）を含むため stow 管理対象外
 
 ## Development Notes
 - The repository supports both Wayland (primary) and X11 environments
