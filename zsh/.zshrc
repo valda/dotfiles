@@ -356,6 +356,21 @@ function docker() {
   command docker "$@"
 }
 
+function docker-compose() {
+  if [[ "$*" =~ "down -v" ]] || [[ "$*" =~ "down".*"-v" ]]; then
+    echo "⚠️  ボリューム削除しようとしてるけど、本当にいい？ (y/N)"
+    read -r confirm
+    [[ "$confirm" =~ ^[Yy]$ ]] || return 1
+  fi
+  command docker-compose "$@"
+}
+
+# down -v をヒストリに残さない
+function zshaddhistory() {
+  [[ "$1" =~ "down -v" ]] && return 1
+  return 0
+}
+
 function resume-ssh-agent() {
     local agent
     agent=`which wsl2-ssh-agent`
