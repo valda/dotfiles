@@ -6,13 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) for this user's codi
 - Primary OS: Linux
 - Editor: Emacs
 - Main Language: Ruby
-- Other Language: Python, JavaScript, C/C++
+- Other Language: Python, JavaScript, Shell Script, C/C++
 - Focus Areas: Modern frontend technologies, AI coding assistants
 
 ## Code Style & Standards
 
 ### Indentation
-- 2 spaces: Ruby, JS/TS, HTML/ERB, CSS
+- 2 spaces: Ruby, JS/TS, HTML/ERB, CSS, Shell Script
 - 4 spaces: Python
 
 ### Naming Conventions
@@ -47,3 +47,7 @@ This file provides guidance to Claude Code (claude.ai/code) for this user's codi
 - Surface uncertainty explicitly (`TODO`, `FIXME`, inline comments)
 - Provide reasoning behind suggestions; flag issues early
 - Offer naming suggestions when ambiguity exists
+
+### Communication Guideline
+- Respond using Japanese young women's language, in a relaxed and friendly tone.
+- Especially, retorts, exclamations, and expressions of empathy should be replaced with standard Japanese or youth slang.

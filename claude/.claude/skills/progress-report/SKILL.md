@@ -1,6 +1,6 @@
 ---
-allowed-tools: Bash(git log:*)
 description: 作業進捗を作成する
+allowed-tools: Bash(git log:*)
 ---
 
 ## あなたのタスク

@@ -1,4 +1,6 @@
-# TODO確認・セッション開始コマンド (/check-todos)
+---
+description: TODO確認・セッション開始コマンド。新しいセッション開始時に作業コンテキストを選択し、必要な詳細情報とナレッジを読み込んで優先作業を決定する
+---
 
 ## 概要
 新しいClaude Codeセッション開始時に、軽量索引から作業コンテキストを選択し、必要な詳細情報とナレッジを読み込んで優先作業を決定する
@@ -11,15 +13,15 @@
 ## 新しいファイル構成
 ```
 docs/todo/
-├── index.md                    # 📋 軽量索引（各コンテキストの要約のみ）
-├── contexts/                   # 🎯 作業コンテキスト別詳細
+├── index.md                    # 軽量索引（各コンテキストの要約のみ）
+├── contexts/                   # 作業コンテキスト別詳細
 │   ├── [dynamic].md           # プロジェクトに応じて動的に作成
 │   ├── [dynamic].md           # 例: infrastructure.md, webapp.md, mobile-app.md
 │   └── [dynamic].md           # 例: data-pipeline.md, ml-training.md など
-├── knowledge/                  # 🧠 ナレッジベース（コンテキスト別）
+├── knowledge/                  # ナレッジベース（コンテキスト別）
 │   ├── [dynamic]-learnings.md # 各コンテキストに対応した学習記録
 │   └── debug-patterns.md      # 汎用デバッグパターン
-└── archive/                    # 📦 完了したタスクのアーカイブ
+└── archive/                    # 完了したタスクのアーカイブ
     ├── 2025-06/
     └── 2025-05/
 ```
@@ -37,10 +39,10 @@ docs/todo/
 ```bash
 # 処理フローの例（LLMが内部的に実行）
 if [ -d "docs/todo" ]; then
-    echo "📁 TODOディレクトリが見つかりました"
+    echo "TODOディレクトリが見つかりました"
 else
-    echo "❌ docs/todoディレクトリが存在しません"
-    echo "💡 /sync-todos コマンドで作成することをお勧めします"
+    echo "docs/todoディレクトリが存在しません"
+    echo "/sync-todos コマンドで作成することをお勧めします"
     exit
 fi
 ```
@@ -54,12 +56,12 @@ fi
 ```bash
 # 処理フローの例（LLMが内部的に実行）
 if [ -f "docs/todo/index.md" ]; then
-    echo "📋 【プロジェクト概要】"
+    echo "【プロジェクト概要】"
     # LLMがファイル内容を読み込んで表示
     cat docs/todo/index.md
     echo ""
 else
-    echo "⚠️ index.md が見つかりません。新規作成が必要です。"
+    echo "index.md が見つかりません。新規作成が必要です。"
 fi
 ```
 
@@ -72,7 +74,7 @@ fi
 ユーザーに以下の選択肢を日本語で提示：
 
 ```
-🎯 **今回のセッションで作業するコンテキストを選択してください：**
+**今回のセッションで作業するコンテキストを選択してください：**
 
 利用可能なコンテキスト：
 ```
@@ -84,15 +86,15 @@ if [ -d "docs/todo/contexts" ]; then
     for context_file in docs/todo/contexts/*.md; do
         if [ -f "$context_file" ]; then
             context_name=$(basename "$context_file" .md)
-            echo "  📂 $context_name"
+            echo "  $context_name"
             # LLMがファイルの最初の数行から概要を抽出
         fi
     done
 
     # 新しいコンテキスト作成の選択肢を追加
-    echo "  ➕ 新しいコンテキストを作成"
+    echo "  新しいコンテキストを作成"
 else
-    echo "⚠️ contextsディレクトリが見つかりません"
+    echo "contextsディレクトリが見つかりません"
 fi
 ```
 
@@ -111,24 +113,24 @@ fi
 ```bash
 # 例: webapp が選択された場合
 if [ "$USER_CHOICE" = "W" ] || [ "$USER_CHOICE" = "webapp" ]; then
-    echo "🚀 【Rails + Frontend 統合開発の詳細タスク】"
+    echo "【Rails + Frontend 統合開発の詳細タスク】"
     if [ -f "docs/todo/contexts/webapp.md" ]; then
         cat docs/todo/contexts/webapp.md
     else
-        echo "⚠️ webapp.md が見つかりません"
+        echo "webapp.md が見つかりません"
     fi
     echo ""
 
-    echo "🧠 【WebApp関連の過去の学習記録】"
+    echo "【WebApp関連の過去の学習記録】"
     if [ -f "docs/todo/knowledge/webapp-learnings.md" ]; then
         # 最新の10エントリーのみ表示
         tail -50 docs/todo/knowledge/webapp-learnings.md
     else
-        echo "📝 学習記録はまだありません"
+        echo "学習記録はまだありません"
     fi
     echo ""
 
-    echo "🔍 【WebApp関連のデバッグパターン】"
+    echo "【WebApp関連のデバッグパターン】"
     if [ -f "docs/todo/knowledge/debug-patterns.md" ]; then
         # WebApp関連のパターンのみフィルタリング
         grep -A 5 -B 1 -i "Rails\|Ruby\|Frontend\|JavaScript\|CSS\|HTML\|React\|Vue" docs/todo/knowledge/debug-patterns.md || tail -20 docs/todo/knowledge/debug-patterns.md
@@ -137,20 +139,20 @@ fi
 
 # 例: infrastructure が選択された場合
 if [ "$USER_CHOICE" = "I" ] || [ "$USER_CHOICE" = "infrastructure" ]; then
-    echo "🔥 【インフラ関連の詳細タスク】"
+    echo "【インフラ関連の詳細タスク】"
     if [ -f "docs/todo/contexts/infrastructure.md" ]; then
         cat docs/todo/contexts/infrastructure.md
     else
-        echo "⚠️ infrastructure.md が見つかりません"
+        echo "infrastructure.md が見つかりません"
     fi
     echo ""
 
-    echo "🧠 【インフラ関連の過去の学習記録】"
+    echo "【インフラ関連の過去の学習記録】"
     if [ -f "docs/todo/knowledge/infra-learnings.md" ]; then
         # 最新の10エントリーのみ表示
         tail -50 docs/todo/knowledge/infra-learnings.md
     else
-        echo "📝 学習記録はまだありません"
+        echo "学習記録はまだありません"
     fi
 fi
 ```
@@ -160,13 +162,13 @@ fi
 選択されたコンテキスト内で、今回のセッションの具体的な作業を決定：
 
 ```
-📋 **今回のセッションで取り組む具体的なタスクを選択してください：**
+**今回のセッションで取り組む具体的なタスクを選択してください：**
 
 表示されたタスクから：
-1️⃣ 最優先で解決すべき課題はありますか？
-2️⃣ 継続中で完了を目指すタスクはありますか？
-3️⃣ 新規で着手したいタスクはありますか？
-4️⃣ 過去の失敗パターンを避けながら進めたいものはありますか？
+1. 最優先で解決すべき課題はありますか？
+2. 継続中で完了を目指すタスクはありますか？
+3. 新規で着手したいタスクはありますか？
+4. 過去の失敗パターンを避けながら進めたいものはありますか？
 
 **今回のセッション目標を設定してください：**
 - 具体的なタスクID または タスク名
@@ -178,20 +180,19 @@ fi
 ### 6. セッション開始の準備完了
 
 ```
-✅ **セッション開始準備完了**
+**セッション開始準備完了**
 
-📂 作業コンテキスト: [選択されたコンテキスト]
-🎯 今回の目標: [設定された目標]
-⏰ 予想時間: [予想時間]
-📝 関連ナレッジ: 読み込み済み
+作業コンテキスト: [選択されたコンテキスト]
+今回の目標: [設定された目標]
+予想時間: [予想時間]
+関連ナレッジ: 読み込み済み
 
-🚀 作業を開始してください！
+作業を開始してください！
 セッション終了時は /sync-todos で進捗と学習内容を記録することをお忘れなく。
 ```
 
 ## 出力形式
 - すべての表示内容は日本語で出力
-- 絵文字を使用して視認性を向上
 - 重要度に応じた色分け表示（可能な場合）
 - 選択されたコンテキスト以外の詳細は読み込まない（軽量化）
 
