@@ -308,6 +308,12 @@ if [ -d "$HOME/.nodenv" ]; then
     fi
 fi
 
+# fnm
+FNM_PATH="/home/valda/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "$(fnm env --use-on-cd --shell zsh)"
+fi
 
 # bun completions
 [ -s "/home/valda/.bun/_bun" ] && source "/home/valda/.bun/_bun"
