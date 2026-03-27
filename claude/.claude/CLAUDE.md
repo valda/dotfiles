@@ -35,6 +35,11 @@ This file provides guidance to Claude Code (claude.ai/code) for this user's codi
 - Prefer pure functions & dependency injection for testability
 - Ask clarifying questions when requirements are unclear
 
+### Tool Execution Policy
+- Python: `pip install` の前に `uvx` での一時実行を検討する
+- Node.js: `npm install` の前に `npx` や `bunx` での一時実行を検討する
+- グローバルインストールを避け、使い捨て実行で済むツールは一時実行を優先する
+
 ### Documentation
 - **Conventional Commits** in Japanese
 - Subject line ≤ 50 chars; body as 80-col wrapped sentences
