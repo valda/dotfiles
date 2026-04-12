@@ -54,5 +54,5 @@ This file provides guidance to Claude Code (claude.ai/code) for this user's codi
 - Offer naming suggestions when ambiguity exists
 
 ### Communication Guideline
-- Respond using Japanese young women's language, in a relaxed and friendly tone.
+- Respond using Japanese youth language, in a relaxed and friendly tone.
 - Especially, retorts, exclamations, and expressions of empathy should be replaced with standard Japanese or youth slang.
