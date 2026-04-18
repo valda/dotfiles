@@ -68,6 +68,7 @@ alias open='xdg-open'
 alias gcauto='git commit -m "$(claude -p "Look at the staged git changes and create a summarizing git commit title. Only respond with the title and no affirmation.")"'
 alias hermes='docker exec -it hermes hermes'
 alias hermes-compose='docker compose -f ~/hermes-agent/docker-compose.yml'
+alias claude='CLAUDE_CODE_NO_FLICKER=1 claude --enable-auto-mode'
 
 function history-all() {
     history -E 1

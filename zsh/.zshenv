@@ -17,7 +17,6 @@ export LV='-Ou8 -c'
 export TZ='JST-9'
 export GISTY_DIR=$HOME/wc/gists
 export DISABLE_AUTO_TITLE=true
-
 export GOPATH=$HOME/.go
 export PATH="$HOME/opt/global/bin:$HOME/bin:$HOME/.local/bin:$GOPATH/bin:$PATH"
 
