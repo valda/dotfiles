@@ -22,68 +22,6 @@
         "type": "custom-command",
         "color": "",
         "commandPath": "~/.claude/burn-buffer.sh"
-      }
-    ],
-    [
-      {
-        "id": "dd2c167d-aab8-4488-b32a-1666de7f9c61",
-        "type": "custom-text",
-        "customText": "📈 "
-      },
-      {
-        "id": "33ceb78c-b082-4e34-9b4a-fac3bb70f0f5",
-        "type": "tokens-total",
-        "color": "brightWhite",
-        "rawValue": true
-      },
-      {
-        "id": "30ab813c-b891-46a0-8c06-868b50e07f30",
-        "type": "custom-text",
-        "customText": " 📝 "
-      },
-      {
-        "id": "74992c24-31db-42de-9b8c-d9e7e2218dbe",
-        "type": "tokens-input",
-        "color": "brightBlue",
-        "rawValue": true
-      },
-      {
-        "id": "34e08eb5-9fa5-42b2-9471-47eab8306c48",
-        "type": "custom-text",
-        "customText": " 💬 "
-      },
-      {
-        "id": "44af036c-5354-4ed8-a5d1-37c8dd0e74d0",
-        "type": "tokens-output",
-        "color": "brightCyan",
-        "rawValue": true
-      },
-      {
-        "id": "47cccca4-8fd2-4341-a8df-90dce01f355d",
-        "type": "custom-text",
-        "color": "green",
-        "customText": " ♻️"
-      },
-      {
-        "id": "dd2ba0f9-465b-431c-b84a-b43669996631",
-        "type": "tokens-cached",
-        "color": "brightGreen",
-        "rawValue": true
-      },
-      {
-        "id": "b40ec60f-7678-46a5-a60e-2db11234c08e",
-        "type": "separator"
-      },
-      {
-        "id": "f100c644-c592-4785-9f05-a56bbb88df66",
-        "type": "custom-text",
-        "customText": "💰 "
-      },
-      {
-        "id": "444b4d8d-55a8-47d6-a06c-54c8269e295e",
-        "type": "session-cost",
-        "color": "brightYellow",
-        "rawValue": true
       },
       {
         "id": "6cceac43-acaa-44a6-b2da-a5727493985e",
