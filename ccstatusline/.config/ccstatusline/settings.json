@@ -18,27 +18,10 @@
         "type": "separator"
       },
       {
-        "id": "4be5dab3-0f4c-4fb9-9390-b5f546a99fd9",
-        "type": "custom-text",
-        "customText": "⌛ "
-      },
-      {
-        "id": "0621e313-632c-4bc2-9ced-ba6f8c8edf5e",
-        "type": "block-timer",
-        "rawValue": true
-      },
-      {
-        "id": "a94512c8-ccd8-497e-ab84-6513e0ec3e1d",
-        "type": "custom-text",
-        "customText": " "
-      },
-      {
-        "id": "3480f7f7-ea2e-4657-806a-d67408d30866",
-        "type": "block-timer",
-        "rawValue": true,
-        "metadata": {
-          "display": "progress-short"
-        }
+        "id": "67c58c35-7161-4873-a3dd-adb66e347838",
+        "type": "custom-command",
+        "color": "",
+        "commandPath": "~/.claude/burn-buffer.sh"
       }
     ],
     [
@@ -78,8 +61,8 @@
       {
         "id": "47cccca4-8fd2-4341-a8df-90dce01f355d",
         "type": "custom-text",
-        "customText": " ♻️",
-        "color": "green"
+        "color": "green",
+        "customText": " ♻️"
       },
       {
         "id": "dd2ba0f9-465b-431c-b84a-b43669996631",
@@ -124,6 +107,7 @@
   "colorLevel": 2,
   "inheritSeparatorColors": false,
   "globalBold": false,
+  "minimalistMode": false,
   "powerline": {
     "enabled": false,
     "separators": [
@@ -134,6 +118,7 @@
     ],
     "startCaps": [],
     "endCaps": [],
-    "autoAlign": false
+    "autoAlign": false,
+    "continueThemeAcrossLines": false
   }
 }
