@@ -21,7 +21,8 @@
         "id": "67c58c35-7161-4873-a3dd-adb66e347838",
         "type": "custom-command",
         "color": "",
-        "commandPath": "~/.claude/burn-buffer.sh"
+        "commandPath": "~/.claude/burn-buffer.sh",
+        "preserveColors": true
       },
       {
         "id": "6cceac43-acaa-44a6-b2da-a5727493985e",
