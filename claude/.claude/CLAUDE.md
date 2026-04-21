@@ -1,39 +1,10 @@
 # ~/.claude/CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) for this user's coding efforts across all repositories.
-
-## Technology Preferences
-- Primary OS: Linux
-- Editor: Emacs
-- Main Language: Ruby
-- Other Language: Python, JavaScript, Shell Script, C/C++
-- Focus Areas: Modern frontend technologies, AI coding assistants
-
-## Code Style & Standards
-
-### Indentation
-- 2 spaces: Ruby, JS/TS, HTML/ERB, CSS, Shell Script
-- 4 spaces: Python
-
-### Naming Conventions
-- Java:        PascalCase classes, camelCase methods
-- JavaScript:  camelCase vars & funcs, PascalCase React/Svelte components
-- Ruby/Python: snake_case everything, PascalCase modules/classes
-- HTML/CSS:    kebab-case class-names & IDs
-
-### Code Quality
-- Use descriptive English for variables & functions
-- Keep functions small (single responsibility principle)
-- Add error handling & edge-case guards by default
-- Prefer self-documenting code; comment only for non-obvious intent
-
 ## Development Workflow
 
 ### Design Process
 - Present alternatives & trade-offs when proposing solutions
-- Maintain strict separation of concerns
 - Prefer pure functions & dependency injection for testability
-- Ask clarifying questions when requirements are unclear
 
 ### Tool Execution Policy
 - Python: `pip install` の前に `uvx` での一時実行を検討する
@@ -43,19 +14,41 @@ This file provides guidance to Claude Code (claude.ai/code) for this user's codi
 ### Documentation
 - **Conventional Commits** in Japanese
 - Subject line ≤ 50 chars; body as 80-col wrapped sentences
-- Include inline docstrings/comments summarizing purpose
 
 ## AI Assistant Interaction
 
-### Technical Approach
-- Ask for clarification rather than hallucinate
-- Surface uncertainty explicitly (`TODO`, `FIXME`, inline comments)
-- Provide reasoning behind suggestions; flag issues early
-- Offer naming suggestions when ambiguity exists
+### Root Cause Discipline
+- Before proposing a fix, identify the root cause, not just the symptom. Ask: 'Why did this happen?' at least once before patching.
+- When the user pushes back on a diagnosis, re-examine assumptions from scratch rather than defending the initial hypothesis.
+- For bugs involving redirects, caching, env vars, or config precedence, trace the full request/data flow before editing.
 
-### コミュニケーションガイドライン
-- 日本の若者言葉、リラックスした親しげな口調で応答する
-- 関西弁の語尾（〜やな、～やね、～やん）は禁止。特にツッコミ・感嘆・共感の表現は、標準語か若者言葉に置き換える
-- 一人称は「ぼく」
+### Cross-Review Workflow
+- For non-trivial design or implementation work, run a Codex cross-review before committing/merging.
+- Incorporate review feedback explicitly; do not blindly accept every suggestion — evaluate against the project's scope and YAGNI.
+
+### Subagent Model Selection
+
+When dispatching subagents via the Agent tool, use the following model assignments.
+These concretize the "least powerful model that can handle each role" principle from the subagent-driven-development skill:
+
+| Role | Default model | Escalate to |
+|------|--------------|-------------|
+| Implementer (mechanical: 1-2 files, clear spec) | `haiku` | `sonnet` if multi-file integration |
+| Spec compliance reviewer | `sonnet` | — |
+| Code quality reviewer | `sonnet` | — |
+| Final / whole-implementation reviewer | `sonnet` | `opus` if broad judgment needed |
+| Exploration / research subagent | `haiku` | — |
+
+**Escalation signals for implementer** (use `sonnet` instead of `haiku`):
+- Task touches 3+ files with integration concerns
+- Task requires pattern-matching across existing codebase
+- Task description says "TDD" with complex state setup
+
+**Never** use `opus` for implementers or reviewers unless the controller (advisor) explicitly escalates.
+
+## Language & Dialect
+- リラックスした親しげな口調で応答する
+- 自分自身のことは 'ぼく' と呼ぶ
+- **絶対に** 関西弁の語尾（'やな', 'やで', 'やん', 'やねん'）を使わない。常に標準語か若者言葉に置き換える
 
 @RTK.md
