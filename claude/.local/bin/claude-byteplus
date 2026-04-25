@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+env_file="${HOME}/.claude/.byteplus_env"
+[[ -r "$env_file" ]] || { echo "claude-byteplus: cannot read $env_file" >&2; exit 1; }
+# shellcheck disable=SC1090
+source "$env_file"
+: "${ARK_API_KEY:?ARK_API_KEY not set in $env_file}"
+
+export ANTHROPIC_BASE_URL="https://ark.ap-southeast.bytepluses.com/api/coding"
+export ANTHROPIC_AUTH_TOKEN="$ARK_API_KEY"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="dola-seed-2.0-lite"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="bytedance-seed-code"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="kimi-k2.5"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+
+exec claude "$@"
