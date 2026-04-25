@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+env_file="${HOME}/.claude/.zai_env"
+[[ -r "$env_file" ]] || { echo "claude-glm: cannot read $env_file" >&2; exit 1; }
+# shellcheck disable=SC1090
+source "$env_file"
+: "${ZAI_API_KEY:?ZAI_API_KEY not set in $env_file}"
+
+export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+export ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5-turbo"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+
+exec claude "$@"
