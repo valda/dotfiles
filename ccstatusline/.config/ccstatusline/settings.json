@@ -38,6 +38,14 @@
         "color": "",
         "commandPath": "~/.claude/burn-buffer.sh",
         "preserveColors": true
+      },
+      {
+        "id": "9acc5977-8b99-4eca-9b4e-623d11acd7f9",
+        "type": "separator"
+      },
+      {
+        "id": "8ce0d9c2-d603-49e5-a6ae-956b99fec87d",
+        "type": "worktree-branch"
       }
     ]
   ],
