@@ -19,6 +19,7 @@ export GISTY_DIR=$HOME/wc/gists
 export DISABLE_AUTO_TITLE=true
 export GOPATH=$HOME/.go
 export PATH="$HOME/opt/global/bin:$HOME/bin:$HOME/.local/bin:$GOPATH/bin:$PATH"
+export CLAUDE_CODE_NO_FLICKER=1
 
 if command -v java >/dev/null 2>&1; then
     export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which java))))"
