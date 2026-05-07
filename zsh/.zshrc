@@ -314,6 +314,7 @@ if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
+alias codex="fnm exec --using=v22.22.1 codex"
 
 # bun completions
 [ -s "/home/valda/.bun/_bun" ] && source "/home/valda/.bun/_bun"
