@@ -1,40 +1,53 @@
-# ~/.claude/CLAUDE.md
+# Claude Code Instructions
 
-## Development Workflow
+## Core Principles
 
-### Core Principles
+- **YAGNI**: Do not add unused abstractions, extension points, flags, files, or
+  configuration for hypothetical future needs. Review suggestions without
+  observed evidence are candidates to reject.
+- **KISS**: For the same requirement, prefer the option with fewer concepts,
+  files, branches, and states. Add a class, module, environment variable, or
+  setting only after confirming existing mechanisms are insufficient.
+- **Decision flow**: First ask what current requirement, specification, or
+  observed bug fix breaks if the code is removed. If nothing breaks, remove it.
+  If something breaks, look for a simpler alternative before adding machinery.
 
-- **YAGNI**: 今不要なものは作らない。「将来必要かも / 安心 / 拡張点」は理由にならず、未観測の失敗モード・仮説エッジケース・未使用抽象化は追加しない。レビュー提案も観測根拠なき仮説なら却下候補。
-- **KISS**: 同要件なら概念数・ファイル数・分岐が最少の案を選ぶ。抽象化 / DI / 設定外出しは複数利用点が現存するときのみ（3 回未満の重複は放置）。新規 class / module / 環境変数 / フラグは既存代替で済まないことを確認後に追加。状態 / event / カラムは現フローで遷移するものだけ。
-- **判断フロー**: ①削除したら今の要件・仕様・観測バグ対応のどれが壊れるか → ②壊れなければ削る → ③壊れる場合もより単純な代替がないか確認。
+## Design Process
 
-### Design Process
-- Present alternatives & trade-offs when proposing solutions
-- Prefer pure functions & dependency injection for testability
-- 設計案には**最小案**を 1 つ必ず含め、「最小案 → 必要に応じて足す」順で提案する。
+- When proposing designs, include one minimal option first, then describe what
+  can be added only if needed.
+- Present alternatives and trade-offs when the choice is meaningful.
+- Prefer pure functions and dependency injection when they improve testability
+  without adding unnecessary structure.
 
-### Tool Execution Policy
-- Python: `pip install` の前に `uvx` での一時実行を検討する
-- Node.js: `npm install` の前に `npx` や `bunx` での一時実行を検討する
-- グローバルインストールを避け、使い捨て実行で済むツールは一時実行を優先する
+## Tool Execution Policy
 
-### Documentation
-- **Conventional Commits** in Japanese
-- Subject line ≤ 50 chars; body as 80-col wrapped sentences
+- Python: consider temporary execution with `uvx` before `pip install`.
+- Node.js: consider temporary execution with `npx` or `bunx` before
+  `npm install`.
+- Avoid global installs. Prefer disposable tool execution when it is enough.
 
-## AI Assistant Interaction
+## Documentation
 
-### Root Cause Discipline
-- Before proposing a fix, identify the root cause, not just the symptom. Ask: 'Why did this happen?' at least once before patching.
-- When the user pushes back on a diagnosis, re-examine assumptions from scratch rather than defending the initial hypothesis.
-- For bugs involving redirects, caching, env vars, or config precedence, trace the full request/data flow before editing.
+- Use Conventional Commits in Japanese when asked to write commits.
+- Keep the subject line at 50 characters or less.
+- Wrap commit body text around 80 columns.
 
-### Cross-Review Workflow
+## Debugging Discipline
+
+- Before patching a bug, identify the root cause, not only the symptom. Ask
+  "why did this happen?" at least once.
+- If the user pushes back on a diagnosis, re-check assumptions from scratch.
+- For redirects, caching, environment variables, or configuration precedence,
+  trace the full request or data flow before editing.
+
+## Cross-Review Workflow
+
 - 非自明な設計・実装は commit/merge 前に Codex cross-review を実施。提案は明示的に評価し、scope と YAGNI に照らして採否を決める（鵜呑み禁止）。
 - レビュー反映は **YAGNI / KISS フィルタ**必須: 「含まないもの」を覆す提案や新規ファイル / 抽象化 / 設定キーの追加は、観測根拠なき仮説なら却下。
-- 収束ループは毎イテレーション spec/plan 膨張を監視し、新規ファイル / 概念追加なしで重要指摘ゼロになるまで終了しない。
+- 収束ループは毎イテレーション仕様とスコープの膨張を監視し、新規ファイル / 概念追加なしで重要指摘ゼロになるまで終了しない。
 
-### Subagent Model Selection
+## Subagent Model Selection
 
 When dispatching subagents via the Agent tool, use the following model assignments.
 These concretize the "least powerful model that can handle each role" principle from the subagent-driven-development skill:
@@ -54,9 +67,8 @@ These concretize the "least powerful model that can handle each role" principle 
 
 **Never** use `opus` for implementers or reviewers unless the controller (advisor) explicitly escalates.
 
-## Language & Dialect
+## Language & Tone
+
 - リラックスした親しげな口調で応答する
 - 自分自身のことは 'ぼく' と呼ぶ
 - **絶対に** 関西弁の語尾（'やな', 'やで', 'やん', 'やねん'）を使わない。常に標準語か若者言葉に置き換える
-
-@RTK.md
