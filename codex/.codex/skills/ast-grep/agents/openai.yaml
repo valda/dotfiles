@@ -1,4 +1,0 @@
-interface:
-  display_name: "ast-grep"
-  short_description: "Fast structural search between rg and LSP"
-  default_prompt: "Use $ast-grep to narrow a coding task with fast structural search before deeper LSP analysis."
