@@ -1,31 +1,22 @@
 # Claude Code Instructions
 
-## Core Principles
+## Don't boil the ocean
 
-- **YAGNI**: Do not add unused abstractions, extension points, flags, files, or
-  configuration for hypothetical future needs. Review suggestions without
-  observed evidence are candidates to reject.
-- **KISS**: For the same requirement, prefer the option with fewer concepts,
-  files, branches, and states. Add a class, module, environment variable, or
-  setting only after confirming existing mechanisms are insufficient.
-- **Decision flow**: First ask what current requirement, specification, or
-  observed bug fix breaks if the code is removed. If nothing breaks, remove it.
-  If something breaks, look for a simpler alternative before adding machinery.
-
-## Design Process
-
-- When proposing designs, include one minimal option first, then describe what
-  can be added only if needed.
-- Present alternatives and trade-offs when the choice is meaningful.
-- Prefer pure functions and dependency injection when they improve testability
-  without adding unnecessary structure.
+AI makes it cheap to expand scope. Resist this.
+Break ocean-sized problems into bounded tasks. Finish the current shoreline before extending the map.
+YAGNI is mandatory. KISS is mandatory. Do not add abstractions, extension points, flags, or configuration for hypothetical needs.
+Complete and verify the requested task. Do not add ritual tests. Test boundary conditions, regressions, and realistic failure modes. Update docs only when behavior, APIs, or operations change.
+Do not rewrite working systems for elegance. Do not refactor unrelated code for consistency. Respect existing architecture, operational constraints, and historical context.
+Search before building. Read before refactoring. Prefer existing patterns over new frameworks.
+When the requested approach is unrealistic, too costly, or unnecessarily complex, say so and offer a smaller recommended option and meaningful alternatives. Explain what each option gains and gives up.
+The goal is not redesign. The goal is a complete, minimal, correct solution within the requested scope.
+If the requested scope is ambiguous, clarify before expanding it.
+Finish the task. Do not expand the ocean.
 
 ## Tool Execution Policy
 
-- Python: consider temporary execution with `uvx` before `pip install`.
-- Node.js: consider temporary execution with `npx` or `bunx` before
-  `npm install`.
-- Avoid global installs. Prefer disposable tool execution when it is enough.
+- Before installing tools or packages, prefer disposable execution (`uvx`, `npx`, `bunx`, etc.); avoid global installs unless necessary.
+- Prefer least-destructive actions: avoid broad irreversible commands (`rm -rf`, `git checkout --`, etc.) unless targets are verified disposable; use narrow deletes, dry-runs, backups, or quarantine moves first, never on repo roots, user content, or unverified variables.
 
 ## Documentation
 
@@ -43,8 +34,7 @@
 
 ## Cross-Review Workflow
 
-- 非自明な設計・実装は commit/merge 前に Codex cross-review を実施。提案は明示的に評価し、scope と YAGNI に照らして採否を決める（鵜呑み禁止）。
-- レビュー反映は **YAGNI / KISS フィルタ**必須: 「含まないもの」を覆す提案や新規ファイル / 抽象化 / 設定キーの追加は、観測根拠なき仮説なら却下。
+- 非自明な設計・実装は commit/merge 前に Codex cross-review を実施。提案は明示的に評価し、scope と YAGNI / KISS に照らして採否を決める。scope を覆す提案や新規ファイル / 抽象化 / 設定キーの追加は、観測根拠なき仮説なら却下。
 - 収束ループは毎イテレーション仕様とスコープの膨張を監視し、新規ファイル / 概念追加なしで重要指摘ゼロになるまで終了しない。
 
 ## Subagent Model Selection
