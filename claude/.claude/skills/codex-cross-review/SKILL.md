@@ -1,5 +1,5 @@
 ---
-name: codex-review
+name: codex-cross-review
 description: |
   Codex CLI（OpenAI）にコード・plan・spec のクロスレビューを依頼する。
   新規レビュー / 再レビュー（resume）/ 指摘がなくなるまでのループレビュー に対応。
@@ -7,7 +7,7 @@ description: |
            "codexレビュー", "クロスレビュー", "プランレビュー", "スペックレビュー"
 ---
 
-# codex-review
+# codex-cross-review
 
 Codex CLI（OpenAI）にクロスレビューを依頼するスキル。Claude 自身の作業を Codex に見てもらう、いわばセカンドオピニオン用。
 
