@@ -20,6 +20,7 @@ export DISABLE_AUTO_TITLE=true
 export GOPATH=$HOME/.go
 export PATH="$HOME/opt/global/bin:$HOME/bin:$HOME/.local/bin:$GOPATH/bin:$PATH"
 export CLAUDE_CODE_NO_FLICKER=1
+export CLOUDSDK_PYTHON=/usr/bin/python3
 
 if command -v java >/dev/null 2>&1; then
     export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which java))))"
