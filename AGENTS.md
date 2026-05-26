@@ -31,6 +31,18 @@ stow -t ~ package_name
 - Use conventional commits in Japanese when asked to write commits.
 - Example: `feat(hypr): Hyprlandの設定を更新`
 
+#### コミット前の機密値チェック
+
+コミットを作成する前に、必ずステージ済み差分を `gitleaks` でスキャンする。
+
+```bash
+gitleaks git --staged --redact
+```
+
+- `gitleaks` が PATH に無い場合は、ユーザーに通知して中断する。勝手にインストールしない。
+- 検出された場合（exit code 1）はコミットを中断し、検出箇所（ファイル・行・ルール ID）をユーザーに報告して指示を仰ぐ。値は redact 済みなので、必要なら staged diff をユーザーが直接確認する。
+- 検出値の書き換え・削除は AI が独断で行わない。`gitleaks:allow` コメントの付与や `.gitleaksignore` への追記は、ユーザーの明示的な承認がある場合に限る。
+
 ## Architecture & Organization
 
 ### Stow Package Structure
