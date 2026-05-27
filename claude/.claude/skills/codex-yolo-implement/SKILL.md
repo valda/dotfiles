@@ -29,26 +29,43 @@ Codex CLI（OpenAI）に plan を渡し、YOLO モード (`--dangerously-bypass-
 
 ## コマンド形式
 
+プロンプトは Write tool で一時ファイルに書き出し、**stdin から読ませる**。出力は直接ログファイルへ redirect する（`| tail` 等のパイプを経由させない）。
+
 ### 初回
 
-```
+Write で `/tmp/codex-prompt-<scope>.txt` を作成してから:
+
+```bash
 codex exec \
   --dangerously-bypass-approvals-and-sandbox \
   --skip-git-repo-check \
   -C <project_dir> \
-  "<plan + 必須指示>"
+  - < /tmp/codex-prompt-<scope>.txt > /tmp/codex-output-<scope>.log 2>&1
 ```
+
+- `-` を PROMPT 引数にすると codex は stdin からプロンプトを読む（`codex exec --help` 仕様）
+- ログファイルは bg 中も逐次書き込まれるので `tail -100 /tmp/codex-output-<scope>.log` で随時進捗確認できる
 
 ### 継続（resume）
 
-```
+Write で `/tmp/codex-resume-<scope>.txt` を作成してから:
+
+```bash
 codex exec resume --last \
   --dangerously-bypass-approvals-and-sandbox \
   --skip-git-repo-check \
-  "<continuation prompt>"
+  - < /tmp/codex-resume-<scope>.txt > /tmp/codex-output-<scope>-resume.log 2>&1
 ```
 
 `-C, --cd` と `-s, --sandbox` は `resume` サブコマンドには存在しない（元セッションを引き継ぐ）。YOLO フラグは resume 側でも明示的に渡す必要がある。
+
+### 引数渡しが禁止な理由
+
+`codex exec ... "$(cat <<'PROMPT' ... PROMPT)"` の形式で長文プロンプトを引数に渡すと、bg 起動時に codex が CPU 0% のまま無限ハングすることがある。原因は heredoc 内の `\"` の二重エスケープと、stdin/tty 関連の初期化の組み合わせ。ファイル + stdin 経由ならどちらも回避できる。
+
+### tail パイプが禁止な理由
+
+`codex exec ... 2>&1 | tail -N` だと、`tail` が EOF まで全入力をバッファして最後に flush するため、codex 実行中は出力ファイルが 0 バイトのまま観察不能になる。中間状態が見えないと「正常進行中」と「ハング」の判別ができない。直接 redirect すれば逐次書き込まれる。
 
 ## 出力フォーマット
 
@@ -162,14 +179,36 @@ $ <failing_cmd>
 
    未コミット変更（plan doc 等）を残したまま `git checkout -b` すれば、変更はそのまま新ブランチに乗る。
 
-4. **初回コマンド**を組み立てて実行（プロンプト末尾に必須指示 3 つを必ず追加）。
+4. **プロンプトファイル作成 → 初回実行**:
+   - Write tool で `/tmp/codex-prompt-<scope>.txt` にプロンプト本文を書き出す（必須指示 3 つを含む）
+   - Bash で `codex exec ... - < /tmp/codex-prompt-<scope>.txt > /tmp/codex-output-<scope>.log 2>&1` を **bg で起動**（`run_in_background: true`、`timeout: 900000`）
+   - **絶対に `| tail -N` パイプを経由させない**（中間観察が不能になる）
+   - **必ず stdin 経由（`- < /tmp/...`）でプロンプトを渡す**。引数で `"$(cat <<'PROMPT' ... PROMPT)"` は使わない（ハングする実例あり）
 
-   `codex exec` は plan の規模次第で数分〜10 分以上かかる。Claude Code の Bash ツールは long-timeout 指定で自動的にバックグラウンドに回すことがあり、その場合 stdout は直接返らず `/tmp/claude-*/tasks/<id>.output` に書かれる。
+   `codex exec` は plan の規模次第で数分〜15 分以上かかる。
 
-   - **bg 化された場合**: タスク完了通知（`status: completed`, exit code 0）を待ち、`tail -150 <output-file>` で末尾を読む（`## 実装結果` 以降の見出しは出力末尾近くに来る）。
-   - **fg で待つ場合**: `timeout: 600000`（10 分）まで延ばして呼ぶ。見出し抽出ロジックは bg と同じ。
+   進捗確認:
+   - 中間進捗: `tail -100 /tmp/codex-output-<scope>.log`（直接 redirect しているので逐次書き込まれる）
+   - worktree 変更: `git status -s | wc -l`
+   - プロセス状態: `ps -p <PID> -o etime,cputime,stat`
 
-   どちらでも codex 側の出力規約は同じなので、後段の抽出は変わらない。
+   タスク完了通知（`status: completed`, exit code 0）を受け取ったら、`tail -150 /tmp/codex-output-<scope>.log` で末尾を読む（`## 実装結果` 以降の見出しは出力末尾近くに来る）。
+
+### ハング検知と対処
+
+bg 実行中、以下の指標が揃ったらハング:
+
+| 指標 | ハング判定値 |
+|---|---|
+| `wc -c /tmp/codex-output-<scope>.log` | 0 バイトのまま起動から 3 分以上 |
+| `ps -p <PID> -o cputime` | `00:00:00` が継続（通常は API レスポンス受信時に数秒の CPU 消費が出る） |
+| `git status -s` | 空のまま（codex がファイルを 1 つも touch していない） |
+
+対処:
+
+1. **TaskStop** でプロセス kill
+2. プロンプトファイル + 出力 redirect 方式で再投入（上記コマンド形式）
+3. 再投入後もハングするなら `codex --version` / `codex exec --help` で codex バイナリ自体の動作確認
 
 5. codex の出力（stdout or output file）を読み、見出しごとに抽出:
    - `## 完了状況` 一行目が `完了` & `## 検証コマンド` あり:
@@ -202,12 +241,10 @@ $ <failing_cmd>
 
 ### plan ファイルからの実装
 
+Write tool で `/tmp/codex-prompt-feature-x.txt` に以下を書き出す:
+
 ```
-codex exec \
-  --dangerously-bypass-approvals-and-sandbox \
-  --skip-git-repo-check \
-  -C /home/valda/wc/myapp \
-  "次の plan を実装してください: /tmp/plans/feature-x.md (ref: /home/valda/wc/myapp/CLAUDE.md)
+次の plan を実装してください: /tmp/plans/feature-x.md (ref: /home/valda/wc/myapp/CLAUDE.md)
 
 最終メッセージは以下の見出しを含む Markdown で返してください:
 - ## 実装結果 — 今ターンの作業概要
@@ -217,16 +254,25 @@ codex exec \
 
 確認や質問は不要です。不明点があっても妥当なデフォルトを採用し、## 実装結果 にその根拠を一文で追記してください。
 
-git commit / git push は実行しないでください。変更は作業ツリーに残すだけで構いません。"
+git commit / git push は実行しないでください。変更は作業ツリーに残すだけで構いません。
+```
+
+その後 Bash で（bg + 直接 redirect、tail パイプ禁止）:
+
+```bash
+codex exec \
+  --dangerously-bypass-approvals-and-sandbox \
+  --skip-git-repo-check \
+  -C /home/valda/wc/myapp \
+  - < /tmp/codex-prompt-feature-x.txt > /tmp/codex-output-feature-x.log 2>&1
 ```
 
 ### 検証失敗後の resume
 
+Write tool で `/tmp/codex-resume-feature-x.txt` に以下を書き出す:
+
 ```
-codex exec resume --last \
-  --dangerously-bypass-approvals-and-sandbox \
-  --skip-git-repo-check \
-  "あなたは '## 完了状況: 完了' を返しましたが、検証コマンドが以下のとおり失敗しました:
+あなたは '## 完了状況: 完了' を返しましたが、検証コマンドが以下のとおり失敗しました:
 
 $ bundle exec rspec spec/foo_spec.rb
 F.....
@@ -235,5 +281,14 @@ Failures:
      expected: 2
           got: 1
 
-'完了' を撤回し（'## 完了状況: 未完了' として）、原因を修正したうえで再度返してください。"
+'完了' を撤回し（'## 完了状況: 未完了' として）、原因を修正したうえで再度返してください。
+```
+
+Bash で:
+
+```bash
+codex exec resume --last \
+  --dangerously-bypass-approvals-and-sandbox \
+  --skip-git-repo-check \
+  - < /tmp/codex-resume-feature-x.txt > /tmp/codex-output-feature-x-resume.log 2>&1
 ```
