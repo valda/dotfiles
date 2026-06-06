@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v nvidia-smi >/dev/null 2>&1; then
+  echo " GPU: nvidia-smi not found"
+  exit 0
+fi
+
+nvidia-smi \
+  --query-gpu=name,temperature.gpu,utilization.gpu,memory.used,memory.total,power.draw,power.limit,pstate \
+  --format=csv,noheader,nounits |
+awk -F', ' '{
+  printf " GPU: %s\n Temp: %s°C  Util: %s%%  PState: %s\n VRAM: %s/%s MiB\n Power: %s/%s W\n",
+    $1, $2, $3, $8, $4, $5, $6, $7
+}'

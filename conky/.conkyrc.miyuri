@@ -149,6 +149,10 @@ ${template3 sdd Read 20 166}${goto 175}${template3 sdd Write 20 166}${voffset -5
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
 ${template8 4 150 200 250 300}
 
+${font URW Gothic L:Book:size=16}${color1}${voffset 3}Graphics ${hr}${color}${font}
+
+${execi 8 ~/.config/conky/bin/conky-nvidia}${voffset 5}
+
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Network ${hr}${color}${font}
 
 ${if_up enp3s0}${template5 enp3s0 Down 20 166}${goto 175}${template5 enp3s0 Up 20 166}${voffset -5}${endif}
