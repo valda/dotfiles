@@ -69,9 +69,9 @@ conky.config = {
    --color9
 
    --# Template
-   -- CPU Graph <num> <height> <width>
+   -- CPU Core Bar <num> <bar_goto> <bar_width>
    template0 = [[
-CPU\1 ${freq_g \1}GHz - ${cpu cpu\1}%${goto 150}${color2}${cpubar cpu\1}${color}]],
+Core\1 - ${cpu cpu\1}%${goto \2}${color2}${cpubar cpu\1 6,\3}${color}]],
    -- CPU Top <num> <indent1> <indent2> <indent3> <indent4>
    template1 = [[
 ${top name \1}${goto \2}${top pid \1}${goto \3}${top cpu \1}${goto \4}${top mem \1}${goto \5}${top io_perc \1}]],
@@ -96,10 +96,6 @@ ${loadgraph \1,\2 333344 eeeeff 12 -t}${offset -\2} Load Average: ${loadavg}${al
    -- Top 5 <template num> <indent1> <indent2> <indent3> <indent4>
    template8 = [[
 ${color4} ${template\1 1 \2 \3 \4 \5}${color}\n ${template\1 2 \2 \3 \4 \5}\n ${template\1 3 \2 \3 \4 \5}\n ${template\1 4 \2 \3 \4 \5}\n ${template\1 5 \2 \3 \4 \5}]],
-   -- CPU Clock / Temp <num> <coretemp path>
-   template9 = [[
-${execigraph 4 "cat /sys/class/hwmon/hwmon0/temp1_input | cut -c -2" \1,\2 333344 eeeeff 100 -t}${offset -\2} Package Temperature: ${hwmon 0 temp 1}°C]],
-
 };
 
 conky.text = [[
@@ -111,28 +107,30 @@ ${font URW Gothic L:Book:size=16}${color1}System ${hr}${color}${font}
 
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Processor ${hr}${color}${font}
 
- ${template0 1}
- ${template0 2}
- ${template0 3}
- ${template0 4}
- ${template0 5}
- ${template0 6}
- ${template0 7}
- ${template0 8}
- ${template0 9}
- ${template0 10}
- ${template0 11}
- ${template0 12}
+${execi 8 ~/.config/conky/bin/conky-cpu summary}${voffset 5}
+${template0 1 75 85}${goto 175}${template0 7 250 85}
+${template0 2 75 85}${goto 175}${template0 8 250 85}
+${template0 3 75 85}${goto 175}${template0 9 250 85}
+${template0 4 75 85}${goto 175}${template0 10 250 85}
+${template0 5 75 85}${goto 175}${template0 11 250 85}
+${template0 6 75 85}${goto 175}${template0 12 250 85}
 ${voffset 5}${template7 20 335}${voffset -5}
-${template9 20 335}${voffset -5}
+
 ${voffset 3}${color3} Command${goto 150}PID${goto 200}%CPU${goto 250}%MEM${goto 300}%I/O${color}
 ${template8 1 150 200 250 300}
+
+${font URW Gothic L:Book:size=16}${color1}${voffset 3}Graphics ${hr}${color}${font}
+
+${execi 8 ~/.config/conky/bin/conky-nvidia summary}
+${execigraph 4 "~/.config/conky/bin/conky-nvidia load-perc" 20,335 333344 eeeeff 100 -t}${offset -335} Load: ${execi 4 ~/.config/conky/bin/conky-nvidia load-perc}%${voffset -5}
+ VRAM: ${execi 8 ~/.config/conky/bin/conky-nvidia vram-text} - ${execi 8 ~/.config/conky/bin/conky-nvidia vram-perc}%${goto 190}${color2}${execibar 8 ~/.config/conky/bin/conky-nvidia vram-perc}${color}${voffset 5}
 
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Memory ${hr}${color}${font}
 
  Mem: ${mem}/${memmax} - ${memperc}%${goto 190}${color2}${membar}${color}
  buffers/cache: ${buffers}/${cached}
  Swap: ${swap}/${swapmax} - ${swapperc}%${goto 190}${color2}${swapbar}${color}
+ zram: ${execi 8 ~/.config/conky/bin/conky-swap zram-text}${goto 175}disk: ${execi 8 ~/.config/conky/bin/conky-swap disk-text}
 ${voffset 5}${color3} Command${goto 150}PID${goto 200}VIRT${goto 250}RES${goto 300}%MEM${color}
 ${template8 2 150 200 250 300}
 
@@ -146,14 +144,10 @@ ${template3 sda Read 20 166}${goto 175}${template3 sda Write 20 166}${voffset -5
 ${template3 sdb Read 20 166}${goto 175}${template3 sdb Write 20 166}${voffset -5}
 ${template3 sdc Read 20 166}${goto 175}${template3 sdc Write 20 166}${voffset -5}
 ${template3 sdd Read 20 166}${goto 175}${template3 sdd Write 20 166}${voffset -5}
-${voffset 3}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
+${voffset 5}${color3} Command${goto 150}PID${goto 200}Read${goto 250}Write${goto 300}%I/O${color}
 ${template8 4 150 200 250 300}
-
-${font URW Gothic L:Book:size=16}${color1}${voffset 3}Graphics ${hr}${color}${font}
-
-${execi 8 ~/.config/conky/bin/conky-nvidia}${voffset 5}
 
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Network ${hr}${color}${font}
 
-${if_up enp3s0}${template5 enp3s0 Down 20 166}${goto 175}${template5 enp3s0 Up 20 166}${voffset -5}${endif}
+${if_up enp4s0}${template5 enp4s0 Down 20 166}${goto 175}${template5 enp4s0 Up 20 166}${voffset -5}${endif}
 ]];

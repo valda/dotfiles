@@ -2,14 +2,43 @@
 set -euo pipefail
 
 if ! command -v nvidia-smi >/dev/null 2>&1; then
-  echo " GPU: nvidia-smi not found"
+  case "${1:-summary}" in
+    load-perc|vram-perc) echo 0 ;;
+    *) echo " GPU: nvidia-smi not found" ;;
+  esac
   exit 0
 fi
 
-nvidia-smi \
-  --query-gpu=name,temperature.gpu,utilization.gpu,memory.used,memory.total,power.draw,power.limit,pstate \
-  --format=csv,noheader,nounits |
-awk -F', ' '{
-  printf " GPU: %s\n Temp: %s°C  Util: %s%%  PState: %s\n VRAM: %s/%s MiB\n Power: %s/%s W\n",
-    $1, $2, $3, $8, $4, $5, $6, $7
-}'
+query_gpu() {
+  nvidia-smi \
+    --query-gpu=name,temperature.gpu,utilization.gpu,memory.used,memory.total,power.draw,power.limit,pstate \
+    --format=csv,noheader,nounits
+}
+
+case "${1:-summary}" in
+  summary)
+    query_gpu | awk -F', ' '{
+      printf " GPU: %s\n Temp: %s°C  PState: %s\n Power: %s/%s W\n",
+        $1, $2, $8, $6, $7
+    }'
+    ;;
+  load-perc)
+    query_gpu | awk -F', ' '{print $3}'
+    ;;
+  vram-text)
+    query_gpu | awk -F', ' '{printf "%s/%s MiB", $4, $5}'
+    ;;
+  vram-perc)
+    query_gpu | awk -F', ' '{
+      if ($5 > 0) {
+        printf "%d\n", int(($4 * 100 / $5) + 0.5)
+      } else {
+        print 0
+      }
+    }'
+    ;;
+  *)
+    echo "usage: $(basename "$0") [summary|load-perc|vram-text|vram-perc]" >&2
+    exit 2
+    ;;
+esac

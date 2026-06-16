@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cpu_name() {
+  awk -F': ' '/^model name/ {
+    name=$2
+    gsub(/  +/, " ", name)
+    sub(/ with Radeon Graphics/, "", name)
+    print name
+    exit
+  }' /proc/cpuinfo
+}
+
+cpu_temp() {
+  for h in /sys/class/hwmon/hwmon*; do
+    [ -r "$h/name" ] || continue
+    [ "$(cat "$h/name" 2>/dev/null)" = "k10temp" ] || continue
+    awk '{printf "%.1f\n", $1 / 1000}' "$h/temp1_input"
+    return 0
+  done
+  echo "n/a"
+}
+
+cpu_pstate() {
+  local base=/sys/devices/system/cpu/cpu0/cpufreq
+  local driver governor
+  driver=$(cat "$base/scaling_driver" 2>/dev/null || echo n/a)
+  governor=$(cat "$base/scaling_governor" 2>/dev/null || echo n/a)
+  printf '%s / %s\n' "$driver" "$governor"
+}
+
+cpu_epp() {
+  cat /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference 2>/dev/null || echo n/a
+}
+
+cpu_clock() {
+  python3 - <<'PY'
+from pathlib import Path
+vals = []
+for p in Path('/sys/devices/system/cpu').glob('cpu[0-9]*/cpufreq/scaling_cur_freq'):
+    try:
+        vals.append(int(p.read_text().strip()) / 1000)
+    except Exception:
+        pass
+if vals:
+    print(f"{min(vals):.0f} / {sum(vals)/len(vals):.0f} / {max(vals):.0f} MHz")
+else:
+    print("n/a")
+PY
+}
+
+case "${1:-summary}" in
+  name)
+    cpu_name
+    ;;
+  temp)
+    cpu_temp
+    ;;
+  pstate)
+    cpu_pstate
+    ;;
+  epp)
+    cpu_epp
+    ;;
+  clock)
+    cpu_clock
+    ;;
+  summary)
+    printf ' CPU: %s\n' "$(cpu_name)"
+    printf ' Temp: %s°C\n' "$(cpu_temp)"
+    printf ' P-State: %s\n' "$(cpu_pstate)"
+    printf ' EPP: %s\n' "$(cpu_epp)"
+    printf ' Clock: %s\n' "$(cpu_clock)"
+    ;;
+  *)
+    echo "usage: $(basename "$0") [summary|name|temp|pstate|epp|clock]" >&2
+    exit 2
+    ;;
+esac

@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+swap_rows() {
+  swapon --show=NAME,SIZE,USED,PRIO --bytes --noheadings 2>/dev/null || true
+}
+
+zram_row() {
+  swap_rows | awk '$1 ~ /^\/dev\/zram/ {print; exit}'
+}
+
+disk_rows() {
+  swap_rows | awk '$1 !~ /^\/dev\/zram/ {print}'
+}
+
+sum_disk() {
+  disk_rows | awk '
+    {size += $2; used += $3}
+    END {printf "%.0f %.0f\n", size, used}
+  '
+}
+
+bytes_to_mib() {
+  awk -v b="$1" 'BEGIN {printf "%.0f", b / 1048576}'
+}
+
+human_mib() {
+  awk -v mib="$1" 'BEGIN {
+    if (mib >= 1024) {
+      printf "%.1fGiB", mib / 1024
+    } else {
+      printf "%.0fMiB", mib
+    }
+  }'
+}
+
+perc() {
+  awk -v used="$1" -v size="$2" 'BEGIN {
+    if (size > 0) printf "%d\n", int((used * 100 / size) + 0.5)
+    else print 0
+  }'
+}
+
+case "${1:-summary}" in
+  zram-text)
+    row=$(zram_row)
+    if [ -z "$row" ]; then
+      echo "0MiB/0MiB"
+      exit 0
+    fi
+    set -- $row
+    size_mib=$(bytes_to_mib "$2")
+    used_mib=$(bytes_to_mib "$3")
+    printf '%s/%s\n' "$(human_mib "$used_mib")" "$(human_mib "$size_mib")"
+    ;;
+  zram-perc)
+    row=$(zram_row)
+    if [ -z "$row" ]; then
+      echo 0
+      exit 0
+    fi
+    set -- $row
+    perc "$3" "$2"
+    ;;
+  disk-text)
+    read -r size used < <(sum_disk)
+    size_mib=$(bytes_to_mib "$size")
+    used_mib=$(bytes_to_mib "$used")
+    printf '%s/%s\n' "$(human_mib "$used_mib")" "$(human_mib "$size_mib")"
+    ;;
+  disk-perc)
+    read -r size used < <(sum_disk)
+    perc "$used" "$size"
+    ;;
+  summary)
+    printf ' zram: %s - %s%%\n' "$($0 zram-text)" "$($0 zram-perc)"
+    printf ' disk: %s - %s%%\n' "$($0 disk-text)" "$($0 disk-perc)"
+    ;;
+  *)
+    echo "usage: $(basename "$0") [summary|zram-text|zram-perc|disk-text|disk-perc]" >&2
+    exit 2
+    ;;
+esac
