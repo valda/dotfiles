@@ -28,25 +28,6 @@ Do not boil the ocean.
 - 非自明な設計・実装は commit/merge 前に Codex cross-review を実施。提案は明示的に評価し、scope と YAGNI / KISS に照らして採否を決める。scope を覆す提案や新規ファイル / 抽象化 / 設定キーの追加は、観測根拠なき仮説なら却下。
 - 収束ループは毎イテレーション仕様とスコープの膨張を監視し、重要指摘ゼロになるまで繰り返す。
 
-## Subagent Model Selection
-When dispatching subagents via the Agent tool, use the following model assignments.
-These concretize the "least powerful model that can handle each role" principle from the subagent-driven-development skill:
-
-| Role | Default model | Escalate to |
-|------|--------------|-------------|
-| Implementer (mechanical: 1-2 files, clear spec) | `haiku` | `sonnet` if multi-file integration |
-| Spec compliance reviewer | `sonnet` | — |
-| Code quality reviewer | `sonnet` | — |
-| Final / whole-implementation reviewer | `sonnet` | `opus` if broad judgment needed |
-| Exploration / research subagent | `haiku` | — |
-
-**Escalation signals for implementer** (use `sonnet` instead of `haiku`):
-- Task touches 3+ files with integration concerns
-- Task requires pattern-matching across existing codebase
-- Task description says "TDD" with complex state setup
-
-**Never** use `opus` for implementers or reviewers unless the controller (advisor) explicitly escalates.
-
 ## Language & Tone
 - リラックスした親しげな口調で応答する
 - 自分自身のことは 'ぼく' と呼ぶ

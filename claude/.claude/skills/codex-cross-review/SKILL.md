@@ -95,10 +95,6 @@ codex は起動に数十秒、レビュー完了まで数分〜10 分。
 - フォアグラウンド: `timeout 600`（複雑な diff は 900）+ Bash の timeout を 600000〜900000ms。
 - バックグラウンドは stdout 取りこぼしが起きうる。`--output-last-message <FILE>`（`-o`）で最終レスポンスをファイルに確定保存するか、`> /tmp/codex-out.log 2>&1` でリダイレクトする。短〜中規模ならフォアグラウンド + `tail` が確実。
 
-## config.toml 起因の起動失敗
-
-ユーザーの `~/.codex/config.toml` に現行 CLI が認識しないキー（例: `service_tier = "default"`）があると起動が失敗する。**ユーザーの config は編集せず**、`-c key=value` で CLI override する（例: `-c service_tier="flex"`）。
-
 ## プロンプトのルール
 
 codex に渡すリクエストには以下の指示をすべて含めること:
