@@ -54,16 +54,27 @@ PR=$(gh pr view --json number -q .number) \
 bash ~/.claude/skills/codex-pr-review-loop/scripts/codex-poll.sh
 ```
 
-環境変数: `REPO` / `PR`（必須）、`BOT`（default `chatgpt-codex-connector[bot]`）、`MAX_CYCLES`（default 18 = 36 分）、`INTERVAL`（default 120 秒）。Claude からは `run_in_background: true` + timeout 2400000ms 程度で起動。`bash <path>` で明示起動する（`sh` 経由だと dash で `${HEAD:0:10}` が `Bad substitution`）。
+環境変数: `REPO` / `PR`（必須）、`BOT`（default `chatgpt-codex-connector[bot]`）、`MAX_CYCLES`（default 18 = 36 分）、`INTERVAL`（default 120 秒）、`NUDGE_AFTER`（default 3 周回 = 6 分。pending が続いたら自動で `@codex review` を投げて bot を起こす閾値）。Claude からは `run_in_background: true` + timeout 2400000ms 程度で起動。`bash <path>` で明示起動する（`sh` 経由だと dash で `${HEAD:0:10}` が `Bad substitution`）。
 
 終端ステータス:
 
 - `NEW_FINDINGS: ...` → 手順 3 へ。CI 完了は待たずに修正に入る（次 push で CI 再実行されるため現 HEAD の CI 結果は無価値）。
 - `CONVERGED` → 手順 5 へ（review + CI 両 green 確認済み）。
 - `CI_FAILED` → CI 失敗ジョブを特定して修正、修正後にループ再起動。
-- `TIMEOUT` → review pending なら本文 reaction を確認 → 無ければ `@codex review` を投げてループ再起動。何も無ければユーザーに判断を仰ぐ。
+- `TIMEOUT` → 最後の砦。nudge 後も bot が反応しない場合に到達。review pending なら本文 reaction を再確認 → 無ければ手動で `@codex review` を投げてループ再起動。何も無ければユーザーに判断を仰ぐ。
 
-`@codex review` の明示トリガは TIMEOUT 経路のみ。先に本文 reaction を必ず確認する（既に 👍 が付いた収束済み PR に投げると bot が 👀 で 👍 を上書きして 1 サイクル無駄になる）。
+**自動 nudge（push trigger 不発の検知と回復）**:
+
+push 後の自動再レビューは **不確実**（bot 側の仕様）。push しても 1 度もレビューが走らないケースが時々発生する。これを TIMEOUT 経路（36 分待ち）まで放置すると、貴重な実行時間が浪費される。
+
+対策として、ポーリング中に `review=pending` が **`NUDGE_AFTER` 周回（default 3 = 6 分）** 続いたら、スクリプトが**自動で 1 度だけ** `@codex review` をコメント投稿して bot を起こす。投げる前に PR 本文の reaction を確認し、`👍` / `👀` / `👎` のいずれかが既にあれば触らない（既存 👍 への投げは bot が再処理して 👀 で 👍 を上書きする罠を回避、過去メモ参照）。一度投げたら同じセッション中は再投げしない（`NUDGED=true` で記録）。
+
+これにより `@codex review` の明示トリガは:
+
+- **自動 nudge**（NUDGE_AFTER 経過時、ポーリングが投げる）
+- **TIMEOUT 経路**（nudge 後も反応がない最終手段、人間が判断）
+
+の 2 経路になる。スクリプトログでは `NUDGE: posting @codex review` 行が出るので、ユーザーは何が起きたか追跡できる。
 
 ### 3. トリアージ（採用判定）
 

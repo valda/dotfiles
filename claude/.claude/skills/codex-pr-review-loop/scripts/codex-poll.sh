@@ -9,16 +9,21 @@ set -u
 BOT="${BOT:-chatgpt-codex-connector[bot]}"
 MAX_CYCLES="${MAX_CYCLES:-18}"   # 2分 × 18 = 最大36分
 INTERVAL="${INTERVAL:-120}"
+NUDGE_AFTER="${NUDGE_AFTER:-3}"  # この周回数 pending が続いたら @codex review を 1 回だけ投げる
 
 HEAD=$(gh pr view "$PR" --json headRefOid -q .headRefOid); H10=${HEAD:0:10}
 
 REVIEW_STATE="pending"  # pending / converged / findings
 CI_STATE="pending"      # pending / passed / failed
 REVIEW_SUMMARY=""
+NUDGED=false             # 同じセッション中の @codex review 再投げ防止
 
 for i in $(seq 1 "$MAX_CYCLES"); do
   # 毎周回 HEAD を取り直す（自分が push したらサイクル切れ目で sha が変わる）
   HEAD=$(gh pr view "$PR" --json headRefOid -q .headRefOid); H10=${HEAD:0:10}
+
+  PREV_REVIEW_STATE="$REVIEW_STATE"
+  PREV_CI_STATE="$CI_STATE"
 
   # ─── (A) Review state を更新（pending のときだけ確認） ───
   if [ "$REVIEW_STATE" = "pending" ]; then
@@ -55,6 +60,33 @@ for i in $(seq 1 "$MAX_CYCLES"); do
   fi
 
   echo "[$i/$MAX_CYCLES] $(date +%H:%M:%S) review=$REVIEW_STATE ci=$CI_STATE"
+
+  # ─── 状態遷移を視覚化（pending → 確定の境目を見えるようにする） ───
+  if [ "$PREV_REVIEW_STATE" != "$REVIEW_STATE" ]; then
+    case "$REVIEW_STATE" in
+      converged) echo "  → 👍 Codex review 収束。CI 完了を待ちます" ;;
+      findings)  echo "  → ⚠ Codex review に指摘あり" ;;
+    esac
+  fi
+  if [ "$PREV_CI_STATE" != "$CI_STATE" ]; then
+    case "$CI_STATE" in
+      passed) echo "  → ✅ CI passed" ;;
+      failed) echo "  → ❌ CI failed" ;;
+    esac
+  fi
+
+  # ─── (D) Pending nudge: push trigger の自動再レビューは不確実なので、
+  #     pending が続いたら 1 度だけ @codex review を投げて bot を起こす ───
+  if [ "$REVIEW_STATE" = "pending" ] && [ "$NUDGED" = "false" ] && [ "$i" -ge "$NUDGE_AFTER" ]; then
+    # 👍 / 👀 / -1 reaction が既にあれば触らない（収束済み or 処理中 or 否定済み）。
+    # 既存 👍 に投げると bot が再処理して 👀 で 👍 を上書きする罠を回避（過去メモ）。
+    if ! gh api "repos/$REPO/issues/$PR/reactions" --paginate \
+           --jq ".[] | select(.user.login==\"$BOT\" and (.content==\"+1\" or .content==\"eyes\" or .content==\"-1\"))" 2>/dev/null | grep -q .; then
+      echo "[$i/$MAX_CYCLES] $(date +%H:%M:%S) NUDGE: posting @codex review (push trigger 不発の可能性)"
+      gh pr comment "$PR" --body "@codex review" > /dev/null 2>&1 || true
+      NUDGED=true
+    fi
+  fi
 
   # ─── (C) 終端判定（優先順位）───
   # NEW_FINDINGS は CI 完了を待たない。次 push で CI 再実行されるため現 HEAD の CI 結果は無価値
