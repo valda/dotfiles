@@ -2,6 +2,12 @@
 # Codex PR review & CI 並走ポーリングループ
 # 使い方: REPO=<owner/repo> PR=<番号> bash scripts/codex-poll.sh
 # 出力ステータス: NEW_FINDINGS / CONVERGED / CI_FAILED / TIMEOUT
+#
+# 反証コメント後の再起動: 既に NEW_FINDINGS を返した review に反証コメントだけ投げて
+#   再起動する場合は SEEN_RID=<前回の review id> を渡す。同 RID の findings は
+#   「再評価待ち」として pending 扱いになり、新 RID 発行 or 👍 reaction が来るまで
+#   ポーリングを継続する。SEEN_RID を渡さないと、対応済み findings を毎回検知して
+#   サイクル 1 で即 exit するループから抜けられない。
 set -u
 
 : "${REPO:?REPO=<owner/repo> を指定}"
@@ -10,6 +16,7 @@ BOT="${BOT:-chatgpt-codex-connector[bot]}"
 MAX_CYCLES="${MAX_CYCLES:-18}"   # 2分 × 18 = 最大36分
 INTERVAL="${INTERVAL:-120}"
 NUDGE_AFTER="${NUDGE_AFTER:-3}"  # この周回数 pending が続いたら @codex review を 1 回だけ投げる
+SEEN_RID="${SEEN_RID:-}"         # 反証済み review id。同 RID の findings は pending 扱い
 
 HEAD=$(gh pr view "$PR" --json headRefOid -q .headRefOid); H10=${HEAD:0:10}
 
@@ -36,15 +43,20 @@ for i in $(seq 1 "$MAX_CYCLES"); do
       RID=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
         --jq "[.[] | select(.user.login==\"$BOT\" and (.body | contains(\"$H10\")))] | last | .id // empty")
       if [ -n "$RID" ]; then
-        NEW=$(gh api "repos/$REPO/pulls/$PR/comments" --paginate \
-          --jq "[.[] | select(.pull_request_review_id==$RID)] | .[].id")
-        BODY_HAS_FINDING=$(gh api "repos/$REPO/pulls/$PR/reviews/$RID" \
-          --jq '.body | test("P[0-9] Badge")' 2>/dev/null)
-        if [ -n "$NEW" ] || [ "$BODY_HAS_FINDING" = "true" ]; then
-          REVIEW_STATE="findings"
-          REVIEW_SUMMARY="review=$RID inline=[$NEW] body_has_finding=$BODY_HAS_FINDING"
+        if [ -n "$SEEN_RID" ] && [ "$RID" = "$SEEN_RID" ]; then
+          # 反証済み review。新しい review or 👍 reaction を待つため pending 維持
+          :
+        else
+          NEW=$(gh api "repos/$REPO/pulls/$PR/comments" --paginate \
+            --jq "[.[] | select(.pull_request_review_id==$RID)] | .[].id")
+          BODY_HAS_FINDING=$(gh api "repos/$REPO/pulls/$PR/reviews/$RID" \
+            --jq '.body | test("P[0-9] Badge")' 2>/dev/null)
+          if [ -n "$NEW" ] || [ "$BODY_HAS_FINDING" = "true" ]; then
+            REVIEW_STATE="findings"
+            REVIEW_SUMMARY="review=$RID inline=[$NEW] body_has_finding=$BODY_HAS_FINDING"
+          fi
+          # review は来たが指摘なし→ pending のまま 👍 reaction を次周回で待つ
         fi
-        # review は来たが指摘なし→ pending のまま 👍 reaction を次周回で待つ
       fi
     fi
   fi

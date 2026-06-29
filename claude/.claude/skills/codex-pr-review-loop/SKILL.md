@@ -54,7 +54,9 @@ PR=$(gh pr view --json number -q .number) \
 bash ~/.claude/skills/codex-pr-review-loop/scripts/codex-poll.sh
 ```
 
-環境変数: `REPO` / `PR`（必須）、`BOT`（default `chatgpt-codex-connector[bot]`）、`MAX_CYCLES`（default 18 = 36 分）、`INTERVAL`（default 120 秒）、`NUDGE_AFTER`（default 3 周回 = 6 分。pending が続いたら自動で `@codex review` を投げて bot を起こす閾値）。Claude からは `run_in_background: true` + timeout 2400000ms 程度で起動。`bash <path>` で明示起動する（`sh` 経由だと dash で `${HEAD:0:10}` が `Bad substitution`）。
+環境変数: `REPO` / `PR`（必須）、`BOT`（default `chatgpt-codex-connector[bot]`）、`MAX_CYCLES`（default 18 = 36 分）、`INTERVAL`（default 120 秒）、`NUDGE_AFTER`（default 3 周回 = 6 分。pending が続いたら自動で `@codex review` を投げて bot を起こす閾値）、`SEEN_RID`（反証済み review id。後述）。Claude からは `run_in_background: true` + timeout 2400000ms 程度で起動。`bash <path>` で明示起動する（`sh` 経由だと dash で `${HEAD:0:10}` が `Bad substitution`）。
+
+**`SEEN_RID` で反証ループを防ぐ**: `NEW_FINDINGS: review=<RID> inline=[...]` を返した review に対して **反証コメントだけ投げて**（コミットや push なし）ポーリングを再起動する場合は、必ず前回の RID を `SEEN_RID=<RID>` で渡す。同 RID の findings は「再評価待ち」として pending 扱いになり、新 RID 発行 or 👍 reaction が来るまでループを継続できる。指定しないと、対応済み findings を毎サイクルで再検知してサイクル 1 で即 `NEW_FINDINGS` exit するループから抜けられない（HEAD が変わらないので RID も変わらない）。修正コミットを push した場合は HEAD sha が変わって RID も別になるため `SEEN_RID` 不要。
 
 終端ステータス:
 
