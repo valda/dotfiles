@@ -18,7 +18,6 @@ Do not boil the ocean.
 - Avoid broad destructive commands (rm -rf, git checkout --, hard resets, mass deletes) unless targets are verified disposable.
 - Never target repo roots, user content, or unverified variables.
 - Prefer narrow, reversible operations: dry-runs, backups, quarantine moves first.
-- GitHub CLI: when Codex needs `gh`, run it with `GH_TOKEN="$(cat ~/.codex/secrets/github_token)"` so it uses the Codex-specific token instead of the user's keyring. Never print or commit the token value.
 
 ## Documentation
 - Use Conventional Commits in the language appropriate to the repository's primary language and established conventions when asked to write commits.
