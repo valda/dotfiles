@@ -255,7 +255,10 @@ function _preexec_update_window_title () {
     if isemacs; then return; fi
     if isscreen || istmux; then
         emulate -L zsh
-        local -a cmd; cmd=(${(z)2})
+        local -a cmd input
+        cmd=(${(z)2})
+        input=(${(z)1})
+        local expanded_command=$cmd[1]
         case $cmd[1] in
             fg)
                 if (( $#cmd == 1 )); then
@@ -273,7 +276,13 @@ function _preexec_update_window_title () {
                 fi
                 ;&
             *)
-                echo -ne "\033k$cmd[1]:t\033\\"
+                local title=$cmd[1]
+                if [[ $expanded_command != cd ]] \
+                    && (( $#input )) \
+                    && (( ${+aliases[$input[1]]} )); then
+                    title=$input[1]
+                fi
+                echo -ne "\033k${title:t}\033\\"
                 return
                 ;;
         esac
