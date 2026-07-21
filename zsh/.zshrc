@@ -85,6 +85,11 @@ function istmux() {
     return 1
 }
 
+function isherdr() {
+    [[ "$HERDR_ENV" = 1 ]] && return 0
+    return 1
+}
+
 function isscreen() {
     istmux && return 1
     [[ "${TERM[0,6]}" = screen ]] && return 0
@@ -444,7 +449,8 @@ if isemacs; then
 fi
 
 # Start tmux
-if ! isemacs && ! istmux && ! isscreen && ! isdumb && command -v tmux > /dev/null 2>&1; then
+if ! isherdr && ! isemacs && ! istmux && ! isscreen && ! isdumb \
+    && command -v tmux > /dev/null 2>&1; then
     ID=$(tmux list-sessions 2>/dev/null | awk -F: '!/attached/ { print $1; exit }')
     if [[ -z "$ID" ]]; then
         tmux new-session
