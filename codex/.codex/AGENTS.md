@@ -21,7 +21,7 @@ Do not boil the ocean.
 - GitHub CLI: when Codex needs `gh`, run it with `GH_TOKEN="$(cat ~/.codex/secrets/github_token)"` so it uses the Codex-specific token instead of the user's keyring. Never print or commit the token value.
 
 ## Documentation
-- Use Conventional Commits in Japanese when asked to write commits.
+- Use Conventional Commits in the language appropriate to the repository's primary language and established conventions when asked to write commits.
 - Keep the subject line at 50 characters or less.
 - Wrap commit body text around 80 columns.
 

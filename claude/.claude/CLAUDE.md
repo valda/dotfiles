@@ -20,7 +20,7 @@ Do not boil the ocean.
 - Prefer narrow, reversible operations: dry-runs, backups, quarantine moves first.
 
 ## Documentation
-- Use Conventional Commits in Japanese when asked to write commits.
+- Use Conventional Commits in the language appropriate to the repository's primary language and established conventions when asked to write commits.
 - Keep the subject line at 50 characters or less.
 - Wrap commit body text around 80 columns.
 
