@@ -327,7 +327,7 @@ if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
-alias codex="fnm exec --using=22 -- codex"
+alias codex="fnm exec --using=24 -- codex"
 
 # pnpm
 export PNPM_HOME="/home/valda/.local/share/pnpm"
