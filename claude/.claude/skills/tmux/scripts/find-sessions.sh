@@ -42,9 +42,10 @@ FORMAT='  #{session_name}:#{window_index}.#{pane_index} id=#{pane_id} command=#{
 
 list_one() {
   # $1: ラベル, 残り: tmux コマンドプレフィックス
+  # セッションを 1 つ以上列挙できたときだけ 0 を返す（呼び出し側の found 判定に使う）
   local label=$1; shift
   if ! "$@" list-sessions >/dev/null 2>&1; then
-    return 0
+    return 1
   fi
   echo "$label"
   local output
@@ -59,18 +60,18 @@ list_one() {
 found=0
 
 if [[ "$default_server" -eq 1 && -z "$socket" ]]; then
-  list_one "SERVER default" tmux && found=1
+  if list_one "SERVER default" tmux; then found=1; fi
 fi
 
 if [[ -n "$socket" ]]; then
-  list_one "SOCKET $socket" tmux -S "$socket" && found=1
+  if list_one "SOCKET $socket" tmux -S "$socket"; then found=1; fi
 fi
 
 if [[ "$all" -eq 1 ]]; then
   socket_dir=${CLAUDE_TMUX_SOCKET_DIR:-${TMPDIR:-/tmp}/claude-tmux-sockets}
   if [[ -d "$socket_dir" ]]; then
     while IFS= read -r -d '' sock; do
-      list_one "SOCKET $sock" tmux -S "$sock" && found=1
+      if list_one "SOCKET $sock" tmux -S "$sock"; then found=1; fi
     done < <(find "$socket_dir" -maxdepth 1 -type s -print0 2>/dev/null || true)
   fi
 fi

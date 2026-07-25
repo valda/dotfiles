@@ -27,7 +27,8 @@ Options:
       --tail     match only the last 3 lines (prompt detection)
   -h, --help     show help
 
-Exits 0 on first match, 1 on timeout (last capture printed to stderr).
+Exits 0 on first match, 1 on timeout (last capture printed to stderr),
+3 if the pane cannot be captured (bad target / dead session).
 EOF
 }
 
@@ -66,9 +67,11 @@ last_capture=""
 
 while :; do
   if ! last_capture=$("${tmux_cmd[@]}" capture-pane -p -J -t "$target" -S "-$lines" 2>&1); then
+    # timeout (1) と区別する。1 を返すと呼び出し側が「まだ来ていない」と誤読し、
+    # 存在しない pane を待ち続ける
     echo "tmux capture-pane failed:" >&2
     printf '%s\n' "$last_capture" >&2
-    exit 1
+    exit 3
   fi
 
   haystack=$last_capture
