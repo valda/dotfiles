@@ -8,50 +8,48 @@ license: Vibecoded
 
 tmux をプログラマブルな端末として使い、対話的 CLI を操作する。利用は 2 モード:
 
-- **モード A: ユーザー所有セッション**（デフォルトソケット）— ユーザーが開いた SSH / rails console / sidekiq tail などの pane に send-keys / capture-pane する。`-S` は付けない。
+- **モード A: ユーザー所有セッション**（デフォルトソケット）— ユーザーが開いた SSH / rails console / sidekiq tail などの pane に send-keys / capture-pane する。`-S` は付けない。実務ではこちらが大半。
 - **モード B: エージェント専用セッション**（プライベートソケット）— 自分で REPL やデバッガを立ち上げる。ユーザーの tmux と分離するため専用ソケットを使う。
-
-実務ではモード A が大半。
 
 ## モード A: ユーザー所有セッションの操作
 
 ### 1. 「再列挙 → 確認 → 送信」の順を守る
 
-セッション番号・pane はターン間で容易に変わる（`can't find pane` を起こす）。記憶したターゲットに直接送らず、毎回確認:
+セッション番号・pane はターン間で容易に変わる（`can't find pane` を起こす）。記憶したターゲットに直接送らず、毎回確認する:
 
 ```bash
-./scripts/find-sessions.sh                 # デフォルトサーバの全 pane を pane id 付きで列挙
-./scripts/find-sessions.sh -q ssh          # ssh している pane だけ
-tmux capture-pane -p -J -t {target} -S -30 # 送信前に中身を見て想定の pane か確認
+~/.claude/skills/tmux/scripts/find-sessions.sh            # デフォルトサーバの全 pane を pane id 付きで列挙
+~/.claude/skills/tmux/scripts/find-sessions.sh -q ssh     # 出力行を 'ssh' で絞り込み（command / title / パス全体が対象）
+tmux capture-pane -p -J -t {target} -S -30                # 送信前に中身を見て想定の pane か確認
 ```
 
-- ターゲット形式は `{session}:{window}.{pane}`（例 `6:1.2`）または pane id `%12`。pane id は分割や入れ替えに強いので、**列挙で得た `%N` を同一作業内では使い回す**。ただしターンをまたいだら再列挙。
-- 中身を確認せずに send-keys しない。コマンド実行系は capture で現在のプロンプト状態（シェルか console か、何か走っていないか）を見てから。
+- ターゲット形式は `{session}:{window}.{pane}`（例 `6:1.2`）または pane id `%12`。pane id は分割や入れ替えに強いので、**列挙で得た `%N` を同一作業内では使い回す**。ターンをまたいだら再列挙。
+- 中身を確認せずに send-keys しない。コマンド実行系は capture で現在の状態（シェルか console か、何か走っていないか）を見てから。
 
 ### 2. 本番・共有 pane の安全ルール
 
 - 本番に繋がっている pane は原則 **読み取り専用**（capture-pane、読み取りクエリのみ）。書き込み・状態変更はユーザーの明示的指示があるときだけ。
 - **直接 Bash で拒否された操作を tmux send-keys 経由で流さない**。権限上は同一操作であり、迂回とみなされる。
 - 自分が起動していないプロセスに `C-c` を送らない（ユーザーの本番シェルを殺すリスク）。中断が必要ならユーザーに確認。
-- ユーザー所有 pane は作業後も **開けたまま残す**。kill-session / kill-pane はユーザー指示があるときだけ。
+- シークレット（パスワード、トークン）を pane に流さない。pane 履歴に残る。
+- ユーザー所有 pane は作業後も開けたまま残す。kill-session / kill-pane はユーザー指示があるときだけ。
 
-### 3. 完了待ちは until ループ（`sleep N; capture` は禁止）
+### 3. 完了待ちは until ループ
 
-ハーネスは `sleep 30; tmux capture-pane ...` 形式をブロックする。完了マーカーやプロンプト復帰を until ループで待つ:
+ハーネスは `sleep 30; tmux capture-pane ...` 形式をブロックする。完了マーカーやプロンプト復帰は until ループで待つ:
 
 ```bash
-# プロンプト復帰待ち（正規表現は事前に capture で実物を確認して合わせる。
-# 例: リモート bash は 'gcolle4\$ *$'、ローカル zsh (powerlevel系) は '❯ *$'）
+# 正規表現は事前に capture で実物を確認して合わせる（bash は '\$ *$'、zsh の powerlevel 系は '❯ *$' 等）
 until tmux capture-pane -p -t {target} -S -3 | grep -qE '[$%#❯] *$'; do sleep 3; done
 tmux capture-pane -p -J -t {target} -S -40
 ```
 
 - 行末アンカー `*$` 付きで pane 末尾数行（`-S -3`）だけを見ると誤マッチしにくい。
-- 長時間（数分超）かかる処理は until ループを `run_in_background: true` で回すか、ヘルパーを使う:
+- 数分を超える処理は until ループを `run_in_background: true` で回すか、ヘルパーを使う（`wait-for-text.sh` の timeout は default 15 秒なので長い待ちには `-T` を明示する）:
 
 ```bash
-./scripts/wait-for-text.sh -t {target} -p 'DONE_MARKER' -T 120
-./scripts/wait-for-text.sh -t {target} -p '\$ *$' --tail -T 60   # プロンプト復帰待ち
+~/.claude/skills/tmux/scripts/wait-for-text.sh -t {target} -p 'DONE_MARKER' -T 120
+~/.claude/skills/tmux/scripts/wait-for-text.sh -t {target} -p '\$ *$' --tail -T 60   # プロンプト復帰待ち
 ```
 
 ### 4. 出力はマーカーで拾う
@@ -77,9 +75,9 @@ tmux -S "$SOCKET" capture-pane -p -J -t "$SESSION":0.0 -S -200
 tmux -S "$SOCKET" kill-session -t "$SESSION"   # 作業完了後は必ず掃除
 ```
 
-- **`-S`（パス）と `-L`（ソケット名）を混在させない**。このスキルでは常に `-S "$SOCKET"`。
+- `-L NAME` は `/tmp/tmux-$UID/NAME` を指すので、`-S` の任意パスとは別サーバになる。混在させると同じセッションが見えない。このスキルでは常に `-S "$SOCKET"`。
 - 新しい pane / セッション直後はシェル起動前で入力が落ちることがある。最初の send-keys の前にプロンプトを待つ。
-- セッション開始直後、ユーザーに監視用コマンドをコピペ可能な形で必ず提示する（最後にも再掲）:
+- セッション開始直後、ユーザーに監視用コマンドをコピペ可能な形で提示する（最後にも再掲）:
 
 ```
 To monitor this session yourself:
@@ -114,34 +112,25 @@ EOF
 tmux load-buffer /tmp/payload.txt && tmux paste-buffer -t {target} && sleep 1 && tmux send-keys -t {target} Enter
 ```
 
-paste 直後の Enter が bracketed paste に飲まれることがあるため `sleep 1` を挟む。モード B では各コマンドに `-S "$SOCKET"` を付ける。
+paste 直後の Enter は bracketed paste に飲まれることがあるため `sleep 1` を挟む。モード B では各コマンドに `-S "$SOCKET"` を付ける。
 
 ## 対話ツール別レシピ
 
+起動 → プロンプト待ち → literal 送信 → capture が共通パターン。ツール固有の注意:
+
 - **rails console / pry**: 複数行コードは **1 行に潰して** 送る（継続プロンプト `..>` に入ると制御不能になりやすい）。長いものは `bin/rails runner` + load-buffer が安全。出力は `grep -vE 'pry\(main\)|DEBUG|SELECT|Load \('` で SQL ノイズを除去し、結果はマーカー（`puts "[[...]]"` や JSON 1 行）で拾う。プロンプト待ちは `pry\(main\)>` / `irb.*>`。
-- **Python REPL**: 必ず `PYTHON_BASIC_REPL=1` を付けて起動（新 REPL は send-keys と干渉する）。プロンプト `^>>>` を待ってから送る。
+- **Python REPL**: `PYTHON_BASIC_REPL=1` を付けて起動する（新 REPL は send-keys と干渉する）。プロンプト `^>>>` を待ってから送る。
 - **デバッガ**: 指定がなければ lldb を既定に。gdb は最初に `set pagination off`。中断は `C-c`、終了は `quit` → `y`。
-- **psql / mysql / node 等**: 同パターン — 起動 → プロンプト待ち → literal 送信 → capture。
 
 ## 出力の読み取り
 
-- 基本形: `tmux capture-pane -p -J -t {target} -S -200`（`-J` で折返し行を結合、`-S -N` で履歴 N 行）。
-- 一時的に attach して目視も可: `tmux -S "$SOCKET" attach -t "$SESSION"`、detach は `Ctrl+b d`。
-
-## よくある落とし穴
-
-1. 古いターゲットへの送信 → `can't find pane`。**送信前に必ず再列挙**（モード A 第 1 則）。
-2. `sleep 30; tmux capture` → ハーネスにブロックされる。until ループか `wait-for-text.sh` を使う。
-3. `-l --` なしの send-keys でスペース・キー名が解釈される。
-4. zsh では `for s in dir/*.sock` がマッチなしでエラー（`no matches found`）。glob には `ls ... 2>/dev/null` か `find` を使う（`find-sessions.sh` は対応済み）。
-5. Bash で拒否された操作の send-keys 迂回（権限的に同一操作。やらない）。
-6. paste-buffer 直後の Enter が paste に飲まれる → `sleep 1` を挟む。
-7. シークレット（パスワード、トークン）を pane に流さない。pane 履歴に残る。
-8. モード B のセッションを放置（kill-session を忘れる）／逆にユーザー所有 pane を勝手に kill する。
+基本形は `tmux capture-pane -p -J -t {target} -S -200`（`-J` で折返し行を結合、`-S -N` で履歴 N 行）。
 
 ## ヘルパースクリプト
 
-- `./scripts/find-sessions.sh [-S SOCKET] [--all] [-q QUERY]` — pane 列挙（pane id 付き）。引数なしでデフォルトサーバ、`--all` でプライベートソケット群も走査。
-- `./scripts/wait-for-text.sh [-S SOCKET] -t TARGET -p PATTERN [-F] [--tail] [-T 秒] [-i 秒] [-l 行]` — パターン出現までポーリング。match で exit 0、タイムアウトで exit 1（直近 capture を stderr に出す）。
+`~/.claude/skills/tmux/scripts/` 配下。`./scripts/...` は SKILL.md からの相対ではなく実行時の cwd に解決されるため、絶対パスで呼ぶ。
 
-スクリプトパスはこの SKILL.md からの相対（`~/.claude/skills/tmux/scripts/`）。カレントディレクトリ相対で呼ばない。
+- `find-sessions.sh [-S SOCKET] [--all] [--no-default] [-q QUERY]` — pane 列挙（pane id 付き）。引数なしでデフォルトサーバ、`--all` でプライベートソケット群も走査、`-q` は固定文字列フィルタ。
+- `wait-for-text.sh [-S SOCKET] -t TARGET -p PATTERN [-F] [--tail] [-T 秒] [-i 秒] [-l 行]` — パターン出現までポーリング。match で exit 0、タイムアウト（default 15 秒）で exit 1 と直近 capture を stderr に出力、pane を capture できない（ターゲット誤り・セッション消滅）ときは exit 3。`--tail` は末尾 3 行のみ照合（プロンプト検出用）。
+
+自分でソケットを走査するときは zsh の glob に注意。`for s in dir/*.sock` はマッチなしで `no matches found` になるため、`find` か `ls ... 2>/dev/null` を使う（両スクリプトは `find` で対応済み）。
