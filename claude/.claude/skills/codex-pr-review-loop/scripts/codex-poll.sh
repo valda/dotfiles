@@ -79,11 +79,23 @@ for i in $(seq 1 "$MAX_CYCLES"); do
   fi
 
   # ─── (B) CI state を更新（pending のときだけ確認） ───
+  # passed を「失敗が無い」で書くと、**チェックがまだ登録されていない**状態が成功に
+  # 化ける。push 直後の rollup は空だったり、skip 済み job（例: claude.yml）だけが
+  # 載っていたりする。そこを passed と読むと CI が 1 つも走らないままマージへ進む。
+  # したがって passed は「SUCCESS が 1 つ以上あり、かつ未確定（conclusion=null =
+  # QUEUED / IN_PROGRESS）が 1 つも無い」で書く。SKIPPED / NEUTRAL は単体では合格
+  # 材料にせず、SUCCESS と併存するときだけ許す。
   if [ "$CI_STATE" = "pending" ]; then
     CI_JSON=$(gh pr view "$PR" --repo "$REPO" --json statusCheckRollup -q '.statusCheckRollup')
-    if echo "$CI_JSON" | jq -e '.[] | select(.conclusion=="FAILURE" or .conclusion=="CANCELLED")' > /dev/null 2>&1; then
+    if echo "$CI_JSON" | jq -e '
+          any(.[]; .conclusion=="FAILURE" or .conclusion=="CANCELLED"
+                or .conclusion=="TIMED_OUT" or .conclusion=="ACTION_REQUIRED"
+                or .conclusion=="STARTUP_FAILURE")' > /dev/null 2>&1; then
       CI_STATE="failed"
-    elif echo "$CI_JSON" | jq -e 'length>0 and all(.[]; .conclusion=="SUCCESS" or .conclusion=="SKIPPED" or .conclusion=="NEUTRAL")' > /dev/null 2>&1; then
+    elif echo "$CI_JSON" | jq -e '
+          length > 0
+          and any(.[]; .conclusion=="SUCCESS")
+          and all(.[]; .conclusion=="SUCCESS" or .conclusion=="SKIPPED" or .conclusion=="NEUTRAL")' > /dev/null 2>&1; then
       CI_STATE="passed"
     fi
   fi

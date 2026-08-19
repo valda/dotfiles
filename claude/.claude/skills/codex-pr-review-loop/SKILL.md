@@ -63,6 +63,8 @@ bash ~/.claude/skills/codex-pr-review-loop/scripts/codex-poll.sh
 
 **`SEEN_RID` で反証ループを防ぐ**: `NEW_FINDINGS: review=<RID> ...` を返した review に対して、コミット無しで反証コメントだけ投げて再起動する場合は `SEEN_RID=<RID>` を渡す。同 RID の findings は「再評価待ち」として pending 扱いになる。指定しないと HEAD が変わらず RID も変わらないため、対応済み findings を毎サイクル再検知してサイクル 1 で即 exit するループから抜けられない。修正 push した場合は RID が変わるので不要。
 
+**CI passed の判定**: 「失敗が無い」で書くと、**チェックがまだ登録されていない**状態が成功に化ける。push 直後の rollup は空だったり、skip 済み job（`claude.yml` 等）だけが載っていたりする。スクリプトは `SUCCESS が 1 つ以上あり、かつ未確定（conclusion=null）が 1 つも無い` を passed の条件にしている。同じ判定をアドホックな待機ループで書き直すとここを踏むので、待つときはこのスクリプトを使う。
+
 **自動 nudge**: push 後の自動再レビューは bot 側の仕様で不確実で、push しても 1 度もレビューが走らないことがある。`review=pending` が `NUDGE_AFTER` 周回続いたら、スクリプトが自動で 1 度だけ `@codex review` を投稿する（ログに `NUDGE: posting @codex review`）。投稿前に PR 本文の reaction を確認し、`👍` / `👀` / `👎` のいずれかが既にあれば触らない（既存 👍 に投げると bot が再処理して 👀 で 👍 を上書きする）。明示トリガはこの自動 nudge と、後述 TIMEOUT 経路での手動投稿の 2 つ。
 
 終端ステータス:
