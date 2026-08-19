@@ -11,7 +11,7 @@ description: |
 
 # codex-yolo-implement
 
-Codex CLI（OpenAI）に plan を渡し、YOLO モード (`--dangerously-bypass-approvals-and-sandbox`) で実装させるスキル。Claude は外側でループを回し、codex の完了申告を **実走検証で二重チェック** する。
+Codex CLI（OpenAI）に plan を渡し、YOLO モード (`--sandbox workspace-write`) で実装させるスキル。Claude は外側でループを回し、codex の完了申告を **実走検証で二重チェック** する。
 
 `codex exec` には `/goal` 相当の Ralph loop フラグが無い（`/goal` は TUI スラッシュコマンドのみ）ため、ループ制御は Claude 側が担う。出力は codex の標準出力をそのまま読む（JSON スキーマ強制はしない）。
 
@@ -25,7 +25,7 @@ Codex CLI（OpenAI）に plan を渡し、YOLO モード (`--dangerously-bypass-
 
 ```bash
 codex exec \
-  --dangerously-bypass-approvals-and-sandbox \
+  --sandbox workspace-write \
   --skip-git-repo-check \
   -C <project_dir> \
   - < /tmp/codex-prompt-<scope>.txt > /tmp/codex-output-<scope>.log 2>&1
@@ -35,7 +35,7 @@ codex exec \
 
 ```bash
 codex exec resume --last \
-  --dangerously-bypass-approvals-and-sandbox \
+  --sandbox workspace-write \
   --skip-git-repo-check \
   - < /tmp/codex-resume-<scope>.txt > /tmp/codex-output-<scope>-resume.log 2>&1
 ```
