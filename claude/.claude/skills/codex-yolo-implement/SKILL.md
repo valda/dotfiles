@@ -15,7 +15,7 @@ Codex CLI（OpenAI）に plan を渡し、YOLO モード (`--sandbox workspace-w
 
 `codex exec` には `/goal` 相当の Ralph loop フラグが無い（`/goal` は TUI スラッシュコマンドのみ）ため、ループ制御は Claude 側が担う。出力は codex の標準出力をそのまま読む（JSON スキーマ強制はしない）。
 
-**YOLO は全ディスクへの書き込み・任意のネットワーク実行・全承認スキップを許す。信頼している作業ディレクトリでのみ使う。** 起動前に `git status` を確認する（手順 2）。
+**`workspace-write` は作業ディレクトリ内への書き込みを許す。信頼している作業ディレクトリでのみ使う。** 起動前に `git status` を確認する（手順 2）。
 
 ## コマンド形式
 
@@ -35,12 +35,11 @@ codex exec \
 
 ```bash
 codex exec resume --last \
-  --sandbox workspace-write \
   --skip-git-repo-check \
   - < /tmp/codex-resume-<scope>.txt > /tmp/codex-output-<scope>-resume.log 2>&1
 ```
 
-`-C, --cd` と `-s, --sandbox` は `resume` に存在しない（元セッションを引き継ぐ）。YOLO フラグは resume 側でも明示的に渡す。
+`-C, --cd` と `-s, --sandbox` は `resume` に存在しない。作業ディレクトリと sandbox は元セッションから引き継がれる。
 
 ### この形式である理由
 
