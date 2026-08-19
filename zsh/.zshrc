@@ -362,7 +362,9 @@ function fnm-install() {
     local package
     local -a packages
     while IFS= read -r package || [[ -n "$package" ]]; do
-        [[ -z "${package//[[:space:]]/}" || "$package" == \#* ]] && continue
+        package="${package##[[:space:]]#}"
+        package="${package%%[[:space:]]#}"
+        [[ -z "$package" || "$package" == \#* ]] && continue
         packages+=("$package")
     done < "$packages_file"
 
