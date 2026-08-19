@@ -282,6 +282,31 @@ function _preexec_update_window_title () {
                 ;&
             *)
                 local title=$cmd[1]
+                if [[ $cmd[1] == fnm && $cmd[2] == exec ]]; then
+                    local i=3
+                    while (( i <= $#cmd )); do
+                        case $cmd[$i] in
+                            --)
+                                (( i++ ))
+                                break
+                                ;;
+                            --*=*|--corepack-enabled)
+                                (( i++ ))
+                                ;;
+                            --node-dist-mirror|--using|--fnm-dir|--log-level|--arch|--version-file-strategy|--resolve-engines)
+                                (( i += 2 ))
+                                ;;
+                            -h|--help)
+                                (( i = $#cmd + 1 ))
+                                break
+                                ;;
+                            *)
+                                break
+                                ;;
+                        esac
+                    done
+                    (( i <= $#cmd )) && title=$cmd[$i]
+                fi
                 if [[ $expanded_command != cd ]] \
                     && (( $#input )) \
                     && (( ${+aliases[$input[1]]} )); then
