@@ -352,7 +352,23 @@ if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
-alias codex="fnm exec --using=24 -- codex"
+
+function fnm-install() {
+    command fnm install --use "$@" || return
+
+    local packages_file="${XDG_CONFIG_HOME:-$HOME/.config}/fnm/default-packages"
+    [[ -f "$packages_file" ]] || return 0
+
+    local package
+    local -a packages
+    while IFS= read -r package || [[ -n "$package" ]]; do
+        [[ -z "${package//[[:space:]]/}" || "$package" == \#* ]] && continue
+        packages+=("$package")
+    done < "$packages_file"
+
+    (( ${#packages} )) || return 0
+    command npm install --global -- "${packages[@]}"
+}
 
 # pnpm
 export PNPM_HOME="/home/valda/.local/share/pnpm"

@@ -1,0 +1,9 @@
+@openai/codex
+agent-browser
+corepack
+npm
+svelte-language-server
+typescript-language-server
+typescript
+wrangler
+yarn
