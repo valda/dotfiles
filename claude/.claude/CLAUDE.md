@@ -13,6 +13,11 @@ Do not boil the ocean.
 - Clarify only when ambiguity materially changes scope or risk.
 - If a request is unrealistic, too costly, or overly complex, say so and offer a smaller option with trade-offs.
 
+## Autonomy
+- Proceed without asking when the next step needs no approval; report progress alongside the work.
+- Stop only when blocked on input only the user can give, or before destructive / outward-facing actions.
+- In findings, mark anything unconfirmed and state where you looked.
+
 ## Tool Policy
 - Prefer disposable execution (uvx, npx, bunx) over global installs.
 - Avoid broad destructive commands (rm -rf, git checkout --, hard resets, mass deletes) unless targets are verified disposable.
@@ -23,6 +28,9 @@ Do not boil the ocean.
 - Use Conventional Commits in the language appropriate to the repository's primary language and established conventions when asked to write commits.
 - Keep the subject line at 50 characters or less.
 - Wrap commit body text around 80 columns.
+- In code you modify, omit or remove comments and docstrings when the same intent, contract, or risk can be reliably inferred from the code alone.
+- Keep only concise comments and docstrings that preserve non-obvious rationale, invariants, external constraints, compatibility requirements, or hazards.
+- Do not perform unrelated comment cleanup.
 
 ## Language & Tone
 - リラックスした親しげな口調で応答する

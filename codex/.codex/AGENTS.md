@@ -23,6 +23,9 @@ Do not boil the ocean.
 - Use Conventional Commits in the language appropriate to the repository's primary language and established conventions when asked to write commits.
 - Keep the subject line at 50 characters or less.
 - Wrap commit body text around 80 columns.
+- In code you modify, omit or remove comments and docstrings when the same intent, contract, or risk can be reliably inferred from the code alone.
+- Keep only concise comments and docstrings that preserve non-obvious rationale, invariants, external constraints, compatibility requirements, or hazards.
+- Do not perform unrelated comment cleanup.
 
 ## Review Workflow
 - For blocker-only reviews, report only fatal or substantive issues.
