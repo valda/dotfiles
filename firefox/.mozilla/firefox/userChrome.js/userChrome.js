@@ -1,4 +1,4 @@
-/* :::::::: Sub-Script/Overlay Loader v3.0.61mod no bind version ::::::::::::::: */
+/* :::::::: Sub-Script/Overlay Loader v3.0.86altmod no bind version ::::::::::::::: */
 
 // automatically includes all files ending in .uc.xul and .uc.js from the profile's chrome folder
 
@@ -8,12 +8,28 @@
 // supports regexes in the include/exclude lines
 // scripts without metadata will run only on the main browser window, for backwards compatibility
 //
-// 1.Including function of UCJS_loader.
-// 2.Compatible with Fx2 and Fx3.0b5pre
+// 1.Including function of UCJS_loader. <--- not work in Firefox135+
+// 2.Compatible with Firefox141
 // 3.Cached script data (path, leafname, regex)
-// 4.Support window.userChrome_js.loadOverlay(overlay [,observer]) //
+// 4.Support window.userChrome_js.loadOverlay(overlay [,observer]) <--- not work in recent Firefox
 // Modified by Alice0775
 //
+// @version       2026/07/28 loadSubScript chrome:// instead of file:// (Bug 1974213 Don't allow file: and jar: schemes in Services.scriptloader.loadSubScript)
+// @version       2026/03/01 Bug 2017957 - Add freezeBuiltins option to Cu.Sandbox
+// @version       2025/06/16 Bug 1968479 - Only allow eval (with system principal / in the parent) when an explicit pref is set
+// @version       2025/05/11 fix extended property flag(enumerable)
+// @version       2025/04/07 default disabled sandbox
+// @version       2025/04/02 read meta @sandbox
+// @version       2025/04/02 fix loadscript uc.js into sandbox
+// @version       2025/01/05 fix error handler
+// @version       2025/01/04 add error handler
+// @version       2025/01/03 use ChromeUtils.compileScript if async
+// @version       2024/12/25 load script async if meta has @async true. nolonger use @charset
+// @version       2023/09/07 remove to use nsIScriptableUnicodeConverter and AUTOREMOVEBOM
+// @version       2022/03/15 fix UCJS_loader
+// @version       2022/08/26 Bug 1695435 - Remove @@hasInstance for IDL interfaces in chrome context
+// @version       2022/08/26 fix load sidebar
+// @version       2022/04/01 remove nsIIOService
 // @version       2021/08/05 fix for 92+ port Bug 1723723 - Switch JS consumers from getURLSpecFromFile to either getURLSpecFromActualFile or getURLSpecFromDir
 // @version       2021/06/25 skip for in-content dialog etc.
 // @version       2019/12/11 fix for 73 Bug 1601094 - Rename remaining .xul files to .xhtml in browser and Bug 1601093 - Rename remaining .xul files to .xhtml in toolkit
@@ -74,11 +90,13 @@
 
 (function(){
   "use strict";
+  var { AppConstants } = AppConstants || ChromeUtils.importESModule(
+  "resource://gre/modules/AppConstants.sys.mjs"
+  );
   // -- config --
   const EXCLUDE_CHROMEHIDDEN = false; //chromehiddenなwindow(popup等)ではロード: しないtrue, する[false]
   const USE_0_63_FOLDER = true; //0.63のフォルダ規則を使う[true], 使わないfalse
-  const FORCESORTSCRIPT = false; //強制的にスクリプトをファイル名順でソートするtrue, しない[false]
-  const AUTOREMOVEBOM   = false;  //BOMを自動的に, 取り除く:true, 取り除かない[false](元ファイルは.BOMとして残る)
+  const FORCESORTSCRIPT = (AppConstants.platform != "win") ? true : false; //強制的にスクリプトをファイル名順でソートするtrue, しない[false]
   const REPLACECACHE = true; //スクリプトの更新日付によりキャッシュを更新する: true , しない:[false]
   //=====================USE_0_63_FOLDER = falseの時===================
   var UCJS      = new Array("UCJSFiles","userContent","userMenu"); //UCJS Loader 仕様を適用 (NoScriptでfile:///を許可しておく)
@@ -128,7 +146,6 @@
     arrSubdir: arrSubdir,
     FORCESORTSCRIPT: FORCESORTSCRIPT,
     ALWAYSEXECUTE: ALWAYSEXECUTE,
-    AUTOREMOVEBOM: AUTOREMOVEBOM,
     INFO: INFO,
     BROWSERCHROME: BROWSERCHROME,
     EXCLUDE_CHROMEHIDDEN: EXCLUDE_CHROMEHIDDEN,
@@ -154,9 +171,8 @@
     getScripts: function(){
       const Cc = Components.classes;
       const Ci = Components.interfaces;
-      const ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-      const fph = ios.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler);
-      const ds = Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties);
+      const fph = Services.io.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler);
+      const ds = Services.dirsvc;
 var Start = new Date().getTime();
       //getdir
       if (this.USE_0_63_FOLDER) {
@@ -212,12 +228,11 @@ var Start = new Date().getTime();
             var file = files.getNext().QueryInterface(Ci.nsIFile);
             if(/\.uc\.js$|\.uc\.xul$/i.test(file.leafName)
                || /\.xul$/i.test(file.leafName) && /\xul$/i.test(this.arrSubdir[i])) {
-              var script = getScriptData(
-                              this.AUTOREMOVEBOM ? deleteBOMreadFile(file) : readFile(file, true)
-                              ,file);
+              var script = getScriptData(readFile(file, true) ,file);
               script.dir = dir;
               if(/\.uc\.js$/i.test(script.filename)){
                 script.ucjs = checkUCJS(script.file.path);
+                script.LastModifiedTime = this.getLastModifiedTime(script.file);
                 s.push(script);
               }else{
                 script.xul = '<?xul-overlay href=\"'+ script.url +'\"?>\n';
@@ -257,7 +272,7 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
 
       //メタデータ収集
       function getScriptData(aContent,aFile){
-        var charset, description;
+        var charset, description, async, sandbox;
         var header = (aContent.match(/^\/\/ ==UserScript==[ \t]*\n(?:.*\n)*?\/\/ ==\/UserScript==[ \t]*\n/m) || [""])[0];
         var match, rex = { include: [], exclude: []};
         while ((match = findNextRe.exec(header)))
@@ -272,6 +287,22 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
         //try
         if(match)
           charset = match.length > 0 ? match[1].replace(/^\s+/,"") : "";
+
+        match = header.match(/\/\/ @sandbox\b(.+)\s*/i);
+        sandbox = false; // default disable sandbox
+        //try
+        if(match) {
+          sandbox = match.length > 0 ? match[1].replace(/^\s+/,"") : "";
+          sandbox = !(sandbox == "false");
+        }
+
+        match = header.match(/\/\/ @async\b(.+)\s*/i);
+        async = false;
+        //try
+        if(match) {
+          async = match.length > 0 ? match[1].replace(/^\s+/,"") : "";
+          async = sandbox;
+        }
 
         match = header.match(/\/\/ @description\b(.+)\s*/i);
         description = "";
@@ -290,6 +321,8 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
           //namespace: "",
           charset: charset,
           description: description,
+          async: async,
+          sandbox: sandbox,
           //code: aContent.replace(header, ""),
           regex: new RegExp("^" + exclude + "(" + (rex.include.join("|") || ".*") + ")$", "i")
         }
@@ -315,36 +348,6 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
         return content.replace(/\r\n?/g, "\n");
       }
 
-      //スクリプトファイル文字コード変換読み込み
-      function deleteBOMreadFile(aFile){
-        var UI = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                      createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-        UI.charset = "UTF-8";
-        var bytes = readBinary(aFile);
-        try {
-          if (bytes.length > 3 && bytes.substring(0,3) == String.fromCharCode(239,187,191)){
-            aFile.copyTo(null, aFile.leafName + ".BOM");
-            bytes = bytes.substring(3,bytes.length);
-            writeFile(aFile, bytes);
-            return UI.ConvertToUnicode(bytes).replace(/\r\n?/g, "\n");
-          }
-          var charset = getCharset(bytes);
-          //window.userChrome_js.debug(aFile.leafName + " " +charset);
-          if (charset == "UTF-8" || charset == "us-ascii"){
-            return UI.ConvertToUnicode(bytes).replace(/\r\n?/g, "\n");
-          } else {
-            UI.charset = charset;
-            aFile.copyTo(null, aFile.leafName + "."+UI.charset);
-            bytes = UI.ConvertToUnicode(bytes);
-            UI.charset = "UTF-8";
-            writeFile(aFile, UI.ConvertFromUnicode(bytes));
-            return bytes.replace(/\r\n?/g, "\n");
-          }
-        } catch(ex){
-          return readFile(aFile);
-        }
-      }
-
       //バイナリ読み込み
       function readBinary(aFile){
         var istream = Components.classes["@mozilla.org/network/file-input-stream;1"]
@@ -366,44 +369,6 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
         foStream.write(aData, aData.length);
         foStream.close();
         return aData;
-      }
-
-      //文字コードを得る
-      function getCharset(str){
-        function charCode(str){
-          if (/\x1B\x24(?:[\x40\x42]|\x28\x44)/.test(str))
-            return 'ISO-2022-JP';
-          if (/[\x80-\xFE]/.test(str)){
-              var buf = RegExp.lastMatch + RegExp.rightContext;
-              if (/[\xC2-\xFD][^\x80-\xBF]|[\xC2-\xDF][\x80-\xBF][^\x00-\x7F\xC2-\xFD]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF][^\x00-\x7F\xC2-\xFD]/.test(buf))
-                return (/[\x80-\xA0]/.test(buf)) ? 'Shift_JIS' : 'EUC-JP';
-              if (/^(?:[\x00-\x7F\xA1-\xDF]|[\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC])+$/.test(buf))
-                return 'Shift_JIS';
-              if (/[\x80-\xA0]/.test(buf))
-                return 'UTF-8';
-              return 'EUC-JP';
-          } else
-            return 'us-ascii';
-        }
-
-        var charset = charCode(str);
-        if (charset == "UTF-8" || charset == "us-ascii")
-          return charset;
-
-        //判定に失敗している場合があるので, 再チェック (鈍くさ);
-        var UI = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                        createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-        try {
-          UI.charset = "UTF-8";
-          if (str === UI.ConvertFromUnicode(UI.ConvertToUnicode(str)))
-            return "UTF-8";
-        } catch(ex){}
-        try {
-          UI.charset = charset;
-          if (str === UI.ConvertFromUnicode(UI.ConvertToUnicode(str)))
-            return charset;
-        } catch(ex){}
-        return "UTF-8";
       }
 
       //prefを読み込み
@@ -530,7 +495,7 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
       } catch (e) {
         return;
       }
-      if (!(/*doc instanceof XULDocument ||*/ doc instanceof HTMLDocument))
+      if (!HTMLDocument.isInstance(doc))
           return;
 
       var script, aScript, url;
@@ -557,17 +522,40 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
         return "1.6";
       })();
 
+      let target = win = doc.defaultView;
+
+        target = new Cu.Sandbox(win, {
+            sandboxPrototype: win,
+            sameZoneAs: win,
+            freezeBuiltins: false,
+        });
+        /* toSource() is not available in sandbox */
+        Cu.evalInSandbox(`
+            Function.prototype.toSource = window.Function.prototype.toSource;
+            Object.defineProperty(Function.prototype, "toSource", {enumerable : false});
+            Object.prototype.toSource = window.Object.prototype.toSource;
+            Object.defineProperty(Object.prototype, "toSource", {enumerable : false});
+            Array.prototype.toSource = window.Array.prototype.toSource;
+            Object.defineProperty(Array.prototype, "toSource", {enumerable : false});
+        `, target);
+        win.addEventListener("unload", () => {
+            setTimeout(() => {
+                Cu.nukeSandbox(target);
+            }, 0);
+        }, {once: true});
+      this.sb = target;
+
       for(var m=0,len=this.scripts.length; m<len; m++){
         script = this.scripts[m];
-      if (this.ALWAYSEXECUTE.indexOf(script.filename) < 0
-        && (!!this.dirDisable['*']
-          || !!this.dirDisable[script.dir]
-          || !!this.scriptDisable[script.filename]) ) continue;
-      if( !script.regex.test(dochref)) continue;
+        if (this.ALWAYSEXECUTE.indexOf(script.filename) < 0
+          && (!!this.dirDisable['*']
+            || !!this.dirDisable[script.dir]
+            || !!this.scriptDisable[script.filename]) ) continue;
+        if( !script.regex.test(dochref)) continue;
         if( script.ucjs ){ //for UCJS_loader
             if (this.INFO) this.debug("loadUCJSSubScript: " + script.filename);
             aScript = doc.createElementNS("http://www.w3.org/1999/xhtml", "script");
-            aScript.type = "application/javascript; version=" + maxJSVersion.toString().substr(0,3);
+            aScript.type = "text/javascript";
             aScript.src = script.url + "?" + this.getLastModifiedTime(script.file);
             try {
               doc.documentElement.appendChild(aScript);
@@ -575,18 +563,31 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
               this.error(script.filename, ex);
             }
         }else{ //Not for UCJS_loader
-          if (this.INFO) this.debug("loadSubScript: " + script.filename);
-          try {
-            if (script.charset)
-              Cc["@mozilla.org/moz/jssubscript-loader;1"].getService(Ci.mozIJSSubScriptLoader)
-                       .loadSubScript(script.url + "?" + this.getLastModifiedTime(script.file),
-                                      doc.defaultView, script.charset);
-            else
-              Cc["@mozilla.org/moz/jssubscript-loader;1"].getService(Ci.mozIJSSubScriptLoader)
-                       .loadSubScript(script.url + "?" + this.getLastModifiedTime(script.file),
-                                      doc.defaultView);
-          }catch(ex) {
-            this.error(script.filename, ex);
+          if (this.INFO) this.debug("loadSubScript: async:" + script.async + " sandbox:" + script.sandbox + "\n--- " + script.filename);
+
+          if (!script.async) {
+            try {
+              if (script.charset)
+                Services.scriptloader.loadSubScriptWithOptions(
+                           script.url + "?" + script.LastModifiedTime, {
+                           target: script.sandbox ? target : doc.defaultView,
+                           allowUnsafeURL: true,
+                });
+              else
+                Services.scriptloader.loadSubScriptWithOptions(
+                           script.url + "?" + script.LastModifiedTime, {
+                           target: script.sandbox ? target : doc.defaultView,
+                           allowUnsafeURL: true,
+                });
+            }catch(ex) {
+              this.error(script.filename, ex);
+            }
+          } else {
+            ChromeUtils.compileScript(
+              script.url + "?" + script.LastModifiedTime
+            ).then((r) => {
+              r.executeInGlobal(/*global*/ script.sandbox ? target : doc.defaultView, {reportExceptions: true});
+            }).catch((ex) => {this.error(script.filename, ex);});
           }
         }
       }
@@ -606,6 +607,7 @@ this.debug('Parsing getScripts: '+((new Date()).getTime()-Start) +'msec');
       if(typeof(err) == 'object') error.init(aMsg + '\n' + err.name + ' : ' + err.message,err.fileName || null,null,err.lineNumber,null,2,err.name);
       else error.init(aMsg + '\n' + err + '\n',null,null,null,null,2,null);
       CONSOLE_SERVICE.logMessage(error);
+      Cu.reportError(err);
     }
   };
 

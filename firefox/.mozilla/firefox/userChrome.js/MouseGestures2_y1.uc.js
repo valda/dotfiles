@@ -84,7 +84,7 @@ var ucjsMouseGestures = {
       name: "Close current Tab",
       name_ja: "\u30BF\u30D6\u3092\u9589\u3058\u308B",  // タブを閉じる
       command: function() {
-        if (!gBrowser._selectedTab.pinned) {
+        if (!gBrowser.selectedTab.pinned) {
           document.getElementById("cmd_close").doCommand();
         }
       }
@@ -101,25 +101,25 @@ var ucjsMouseGestures = {
     "W-": {
       name: "Previous Tab",
       name_ja: "\u524D\u306E\u30BF\u30D6\u3078",    // 前のタブへ
-      command: function() { document.getElementById('tabbrowser-tabs').advanceSelectedTab(-1, true); }
+      command: function() { setTimeout(() => { gBrowser.tabContainer.advanceSelectedTab(-1, true); }, 0); }
     },
 
     "UL": {
       name: "Previous Tab",     // 前のタブへ
       name_ja: "\u524D\u306E\u30BF\u30D6\u3078",    // 前のタブへ
-      command: function() { document.getElementById('tabbrowser-tabs').advanceSelectedTab(-1, true); }
+      command: function() { setTimeout(() => { gBrowser.tabContainer.advanceSelectedTab(-1, true); }, 0); }
     },
 
     "W+": {
       name: "Next Tab",
       name_ja: "\u6B21\u306E\u30BF\u30D6\u3078",    // 次のタブへ
-      command: function() { document.getElementById('tabbrowser-tabs').advanceSelectedTab(+1, true); }
+      command: function() { setTimeout(() => { gBrowser.tabContainer.advanceSelectedTab(+1, true); }, 0); }
     },
 
     "UR": {
       name: "Next Tab",     // 次のタブへ
       name_ja: "\u6B21\u306E\u30BF\u30D6\u3078",    // 次のタブへ
-      command: function() { document.getElementById('tabbrowser-tabs').advanceSelectedTab(+1, true); }
+      command: function() { setTimeout(() => { gBrowser.tabContainer.advanceSelectedTab(+1, true); }, 0); }
     },
 
     "LU": {
@@ -177,24 +177,24 @@ var ucjsMouseGestures = {
     this._lang = navigator.language.substring(0, 2);
     gBrowser.tabpanels.addEventListener("mousedown", this, false);
     gBrowser.tabpanels.addEventListener("mousemove", this, false);
-    gBrowser.tabpanels.addEventListener("mouseup", this, false);
+    document.addEventListener("mouseup", this, false);
     gBrowser.tabpanels.addEventListener("contextmenu", this, true);
     if (this.enableRockerGestures)
-      gBrowser.tabpanels.addEventListener("draggesture", this, true);
+      gBrowser.tabpanels.addEventListener("dragstart", this, true);
     if (this.enableWheelGestures)
-      gBrowser.tabpanels.addEventListener("DOMMouseScroll", this, false);
+      window.addEventListener("wheel", this, {capture: true, passive: false});
   },
 
   uninit: function()
   {
     gBrowser.tabpanels.removeEventListener("mousedown", this, false);
     gBrowser.tabpanels.removeEventListener("mousemove", this, false);
-    gBrowser.tabpanels.removeEventListener("mouseup", this, false);
+    document.removeEventListener("mouseup", this, false);
     gBrowser.tabpanels.removeEventListener("contextmenu", this, true);
     if (this.enableRockerGestures)
-      gBrowser.tabpanels.removeEventListener("draggesture", this, true);
+      gBrowser.tabpanels.removeEventListener("dragstart", this, true);
     if (this.enableWheelGestures)
-      gBrowser.tabpanels.removeEventListener("DOMMouseScroll", this, false);
+      window.removeEventListener("wheel", this, {capture: true, passive: false});
   },
 
   _isMouseDownL: false,
@@ -269,16 +269,16 @@ var ucjsMouseGestures = {
         //}
       }
       break;
-    case "DOMMouseScroll":
+    case "wheel":
       if (this.enableWheelGestures && this._isMouseDownR) {
         event.preventDefault();
         event.stopPropagation();
         this._suppressContext = true;
-        this._directionChain = "W" + (event.detail > 0 ? "+" : "-");
+        this._directionChain = "W" + (event.deltaY > 0 ? "+" : "-");
         this._stopGesture(event);
       }
       break;
-    case "draggesture":
+    case "dragstart":
       this._isMouseDownL = false;
       break;
     }
@@ -286,13 +286,18 @@ var ucjsMouseGestures = {
 
   _displayContextMenu: function(event)
   {
-    var evt = event.originalTarget.ownerDocument.createEvent("MouseEvents");
-    evt.initMouseEvent(
-      "contextmenu", true, true, event.originalTarget.defaultView, 0,
-      event.screenX, event.screenY, event.clientX, event.clientY,
-      false, false, false, false, 2, null
-    );
-    event.originalTarget.dispatchEvent(evt);
+    var target = event.composedPath ? event.composedPath()[0] : event.target;
+    var evt = new MouseEvent("contextmenu", {
+      bubbles: true,
+      cancelable: true,
+      view: target.ownerDocument.defaultView,
+      screenX: event.screenX,
+      screenY: event.screenY,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      button: 2,
+    });
+    target.dispatchEvent(evt);
   },
 
   _startGesture: function(event)
