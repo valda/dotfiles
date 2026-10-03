@@ -38,13 +38,14 @@ PROMPT
 直前の Codex セッションのコンテキストを引き継ぐ:
 
 ```bash
-timeout 600 codex exec resume <SESSION_ID> - <<'PROMPT' 2>&1 | tail -120
+timeout 600 codex exec resume <SESSION_ID> -c 'sandbox_mode="read-only"' - <<'PROMPT' 2>&1 | tail -120
 <プロンプト本文>
 PROMPT
 ```
 
 - `--last` はマシン全体で最後の codex セッションを拾う。別プロジェクトや codex-yolo-implement の実装セッションが挟まると取り違えるので session id 指定を優先する。
-- resume は `--cd` / `--sandbox` を受け付けない（unexpected argument エラー）。sandbox 等は元セッションから引き継がれる。変えたいときは `-c key=value`。
+- resume は `--cd` / `--sandbox` を受け付けない（unexpected argument エラー）。
+- **sandbox は元セッションから引き継がれない**。何も指定しないと config の既定になり、この環境では `workspace-write` で動く（codex-cli 0.153.4 で確認。read-only で始めたセッションでも同じ）。なので `-c 'sandbox_mode="read-only"'` を必ず付けて、バナーに `sandbox: read-only` と出ていることを確認する。
 
 ### モード3: 収束ループ（デフォルト）
 
@@ -122,7 +123,7 @@ codex に渡すリクエストに以下をすべて含める:
 | `--sandbox read-only` | 読み取り専用サンドボックス。レビューはこれで固定 |
 | `--cd <dir>` | 対象プロジェクトのディレクトリ |
 | `-` + heredoc / `< file` | プロンプトを stdin から渡す |
-| `resume <SESSION_ID>` | 指定セッションを引き継ぐ（`--last` は取り違えリスクあり） |
+| `resume <SESSION_ID>` | 指定セッションを引き継ぐ（`--last` は取り違えリスクあり）。sandbox は引き継がれないので `-c 'sandbox_mode="read-only"'` と組で使う |
 | `-c key=value` | config.toml の値を上書き |
 | `-o <file>` | 最終レスポンスをファイルに保存（bg 実行時の取りこぼし対策） |
 

@@ -34,12 +34,17 @@ codex exec \
 ### 継続（resume）
 
 ```bash
-codex exec resume --last \
+codex exec resume <SESSION_ID> \
+  -c 'sandbox_mode="workspace-write"' \
   --skip-git-repo-check \
   - < /tmp/codex-resume-<scope>.txt > /tmp/codex-output-<scope>-resume.log 2>&1
 ```
 
-`-C, --cd` と `-s, --sandbox` は `resume` に存在しない。作業ディレクトリと sandbox は元セッションから引き継がれる。
+`<SESSION_ID>` は初回ログ冒頭の `session id:` から控える。`--last` はマシン全体で最後のセッションを拾うので、cross-review 等が挟まると取り違える。
+
+`-C, --cd` と `-s, --sandbox` は `resume` に存在しない。作業ディレクトリは元セッションから引き継がれる。
+
+sandbox は引き継がれない。指定しないと config の既定になる（この環境では `workspace-write`。codex-cli 0.153.4 で確認）。なので `-c sandbox_mode=...` で明示する。
 
 ### この形式である理由
 
@@ -165,7 +170,7 @@ bg 実行中、以下が揃ったらハング:
 
 対処: TaskStop で kill → 上記コマンド形式（ファイル + stdin + 直接 redirect）で再投入 → なお再現するなら `codex --version` / `codex exec --help` でバイナリ自体を確認。
 
-OOM Killer に殺された場合の症状は、プロセスが消えているのに出力ログが `## 完了状況` も `tokens used` も無いまま途絶えていること（調査トレースだけで終わる）。codex（Node.js）は数百 MB〜1 GB+ を消費するので、起動前に `free -h` を見て他の重いプロセスと同時に走らせない。OOM 後は `codex exec resume --last` で再開できる。
+OOM Killer に殺された場合の症状は、プロセスが消えているのに出力ログが `## 完了状況` も `tokens used` も無いまま途絶えていること（調査トレースだけで終わる）。codex（Node.js）は数百 MB〜1 GB+ を消費するので、起動前に `free -h` を見て他の重いプロセスと同時に走らせない。OOM 後は `codex exec resume <SESSION_ID>` で再開できる。
 
 ## 注意事項
 
