@@ -32,12 +32,13 @@ PR 提出（または既存 PR 指定）
 ## Codex bot の挙動（判定の前提）
 
 - push または `@codex review` 毎に HEAD 対象の review（state=COMMENTED, body 冒頭に「Reviewed commit: `<sha>`」）が 1 つ発行される。
-- 指摘の出力先は 2 通り（片方 / 両方）:
+- 指摘の出力先は 3 通り:
   - (a) **inline comment**（`pulls/comments`、`pull_request_review_id` で review に紐づく）
   - (b) **review body 直書き**（`pulls/reviews.body` 内に `![P<N> Badge]` マーカー付き）
+  - (c) **issue comment**（`issues/comments`）。`@codex review` への返信は review を発行せず、`### 💡 Codex Review` + HEAD sha の blob リンク + P バッジの普通のコメントで来ることがある
 - 指摘なし → inline ゼロ + body に P バッジなし + **PR 本文（issue reaction）に 👍**。HEAD 対象の review が発行されず 👍 だけ来るケースもある。
 - 判定マーカーは `P[0-9] Badge` のみ。`💡 Codex Review` ヘッダは指摘なし review にも入る定型なので使わない。
-- 判定要素は「PR 本文 👍」「HEAD sha 対象 review の inline comment」「review body の P バッジ」の 3 つで、スクリプトが全てチェックする。
+- 判定要素は「PR 本文 👍」「HEAD sha 対象 review の inline comment」「review body の P バッジ」「HEAD sha を含む bot の issue comment の P バッジ」の 4 つで、スクリプトが全てチェックする。
 
 ## 手順
 
@@ -59,7 +60,7 @@ PR=$(gh pr view --json number -q .number) \
 bash ~/.claude/skills/codex-pr-review-loop/scripts/codex-poll.sh
 ```
 
-環境変数: `REPO` / `PR`（必須）、`BOT`（default `chatgpt-codex-connector[bot]`）、`MAX_CYCLES`（default 18）、`INTERVAL`（default 120 秒）、`NUDGE_AFTER`（default 3 周回）、`SEEN_RID`（反証済み review id）。スクリプトは全 `gh` 呼び出しに `--repo "$REPO"` を渡すのでリポジトリ dir 外からも起動できる（上の例で `REPO` / `PR` を導出する 2 行だけは repo dir 内で実行するか、値を直接書く）。Claude からは `run_in_background: true` + timeout 2400000ms 程度で起動。`bash <path>` で明示起動する（`sh` 経由だと dash で `${HEAD:0:10}` が `Bad substitution`）。
+環境変数: `REPO` / `PR`（必須）、`BOT`（default `chatgpt-codex-connector[bot]`）、`MAX_CYCLES`（default 18）、`INTERVAL`（default 120 秒）、`NUDGE_AFTER`（default 3 周回）、`SEEN_RID`（反証済みの review id か issue comment id）。スクリプトは全 `gh` 呼び出しに `--repo "$REPO"` を渡すのでリポジトリ dir 外からも起動できる（上の例で `REPO` / `PR` を導出する 2 行だけは repo dir 内で実行するか、値を直接書く）。Claude からは `run_in_background: true` + timeout 2400000ms 程度で起動。出力は `> <log> 2>&1` でファイルへ書き、終了後に `tail` する（`| tail -N` にパイプすると終了まで何も出ず、途中経過を確認できない）。`bash <path>` で明示起動する（`sh` 経由だと dash で `${HEAD:0:10}` が `Bad substitution`）。
 
 **`SEEN_RID` で反証ループを防ぐ**: `NEW_FINDINGS: review=<RID> ...` を返した review に対して、コミット無しで反証コメントだけ投げて再起動する場合は `SEEN_RID=<RID>` を渡す。同 RID の findings は「再評価待ち」として pending 扱いになる。指定しないと HEAD が変わらず RID も変わらないため、対応済み findings を毎サイクル再検知してサイクル 1 で即 exit するループから抜けられない。修正 push した場合は RID が変わるので不要。
 
@@ -85,7 +86,12 @@ gh api repos/{owner}/{repo}/pulls/comments/<id> --jq '{path, body}'
 
 # (b) review body 直書き指摘
 gh api repos/{owner}/{repo}/pulls/<PR>/reviews/<RID> --jq .body
+
+# (c) issue comment の指摘（NEW_FINDINGS: issue_comment=<CID>）
+gh api repos/{owner}/{repo}/issues/comments/<CID> --jq .body
 ```
+
+(c) は本文の blob リンク（`blob/<sha>/<path>#L<line>`）が対象位置。反証して再起動するときは `SEEN_RID=<CID>` を渡す。
 
 review body 直書きは `path:line` が無いので、本文内の説明から対象ファイルを特定する。codex はバッジ後の **太字行**（`**Remove the committed Redis dump**` 等）を見出しに使うのでそこを起点に読む。
 
@@ -159,7 +165,7 @@ review bot は対象の運用実態も設計意図も知らない。**こちら�
 1. 修正を実装（薄い修正は直接、大きい修正は `codex-yolo-implement` に委譲してよい）
 2. pre-commit checklist（関連範囲の lint / spec。CLAUDE.md 参照）を通す
 3. 可能な限り回帰テストを足す（指摘されたシナリオを再現するテスト）
-4. Conventional Commits（日本語）でコミットして push
+4. Conventional Commits でコミットして push
 
 `@codex 指摘反映しました` 型の ack コメントは、push 自体が再レビュートリガなので通知として冗長なうえ、bot が返信を書くトークンを浪費する。修正意図はコミットメッセージに書けば伝わるので投稿しない。
 

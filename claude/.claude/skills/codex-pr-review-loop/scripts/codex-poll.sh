@@ -6,7 +6,7 @@
 # REPO を全 gh 呼び出しに渡すため、リポジトリ dir 外からでも起動できる
 #
 # 反証コメント後の再起動: 既に NEW_FINDINGS を返した review に反証コメントだけ投げて
-#   再起動する場合は SEEN_RID=<前回の review id> を渡す。同 RID の findings は
+#   再起動する場合は SEEN_RID=<前回の review id または issue_comment id> を渡す。同 RID の findings は
 #   「再評価待ち」として pending 扱いになり、新 RID 発行 or 👍 reaction が来るまで
 #   ポーリングを継続する。SEEN_RID を渡さないと、対応済み findings を毎回検知して
 #   サイクル 1 で即 exit するループから抜けられない。
@@ -73,6 +73,17 @@ for i in $(seq 1 "$MAX_CYCLES"); do
             REVIEW_SUMMARY="review=$RID inline=[$NEW] body_has_finding=$BODY_HAS_FINDING"
           fi
           # review は来たが指摘なし→ pending のまま 👍 reaction を次周回で待つ
+        fi
+      fi
+      # `@codex review` への返信は review ではなく issue comment で来ることがある。
+      # 本文に HEAD sha の blob リンクと P バッジを持つ bot コメントを指摘として扱う。
+      if [ "$REVIEW_STATE" = "pending" ]; then
+        CID=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+          --jq "[.[] | select(.user.login==\"$BOT\" and (.body | contains(\"$H10\")) and (.body | test(\"P[0-9] Badge\")))] | last | .id // empty" \
+          | tail -1)
+        if [ -n "$CID" ] && [ "$CID" != "$SEEN_RID" ]; then
+          REVIEW_STATE="findings"
+          REVIEW_SUMMARY="issue_comment=$CID"
         fi
       fi
     fi
