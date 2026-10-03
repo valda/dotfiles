@@ -19,7 +19,7 @@ tmux をプログラマブルな端末として使い、対話的 CLI を操作�
 
 ```bash
 ~/.claude/skills/tmux/scripts/find-sessions.sh            # デフォルトサーバの全 pane を pane id 付きで列挙
-~/.claude/skills/tmux/scripts/find-sessions.sh -q ssh     # 出力行を 'ssh' で絞り込み（command / title / パス全体が対象）
+~/.claude/skills/tmux/scripts/find-sessions.sh -q ssh     # 出力行を 'ssh' で絞り込み（session 名 / pane id / command / title への固定文字列一致。パスは含まない）
 tmux capture-pane -p -J -t {target} -S -30                # 送信前に中身を見て想定の pane か確認
 ```
 
