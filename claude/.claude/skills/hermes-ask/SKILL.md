@@ -1,10 +1,10 @@
 ---
-name: discuss-with-hermes
+name: hermes-ask
 description: Hermes Agent に相談・レビュー・議論・調査・Cron 登録などを依頼する。既定は Hermes CLI (`hermes chat --oneshot --resume`) でセッションを継続して対話し、ユーザーが「discord で相談して」「discord で指示して」など Discord を明示したときだけ #hermes チャンネル経由で話す。承認された範囲だけ実行させる。Triggers - "hermes に相談", "hermes と議論", "hermes にレビューしてもらう", "hermes に投げる", "hermes に頼む", "hermes と話す", "discord で hermes に相談", "discord で指示して", "discuss with hermes", "ask hermes", "cross-review with hermes".
 argument-hint: "[Hermes への相談・依頼内容]"
 ---
 
-# Discuss with Hermes
+# Hermes Ask
 
 Claude Code が進行役となり、Hermes Agent に相談・依頼する。Hermes は独自の memory と skill を持つため、設計判断・plan review・運用知見の取りこぼし確認で独立した視点になる。
 
