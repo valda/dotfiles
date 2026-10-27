@@ -29,8 +29,36 @@
 # preserveColors を true にしないと、本スクリプトが出力する ANSI カラーコード
 # (緑/黄/赤の状態色) がステータスラインに反映されない点に注意。
 json=$(cat)
-read used resets <<<$(echo "$json" | jq -r '
-  "\(.rate_limits.five_hour.used_percentage // "null") \(.rate_limits.five_hour.resets_at // "null")"')
+
+# 表示とは独立して利用枠だけを保存し、計算・正規化は読み手に任せる。
+(
+  umask 077
+  cache="$HOME/.cache/conky-usage"
+  mkdir -p -m 700 "$cache" || exit 0
+  temporary=$(mktemp "$cache/.claude-statusline.XXXXXX") || exit 0
+  trap 'rm -f -- "$temporary"' EXIT
+  if printf '%s\n' "$json" | jq -e '
+    def valid:
+      type == "object" and
+      (.used_percentage | type == "number" and . >= 0 and . <= 100) and
+      (.resets_at | type == "number" and . >= 0);
+    def window:
+      if valid then {used_percentage, resets_at} else null end;
+    .rate_limits | select(type == "object") |
+    {five_hour: (.five_hour | window), seven_day: (.seven_day | window)} |
+    select((.five_hour | valid) or (.seven_day | valid)) |
+    {schema_version: 2, fetched_at: (now | todateiso8601), rate_limits: .}
+  ' > "$temporary"; then
+    mv -f -- "$temporary" "$cache/claude.json"
+  fi
+) 2>/dev/null || :
+
+read -r used resets <<<"$(printf '%s\n' "$json" | jq -r '
+  .rate_limits.five_hour |
+  if type == "object" and
+     (.used_percentage | type == "number" and . >= 0 and . <= 100) and
+     (.resets_at | type == "number" and . >= 0 and . == floor)
+  then "\(.used_percentage) \(.resets_at)" else "null null" end' 2>/dev/null)"
 
 # 欠損時のフォールバック
 if [[ "$used" == "null" || "$resets" == "null" || -z "$used" ]]; then

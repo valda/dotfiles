@@ -150,4 +150,10 @@ ${template8 4 150 200 250 300}
 ${font URW Gothic L:Book:size=16}${color1}${voffset 3}Network ${hr}${color}${font}
 
 ${if_up enp4s0}${template5 enp4s0 Down 20 166}${goto 175}${template5 enp4s0 Up 20 166}${voffset -5}${endif}
+
+${if_existing /home/valda/.local/share/conky-usage/quota_monitor.py}
+${font URW Gothic L:Book:size=16}${color1}${voffset 3}AI Quota ${hr}${color}${font}
+
+${execpi 15 /usr/bin/python3 "/home/valda/.local/share/conky-usage/quota_monitor.py" render --conky --cache "/home/valda/.cache/conky-usage"}${color}${font}
+${endif}
 ]];
