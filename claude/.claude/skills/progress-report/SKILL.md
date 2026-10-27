@@ -4,7 +4,7 @@ description: >-
   作業進捗を作成する。
   トリガー: "progress-report", "進捗報告", "進捗レポート", "作業報告",
   "コミットログからレポート", "今日の進捗"
-allowed-tools: Bash(git log:*), Read, Glob, mcp__hindsight__hindsight_search_knowledge_pages, mcp__hindsight__hindsight_read_knowledge_page, mcp__hindsight__hindsight_list_knowledge_pages, mcp__hindsight__hindsight_reflect
+allowed-tools: Bash(git log:*), Bash(git tag:*), Bash(gh issue view:*), Bash(gh pr view:*), Bash(gh run list:*), Read, Glob, Grep, mcp__hindsight__hindsight_search_knowledge_pages, mcp__hindsight__hindsight_read_knowledge_page, mcp__hindsight__hindsight_list_knowledge_pages, mcp__hindsight__hindsight_reflect
 ---
 
 ## あなたのタスク
@@ -100,6 +100,21 @@ $ARGUMENTS がなければ本日、あるいは直近の一日から作成して
    **hindsight**（`hindsight_search_knowledge_pages` / `hindsight_reflect`）を参照し、
    コミットメッセージだけでは見えない背景・経緯・未解決事項を補う
 
+### 実施・デプロイ状況の確認
+
+コミットログは「コードが入った」ことしか示さない。作業手順（rake 等）を足しただけのコミットや
+修正のコミットについて、本番で実施・デプロイ済みかが読み手には重要だが、ログからは分からない。
+状況が不明瞭な項目は、レポートを書く前に次の順で当たる。
+
+1. **GitHub の Issue / PR**: `gh issue view <番号> --comments` / `gh pr view <番号> --comments`。
+   実施結果・デプロイ報告のコメントや close の有無を見る
+2. **セッションログ**: `~/.claude/projects/<project>/*.jsonl` を Issue 番号や rake 名で Grep し、
+   実行・デプロイの記録を探す
+3. **hindsight**: `hindsight_search_knowledge_pages` / `hindsight_reflect` で該当 Issue の状況を引く
+
+裏が取れたものは「実施済み」「両サイトへ展開済み」のように項目へ反映する。
+どこにも記録が無いものはレポートに推測で書かず、出力後にユーザーへ確認事項として示す。
+
 ### hindsight / メモリ利用時の注意
 
 - **他プロジェクトの情報を混ぜない**。hindsight の recall / reflect は横断的に応答しうるため、
@@ -116,7 +131,7 @@ $ARGUMENTS がなければ本日、あるいは直近の一日から作成して
 以下の構造に従って出力する。インデントは半角スペース2つ。
 
 ```
-{プロジェクト名}
+■ {プロジェクト名}
 
 進捗報告（{対象期間}）
 対象期間のコミット数: {N}件
