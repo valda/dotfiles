@@ -1,0 +1,330 @@
+#!/usr/bin/env python3
+"""Background quota updater and network-free Conky renderer (stdlib only)."""
+import argparse
+import asyncio
+from datetime import datetime, timezone
+import fcntl
+import json
+import math
+import os
+from pathlib import Path
+import re
+import subprocess
+import tempfile
+import time
+
+import codex_quota
+
+INTERVAL = 300
+STALE_AFTER = 600
+MAX_BACKOFF = 3600
+CACHE = Path(os.environ.get('XDG_CACHE_HOME', str(Path.home() / '.cache'))) / 'conky-usage'
+LABELS = {
+    'claude': [('five_hour', 'Current session (5h)'), ('seven_day', 'Weekly (all models)'),
+               ('model_specific_weekly', 'Weekly (model-specific)')],
+    'codex': [('short_term', 'Short-term'), ('seven_day', 'Weekly (7d)')],
+}
+STATES = {'ok': '取得済', 'partial': '一部取得', 'unsupported': '未対応',
+          'unauthenticated': '未認証', 'error': '取得失敗', 'unavailable': '未取得', 'stale': '古い'}
+REASONS = {
+    'window_not_reported': '枠の報告なし', 'not_exposed_by_statusline': '公式出力なし',
+    'awaiting_statusline_data': 'Claude応答待ち', 'cache_missing': '初回取得待ち',
+    'authentication_required': '再ログイン必要', 'claude_login_required': '再ログイン必要',
+    'timeout': 'タイムアウト', 'rpc_failed': '通信/API失敗',
+    'transport_or_protocol_error': '通信/形式エラー', 'invalid_cache': 'キャッシュ不正',
+    'claude_cli_missing': 'CLIなし', 'codex_cli_not_found': 'CLIなし',
+    'cache_expired': '更新待ち', 'window_expired': 'リセット後未取得',
+}
+
+
+def stamp():
+    return datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+
+
+def parse_date(value):
+    try:
+        d = datetime.fromisoformat(value.replace('Z', '+00:00'))
+        return d if d.tzinfo else None
+    except (ValueError, TypeError, AttributeError):
+        return None
+
+
+def read_json(path):
+    try:
+        with Path(path).open() as f:
+            data = f.read(1048577)
+        obj = json.loads(data) if len(data) <= 1048576 else None
+        return obj if isinstance(obj, dict) else None
+    except (OSError, ValueError, RecursionError):
+        return None
+
+
+def atomic_write(path, result):
+    path = Path(path)
+    fd, temporary = tempfile.mkstemp(prefix='.quota-', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w') as stream:
+            json.dump(result, stream, ensure_ascii=False, allow_nan=False)
+            stream.write('\n')
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def claude_auth_status():
+    try:
+        response = subprocess.run(['claude', 'auth', 'status'], capture_output=True,
+                                  text=True, timeout=10)
+        data = json.loads(response.stdout)
+        if not isinstance(data, dict):
+            return 'error', 'invalid_auth_status'
+        if data.get('loggedIn') is False:
+            return 'unauthenticated', 'claude_login_required'
+        if response.returncode != 0 or data.get('loggedIn') is not True:
+            return 'error', 'auth_status_failed'
+        if data.get('authMethod') != 'claude.ai' or data.get('subscriptionType') not in ('pro', 'max'):
+            return 'unsupported', 'statusline_requires_pro_or_max'
+        return 'unavailable', 'awaiting_statusline_data'
+    except FileNotFoundError:
+        return 'unsupported', 'claude_cli_missing'
+    except subprocess.TimeoutExpired:
+        return 'error', 'auth_status_timeout'
+    except (ValueError, OSError):
+        return 'error', 'auth_status_failed'
+
+
+def normalize_claude(raw):
+    if not isinstance(raw, dict):
+        return unavailable('claude', 'error', 'invalid_cache')
+    # Accept the previous normalized cache during migration, without restamping it.
+    if 'rate_limits' not in raw:
+        return normalize('claude', raw)
+    out = unavailable('claude')
+    fetched = parse_date(raw.get('fetched_at'))
+    rates = raw.get('rate_limits')
+    if not fetched or not isinstance(rates, dict):
+        return unavailable('claude', 'error', 'invalid_cache')
+    out['fetched_at'] = fetched.isoformat()
+    for item in out['limits'][:2]:
+        window = rates.get(item['id'])
+        if window is None:
+            item.update(reason='window_not_reported')
+            continue
+        used = window.get('used_percentage') if isinstance(window, dict) else None
+        reset = window.get('resets_at') if isinstance(window, dict) else None
+        if not (type(used) in (int, float) and 0 <= used <= 100 and math.isfinite(used)):
+            item.update(status='error', reason='invalid_cache')
+            continue
+        try:
+            if type(reset) not in (int, float) or reset < 0:
+                raise ValueError
+            reset = datetime.fromtimestamp(reset, timezone.utc)
+        except (ValueError, OverflowError, OSError):
+            item.update(status='error', reason='invalid_cache')
+            continue
+        item.update(status='ok', reason=None, remaining_percent=round(100 - used, 6),
+                    resets_at=reset.isoformat())
+    states = [item['status'] for item in out['limits'][:2]]
+    out['status'] = ('ok' if states == ['ok', 'ok'] else 'partial' if 'ok' in states
+                     else 'error' if 'error' in states else 'unavailable')
+    out['reason'] = None if out['status'] in ('ok', 'partial') else 'invalid_cache'
+    return out
+
+
+def unavailable(provider, status='unavailable', reason='cache_missing'):
+    result = {'provider': provider, 'status': status, 'reason': reason, 'fetched_at': None,
+            'limits': [dict(id=i, display_name=n, status=status, reason=reason,
+                            remaining_percent=None, resets_at=None) for i, n in LABELS[provider]]}
+    if provider == 'claude':
+        result['limits'][-1].update(status='unsupported', reason='not_exposed_by_statusline')
+    return result
+
+
+def normalize(provider, raw):
+    """Allowlist every displayed field; never pass arbitrary server text to Conky."""
+    if not isinstance(raw, dict):
+        return unavailable(provider, 'error', 'invalid_cache')
+    out = unavailable(provider)
+    status = raw.get('status')
+    out['status'] = status if status in STATES else 'error'
+    reason = raw.get('reason')
+    out['reason'] = reason if reason in REASONS else None
+    dt = parse_date(raw.get('fetched_at'))
+    out['fetched_at'] = dt.isoformat() if dt else None
+    src = raw.get('windows' if provider == 'codex' else 'limits', [])
+    if not isinstance(src, list):
+        return unavailable(provider, 'error', 'invalid_cache')
+    for target in out['limits']:
+        key = {'seven_day': 'codex:weekly', 'short_term': 'codex:short_term'}.get(target['id']) if provider == 'codex' else target['id']
+        found = next((x for x in src if isinstance(x, dict) and x.get('id') == key), None)
+        if found is None:
+            target.update(status=out['status'] if out['status'] not in ('ok', 'partial') else 'unsupported',
+                          reason=out['reason'] or 'window_not_reported')
+            continue
+        state = found.get('status')
+        state = state if state in STATES else 'error'
+        v = found.get('remaining_percent')
+        valid = type(v) in (int, float) and 0 <= v <= 100 and math.isfinite(v)
+        if state == 'ok' and not valid:
+            state = 'error'
+        r = found.get('reason')
+        reset = parse_date(found.get('reset_at' if provider == 'codex' else 'resets_at'))
+        target.update(status=state, reason=r if r in REASONS else None,
+                      remaining_percent=v if state == 'ok' and valid else None,
+                      resets_at=reset.isoformat() if reset else None)
+        # A short-term duration is only named when actually observed.
+        minutes = found.get('window_minutes')
+        if provider == 'codex' and target['id'] == 'short_term' and type(minutes) in (int, float) and 0 < minutes < 1440:
+            target['display_name'] = f'Short-term ({minutes:g}min)'
+            target['window_minutes'] = minutes
+    return out
+
+
+def backoff(failures):
+    return min(MAX_BACKOFF, INTERVAL * 2 ** min(failures, 4))
+
+
+def update_codex(state, result, now):
+    current = normalize('codex', result)
+    good = current['status'] in ('ok', 'partial')
+    previous = state.get('codex', {})
+    # Keep last good only for transient errors, never on authentication failure.
+    if current['status'] == 'error' and previous.get('fetched_at'):
+        current['last_good'] = previous.get('last_good', previous)
+        current['last_good'].pop('last_good', None)
+    failures = 0 if good else min(int(state.get('failures', 0)) + 1, 100)
+    state.update(codex=current, failures=failures,
+                 next_codex_at=now + (INTERVAL if good else backoff(failures)))
+
+
+def cycle(cache, state, codex='codex', now=None):
+    now = time.time() if now is None else now
+    if now >= state.get('next_codex_at', 0):
+        update_codex(state, asyncio.run(codex_quota.fetch(timeout=20, codex=codex)), now)
+    if now >= state.get('next_auth_at', 0):
+        status, reason = claude_auth_status()
+        state['claude_auth'] = {'status': status, 'reason': reason}
+        state['next_auth_at'] = now + INTERVAL
+    auth = state.get('claude_auth', {})
+    if auth.get('status') not in ('unavailable', None):
+        claude = unavailable('claude', auth['status'], auth['reason'])
+    else:
+        raw = read_json(cache / 'claude.json')
+        claude = normalize_claude(raw) if raw else unavailable('claude', reason='awaiting_statusline_data')
+    state.update(schema_version=1, updated_at=stamp(), claude=claude)
+    atomic_write(cache / 'monitor.json', state)
+    return state
+
+
+def localtime(value):
+    d = parse_date(value)
+    return d.astimezone().strftime('%m/%d %H:%M %Z') if d else '--'
+
+
+def render(state, now=None, conky=False):
+    now = datetime.now(timezone.utc) if now is None else now
+    lines = []
+    for provider in ('claude', 'codex'):
+        obj = state.get(provider) if isinstance(state, dict) else None
+        obj = obj if isinstance(obj, dict) else unavailable(provider)
+        failed = obj.get('status') == 'error'
+        view = obj.get('last_good', obj) if failed else obj
+        view = view if isinstance(view, dict) else unavailable(provider, 'error', 'invalid_cache')
+        raw = dict(view)
+        if provider == 'codex':
+            limits = view.get('limits', [])
+            raw['windows'] = [dict(x, id={'seven_day': 'codex:weekly', 'short_term': 'codex:short_term'}.get(x.get('id')),
+                                   reset_at=x.get('resets_at'))
+                              for x in (limits if isinstance(limits, list) else []) if isinstance(x, dict)]
+        view = normalize(provider, raw)
+        fetched = parse_date(view.get('fetched_at'))
+        age = (now - fetched).total_seconds() if fetched else None
+        stale = failed or age is None or age > STALE_AFTER or age < -60
+        header = provider.title() + ' 取得 ' + localtime(view.get('fetched_at'))
+        if stale:
+            header += ' [古い/未取得]'
+        if failed or obj.get('status') == 'unauthenticated':
+            header += ' ' + STATES.get(obj.get('status'), '取得失敗')
+            header += ' (' + REASONS.get(obj.get('reason'), '取得不可') + ')'
+        lines.append(header)
+        for item in view['limits']:
+            value, status = item.get('remaining_percent'), item['status']
+            if conky and status == 'unsupported':
+                continue
+            reset = parse_date(item.get('resets_at'))
+            if value is not None and reset and reset <= now:
+                status, value = 'unavailable', None
+                item['reason'] = 'window_expired'
+            if value is not None:
+                text = f'{value:g}%'
+                if stale:
+                    text += ' [古い]'
+                text += ' / reset ' + localtime(item.get('resets_at'))
+            else:
+                text = STATES.get(status, '取得不可') + ' (' + REASONS.get(item.get('reason'), '取得不可') + ')'
+            if conky:
+                # Only fixed markup and validated numbers become Conky commands.
+                # Never interpolate raw cache/server strings into executable output.
+                label = {'five_hour': 'Session (5h)', 'seven_day': 'Weekly',
+                         'short_term': 'Short-term',
+                         'model_specific_weekly': 'Model weekly'}[item['id']]
+                if value is not None:
+                    suffix = ' [古い]' if stale else ''
+                    lines.append(f' {label}: {value:g}%{suffix}'
+                                 '${goto 190}${color2}'
+                                 f'${{execbar 6,145 printf {value:g}}}' + '${color}')
+                    lines.append('  reset ' + localtime(item.get('resets_at')))
+                else:
+                    lines.append(' ' + label + ': ' + text)
+            else:
+                lines.append(' ' + item['display_name'] + ': ' + text)
+    text = '\n'.join(lines)
+    if conky:
+        # Fixed English UI strings keep the entire widget in the default font.
+        translations = {
+            '古い/未取得': 'stale/unavailable', '取得済': 'available',
+            '一部取得': 'partial', '未対応': 'unsupported',
+            '未認証': 'not authenticated', '取得失敗': 'fetch failed',
+            '未取得': 'unavailable', '古い': 'stale', '取得': 'fetched',
+            '枠の報告なし': 'window not reported', '公式出力なし': 'not exposed',
+            'Claude応答待ち': 'awaiting Claude response',
+            '初回取得待ち': 'awaiting first fetch',
+            '再ログイン必要': 'login required', 'タイムアウト': 'timeout',
+            '通信/API失敗': 'connection/API error',
+            '通信/形式エラー': 'connection/format error',
+            'キャッシュ不正': 'invalid cache', 'CLIなし': 'CLI missing',
+            '更新待ち': 'awaiting update',
+            'リセット後未取得': 'awaiting fetch after reset', '取得不可': 'unavailable',
+        }
+        pattern = '|'.join(re.escape(key) for key in sorted(translations, key=len, reverse=True))
+        text = re.sub(pattern, lambda match: translations[match.group()], text)
+    return text
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('action', choices=['render', 'once', 'daemon'])
+    p.add_argument('--cache', type=Path, default=CACHE)
+    p.add_argument('--codex', default='codex')
+    p.add_argument('--conky', action='store_true', help='Render trusted Conky bars; hide unsupported rows')
+    args = p.parse_args()
+    if args.action == 'render':
+        print(render(read_json(args.cache / 'monitor.json'), conky=args.conky))
+        return
+    args.cache.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with (args.cache / 'updater.lock').open('w') as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
+        state = read_json(args.cache / 'monitor.json') or {}
+        while True:
+            cycle(args.cache, state, args.codex)
+            if args.action == 'once':
+                return
+            time.sleep(15)
+
+
+if __name__ == '__main__':
+    main()

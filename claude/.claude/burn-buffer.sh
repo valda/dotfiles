@@ -35,6 +35,8 @@ json=$(cat)
   umask 077
   cache="$HOME/.cache/conky-usage"
   mkdir -p -m 700 "$cache" || exit 0
+  # ccstatusline に kill されると EXIT trap が走らず一時ファイルが残るため掃除する。
+  find "$cache" -maxdepth 1 -name '.claude-statusline.*' -mmin +5 -delete
   temporary=$(mktemp "$cache/.claude-statusline.XXXXXX") || exit 0
   trap 'rm -f -- "$temporary"' EXIT
   if printf '%s\n' "$json" | jq -e '
