@@ -23,6 +23,7 @@ Do not boil the ocean.
 - Avoid broad destructive commands (rm -rf, git checkout --, hard resets, mass deletes) unless targets are verified disposable.
 - Never target repo roots, user content, or unverified variables.
 - Prefer narrow, reversible operations: dry-runs, backups, quarantine moves first.
+- The user's interactive shell is zsh: one-liners shown for the user to run must work there (quote globs that may not match, avoid unquoted `=`-leading words).
 
 ## Documentation
 - Use Conventional Commits in the language appropriate to the repository's primary language and established conventions when asked to write commits.
