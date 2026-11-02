@@ -3,7 +3,8 @@
 # the files are located in the bash-doc package.
 
 ZSHPATH=/bin/zsh
-if [ -x $ZSHPATH ]; then
+# 非対話の bash -l まで置き換えると -c のコマンドが実行されなくなる
+if [[ $- == *i* ]] && [ -x "$ZSHPATH" ]; then
     SHELL=$ZSHPATH && exec $SHELL --login
 fi
 
